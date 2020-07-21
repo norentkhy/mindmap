@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "jsx": "react",
+    "paths": {
+      "hooks/*": ["./src/hooks/*"],
+      "utils/*": ["./src/utils/*"],
+      "components/*": ["./src/apps/website/components/*"],
+      "pages/*": ["./src/website/pages/*"],
+      "images/*": ["./mock-files/images/*"],
+      "~website/*": ["./src/apps/website/*"]
+    }
+  }
+}
