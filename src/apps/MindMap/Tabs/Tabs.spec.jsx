@@ -57,8 +57,7 @@ describe('views', () => {
 
 describe('tab selection', () => {
   test('function call to view model', () => {
-    let idSelect;
-    const selectTab = jest.fn((id) => (idSelect = id));
+    const selectTab = jest.fn();
 
     render(
       <TabsMockProvider
@@ -74,9 +73,10 @@ describe('tab selection', () => {
       </TabsMockProvider>
     );
 
-    tabs.forEach((tab) => {
+    tabs.forEach((tab, i) => {
       fireEvent.click(screen.getByText(tab.title));
-      expect(idSelect).toBe(tab.id);
+      expect(selectTab).toHaveBeenCalledTimes(i + 1);
+      expect(selectTab.mock.calls[i]).toEqual([tab.id]);
     });
   });
 
@@ -100,8 +100,7 @@ describe('tab selection', () => {
 
 describe('tab renaming', () => {
   test('function call to view model', () => {
-    let idRename;
-    const initiateRenameTab = jest.fn((id) => (idRename = id));
+    const initiateRenameTab = jest.fn();
 
     render(
       <TabsMockProvider
@@ -117,9 +116,10 @@ describe('tab renaming', () => {
       </TabsMockProvider>
     );
 
-    tabs.forEach((tab) => {
+    tabs.forEach((tab, i) => {
       fireEvent.dblClick(screen.getByText(tab.title));
-      expect(idRename).toBe(tab.id);
+      expect(initiateRenameTab).toHaveBeenCalledTimes(i + 1);
+      expect(initiateRenameTab.mock.calls[i]).toEqual([tab.id]);
     });
   });
 
