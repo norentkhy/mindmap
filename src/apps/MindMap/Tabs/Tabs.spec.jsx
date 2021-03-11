@@ -12,13 +12,13 @@ test('overlap with MindMap.spec', () => {
   screen.getByLabelText(/^tabs$/i);
 });
 
-describe('views', () => {
-  const tabs = [
-    { id: uuidv4(), title: 'untitled', selected: true },
-    { id: uuidv4(), title: 'untitled-2', selected: false },
-    { id: uuidv4(), title: 'untitled-3', selected: false },
-  ];
+const tabs = [
+  { id: uuidv4(), title: 'untitled', selected: true },
+  { id: uuidv4(), title: 'untitled-2', selected: false },
+  { id: uuidv4(), title: 'untitled-3', selected: false },
+];
 
+describe('views', () => {
   test('add new tab', () => {
     const addNewTab = jest.fn();
     render(
@@ -33,10 +33,30 @@ describe('views', () => {
     expect(addNewTab).toHaveBeenCalled();
   });
 
-  test('renders tabs', () => {
-    let idSelect, idRename;
+  test('render of tabs in state', () => {
+    render(
+      <TabsMockProvider
+        modifyViewModel={(viewModel) => ({
+          ...viewModel,
+          state: {
+            tabs,
+          },
+        })}
+      >
+        <Tabs context={TabsMockContext} />
+      </TabsMockProvider>
+    );
+
+    tabs.forEach((tab) => {
+      expect(screen.getByText(tab.title)).toBeVisible();
+    });
+  });
+});
+
+describe('tab selection', () => {
+  test('function call to view model', () => {
+    let idSelect;
     const selectTab = jest.fn((id) => (idSelect = id));
-    const renameTab = jest.fn((id) => (idRename = id));
 
     render(
       <TabsMockProvider
@@ -46,7 +66,6 @@ describe('views', () => {
             tabs,
           },
           selectTab,
-          renameTab,
         })}
       >
         <Tabs context={TabsMockContext} />
@@ -54,18 +73,12 @@ describe('views', () => {
     );
 
     tabs.forEach((tab) => {
-      const Tab = screen.getByText(tab.title);
-      expect(Tab).toBeVisible();
-
-      fireEvent.click(Tab);
+      fireEvent.click(screen.getByText(tab.title));
       expect(idSelect).toBe(tab.id);
-
-      fireEvent.dblClick(Tab);
-      expect(idRename).toBe(tab.id);
     });
   });
 
-  test('tab selection', () => {
+  test('state result from view model', () => {
     render(
       <TabsMockProvider
         modifyViewModel={(viewModel) => ({ ...viewModel, state: { tabs } })}
@@ -79,6 +92,32 @@ describe('views', () => {
       expect(Tab).toHaveStyle(
         `font-weight: ${tab.selected ? 'bold' : 'normal'}`
       );
+    });
+  });
+});
+
+describe('tab renaming', () => {
+  test('function call to view model', () => {
+    let idRename;
+    const initiateRenameTab = jest.fn((id) => (idRename = id));
+
+    render(
+      <TabsMockProvider
+        modifyViewModel={(viewModel) => ({
+          ...viewModel,
+          state: {
+            tabs,
+          },
+          initiateRenameTab,
+        })}
+      >
+        <Tabs context={TabsMockContext} />
+      </TabsMockProvider>
+    );
+
+    tabs.forEach((tab) => {
+      fireEvent.dblClick(screen.getByText(tab.title));
+      expect(idRename).toBe(tab.id);
     });
   });
 });

@@ -2,7 +2,9 @@ import React, { useContext } from 'react';
 import styled from 'styled-components';
 
 export function Tabs({ context }) {
-  const { state, addNewTab, selectTab, renameTab } = useContext(context);
+  const { state, addNewTab, selectTab, initiateRenameTab } = useContext(
+    context
+  );
 
   return (
     <div aria-label="tabs">
@@ -10,7 +12,7 @@ export function Tabs({ context }) {
         <Tab
           key={tab.id}
           onClick={() => selectTab(tab.id)}
-          onDoubleClick={() => renameTab(tab.id)}
+          onDoubleClick={() => initiateRenameTab(tab.id)}
           selected={tab.selected}
         >
           {tab.title}
