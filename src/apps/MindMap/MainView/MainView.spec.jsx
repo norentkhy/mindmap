@@ -96,6 +96,23 @@ describe('making a rootnode', () => {
     expect(finalizeEditNode).toHaveBeenCalled();
     expect(finalizeEditNode.mock.calls[0]).toEqual([{ id, text: someNewText }]);
   });
+
+  test('display of multiple rootnodes', () => {
+    const rootNode1 = { id: uuidv4(), text: '1' };
+    const rootNode2 = { id: uuidv4(), text: '2' };
+    const initialState = { trees: [rootNode1, rootNode2] };
+    render(
+      <MainViewMockProvider
+        initialState={initialState}
+        modifyViewModel={(viewModel) => ({ ...viewModel })}
+      >
+        <MainView context={MainViewMockContext} />
+      </MainViewMockProvider>
+    );
+
+    expect(screen.getByText(rootNode1.text)).toBeVisible();
+    expect(screen.getByText(rootNode2.text)).toBeVisible();
+  });
 });
 
 describe('adding a child node', () => {

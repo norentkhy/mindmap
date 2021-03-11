@@ -64,6 +64,16 @@ describe('main view integration', () => {
     expect(screen.getByText(someNewText)).toBeVisible();
   });
 
+  test('create multiple rootnodes', () => {
+    render(<MindMap />);
+
+    const rootTexts = ['root node 1', 'root node 2'];
+    rootTexts.forEach((text) => {
+      createRootNodeWithProperties({ text });
+      expect(screen.getByText(text)).toBeVisible();
+    });
+  });
+
   test('create a childnode', async () => {
     render(<MindMap />);
     const rootText = 'root text';
@@ -85,14 +95,16 @@ describe('main view integration', () => {
     expect(screen.getByText(childText)).toBeVisible();
   });
 
-  function createRootNodeWithProperties({ text }) {
-    fireEvent.doubleClick(screen.getByLabelText('main view'));
-    const InputNode = queryNodeInput();
-    userEvent.type(InputNode, text);
-    userEvent.type(InputNode, '{enter}');
-  }
-
   function createChildNode(ParentNode) {
     userEvent.type(ParentNode, 'c');
   }
 });
+
+function createRootNodeWithProperties({ text, ...rest }) {
+  const MainView = screen.getByLabelText('main view');
+  fireEvent.doubleClick(MainView);
+
+  const InputNode = queryNodeInput();
+  userEvent.type(InputNode, text);
+  userEvent.type(InputNode, '{enter}');
+}

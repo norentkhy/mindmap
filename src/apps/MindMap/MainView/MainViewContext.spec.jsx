@@ -31,11 +31,26 @@ describe('create a root node', () => {
     });
 
     act(() => result.current.createRootNode());
-    const { id } = getRootNode(result);
+    const { id } = getNewestRootNode(result);
     const someNewText = 'some new text';
 
     act(() => result.current.finalizeEditNode({ id, text: someNewText }));
-    expect(getRootNode(result).text).toBe(someNewText);
+    expect(getNewestRootNode(result).text).toBe(someNewText);
+  });
+
+  test('make multiple rootnodes', () => {
+    const wrapper = ({ children }) => (
+      <MainViewProvider>{children}</MainViewProvider>
+    );
+    const { result } = renderHook(() => useContext(MainViewContext), {
+      wrapper,
+    });
+
+    const nodeTexts = ['root1', 'root2'];
+    nodeTexts.forEach((text) => {
+      createRootNodeWithProperties(result, { text });
+      expect(getNewestRootNode(result)).toMatchObject({ text });
+    });
   });
 });
 
@@ -48,7 +63,7 @@ describe('create a child node', () => {
       wrapper,
     });
     act(() => result.current.createRootNode());
-    const parentNode = getRootNode(result);
+    const parentNode = getNewestRootNode(result);
     act(() =>
       result.current.finalizeEditNode({
         id: parentNode.id,
@@ -60,6 +75,17 @@ describe('create a child node', () => {
   });
 });
 
-function getRootNode(result) {
-  return result.current.state.trees[0];
+function createRootNodeWithProperties(result, { text, ...others }) {
+  act(() => result.current.createRootNode());
+  const { id } = getNewestRootNode(result);
+  act(() => result.current.finalizeEditNode({ id, text, ...others }));
+}
+
+function getRootNodes(result) {
+  return result.current.state.trees;
+}
+
+function getNewestRootNode(result) {
+  const rootNodes = getRootNodes(result);
+  return rootNodes[rootNodes.length - 1];
 }
