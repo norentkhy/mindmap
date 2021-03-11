@@ -1,10 +1,10 @@
 import { useContext } from 'react';
-import { MainViewContext as defaultContext } from '../MainView/MainViewContext';
+import { ProjectContext } from '../Contexts/ProjectContext';
 
 export function useActions(
-  { MainViewContext = defaultContext } = { MainViewContext: defaultContext }
+  { theProjectContext = ProjectContext } = { theProjectContext: ProjectContext }
 ) {
-  const { undo, redo, createRootNode } = useContext(MainViewContext);
+  const { undo, redo, createRootNode } = useContext(theProjectContext);
 
   return {
     undoAction: undo,

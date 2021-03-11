@@ -2,7 +2,7 @@ import React from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MindMap } from './MindMap';
 import userEvent from '@testing-library/user-event';
-import { foldNode, queryNodeInput } from './MainView/MainView.spec';
+import { foldNode, queryNodeInput } from './MainView/testUtilities';
 import {
   createRootNode,
   completeNodeNaming,

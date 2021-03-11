@@ -1,21 +1,22 @@
 import { renderHook, act } from '@testing-library/react-hooks';
-import React, { createContext, useContext } from 'react';
-import { MainViewProvider, MainViewContext } from './MainViewContext';
+import React, { useContext } from 'react';
+import { ProjectProvider, ProjectContext } from './ProjectContext';
 
 describe('core', () => {
   describe('create a root node', () => {
     test('create root node and set it to edit mode', () => {
       const { result } = renderUseMainViewContext();
-
-      expect(result.current.state.trees).toEqual([]);
+      expect(getTrees(result)).toEqual([]);
 
       act(() => result.current.createRootNode());
-      expect(result.current.state.trees.length).toBe(1);
+      expect(getTrees(result).length).toBe(1);
 
-      const node = result.current.state.trees[0];
-      expect(node.text).toBe('');
-      expect(node.editing).toBe(true);
+      const node = getTrees(result)[0];
       expect(node.id).toBeTruthy();
+      expect(node).toMatchObject({
+        text: '',
+        editing: true,
+      });
     });
 
     test('receive command to initiate editing', () => {
@@ -53,37 +54,27 @@ describe('core', () => {
   describe('create a child node', () => {
     test('create a child node and set it to edit mode', () => {
       const { result } = renderUseMainViewContext();
+      const parentId = createRootNodeWithProperties(result, {
+        text: 'root node',
+      });
 
-      act(() => result.current.createRootNode());
-      const parentNode = getNewestRootNode(result);
-      act(() =>
-        result.current.finalizeEditNode({
-          id: parentNode.id,
-          text: 'root node',
-        })
-      );
-
-      act(() => result.current.createChildNode(parentNode.id));
+      act(() => result.current.createChildNode(parentId));
     });
   });
 
   describe('fold a node', () => {
     test('fold a node', () => {
       const { result } = renderUseMainViewContext();
-
-      createRootNodeWithProperties(result, { text: 'root node' });
+      const id = createRootNodeWithProperties(result, { text: 'root node' });
 
       const initialNode = getNewestRootNode(result);
-      const { id } = initialNode;
       expect(initialNode.folded).toBeFalsy();
 
       act(() => result.current.foldNode(id));
-
       const foldedNode = getNewestRootNode(result);
       expect(foldedNode.folded).toBe(true);
 
       act(() => result.current.foldNode(id));
-
       const unfoldedNode = getNewestRootNode(result);
       expect(unfoldedNode.folded).toBe(false);
     });
@@ -93,7 +84,6 @@ describe('core', () => {
 describe('undo and redo', () => {
   test('undo and redo', () => {
     const { result } = renderUseMainViewContext();
-
     const stateBefore = getState(result);
     createNode();
     const stateAfter = getState(result);
@@ -110,14 +100,14 @@ describe('undo and redo', () => {
     redo();
     expect(getState(result)).toEqual(stateAfter);
 
-    nameNode('this will be undone');
+    renameNode('this will be undone');
     const stateToBeUndone = getState(result);
     undo();
-    nameNode('new name');
+    renameNode('new name');
     redo();
     expect(getState(result)).not.toEqual(stateToBeUndone);
 
-    function nameNode(text) {
+    function renameNode(text) {
       act(() =>
         result.current.finalizeEditNode({
           id: getNewestRootNode(result).id,
@@ -138,14 +128,6 @@ describe('undo and redo', () => {
       act(() => result.current.redo());
     }
   });
-
-  function doSomething(result) {
-    const { state: stateBefore } = result.current;
-    act(result.current.createRootNode);
-    const { state: stateAfter } = result.current;
-
-    return [stateBefore, stateAfter];
-  }
 });
 
 describe('utilities', () => {
@@ -264,8 +246,8 @@ function captureNewNodes({ result, change }) {
 }
 
 function renderUseMainViewContext() {
-  return renderHook(() => useContext(MainViewContext), {
-    wrapper: ({ children }) => <MainViewProvider>{children}</MainViewProvider>,
+  return renderHook(() => useContext(ProjectContext), {
+    wrapper: ({ children }) => <ProjectProvider>{children}</ProjectProvider>,
   });
 }
 
@@ -304,4 +286,8 @@ function getNewestRootNode(result) {
 
 function getState(result) {
   return result.current.state;
+}
+
+function getTrees(result) {
+  return getState(result).trees;
 }

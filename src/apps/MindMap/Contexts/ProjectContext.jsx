@@ -3,15 +3,15 @@ import produce from 'immer';
 import { v4 as uuidv4 } from 'uuid';
 import { useTime } from '../hooks/useTime';
 
-export const MainViewContext = createContext();
+export const ProjectContext = createContext();
 
-export function MainViewProvider({ children, initialState = { trees: [] } }) {
+export function ProjectProvider({ children, initialState = { trees: [] } }) {
   const newViewModel = useMainView({ initialState });
 
   return (
-    <MainViewContext.Provider value={newViewModel}>
+    <ProjectContext.Provider value={newViewModel}>
       {children}
-    </MainViewContext.Provider>
+    </ProjectContext.Provider>
   );
 }
 
@@ -25,6 +25,8 @@ function useMainView({ initialState }) {
 
   return {
     state: timeline.present,
+    undo: goBack,
+    redo: goForward,
     createRootNode() {
       dispatch({ type: 'CREATE_ROOT_NODE' });
     },
@@ -43,8 +45,6 @@ function useMainView({ initialState }) {
     replaceState(newState) {
       dispatch({ type: 'REPLACE_STATE', payload: newState });
     },
-    undo: goBack,
-    redo: goForward,
   };
 
   function reduce(state, action) {
@@ -81,9 +81,6 @@ const stateTransitions = {
       const node = getNode({ id, trees: newState.trees });
       node.folded = !node.folded;
     });
-  },
-  REPLACE_STATE(state, newState) {
-    return newState;
   },
 };
 

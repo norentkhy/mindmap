@@ -1,12 +1,12 @@
 import React from 'react';
 import { renderHook, act } from '@testing-library/react-hooks';
-import { MainViewProvider } from '../MainView/MainViewContext';
+import { ProjectProvider } from '../Contexts/ProjectContext';
 import { createMockContextProvider } from '../utils/createMockContextProvider';
 import { useActions } from './useActions';
 
 test('intended use', () => {
   renderHook(useActions, {
-    wrapper: ({ children }) => <MainViewProvider>{children}</MainViewProvider>,
+    wrapper: ({ children }) => <ProjectProvider>{children}</ProjectProvider>,
   });
 });
 
@@ -41,21 +41,15 @@ describe('with mock provider', () => {
     });
   });
 
-  function renderWithMockProvider(contextModifications) {
-    const [
-      MainViewMockContext,
-      MainViewMockProvider,
-    ] = createMockContextProvider();
+  function renderWithMockProvider(modifications) {
+    const [ProjectContext, ProjectMockProvider] = createMockContextProvider({
+      modifications,
+    });
 
-    return renderHook(
-      () => useActions({ MainViewContext: MainViewMockContext }),
-      {
-        wrapper: ({ children }) => (
-          <MainViewMockProvider viewModelModifications={contextModifications}>
-            {children}
-          </MainViewMockProvider>
-        ),
-      }
-    );
+    return renderHook(() => useActions({ theProjectContext: ProjectContext }), {
+      wrapper: ({ children }) => (
+        <ProjectMockProvider>{children}</ProjectMockProvider>
+      ),
+    });
   }
 });

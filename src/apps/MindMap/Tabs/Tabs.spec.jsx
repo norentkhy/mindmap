@@ -1,186 +1,215 @@
-import React, { createContext } from 'react';
+import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { Tabs } from './Tabs';
 import { v4 as uuidv4 } from 'uuid';
-import produce from 'immer';
 import userEvent from '@testing-library/user-event';
 import { getInputSelection } from '../utils/getInputSelection';
+import { TabsProvider } from './TabsContext';
+import { createMockContextProvider } from '../utils/createMockContextProvider';
 
-test('overlap with MindMap.spec', () => {
-  render(
-    <TabsMockProvider>
-      <Tabs context={TabsMockContext} />
-    </TabsMockProvider>
-  );
-  screen.getByLabelText(/^tabs$/i);
+describe('rendered as intended', () => {
+  test('overlap with MindMap.spec', () => {
+    renderAsIntended();
+    expect(queryByLabelText(/^tabs$/i)).toBeVisible();
+  });
+
+  function renderAsIntended() {
+    render(
+      <TabsProvider>
+        <Tabs />
+      </TabsProvider>
+    );
+  }
 });
 
-const tabs = [
-  { id: uuidv4(), title: 'untitled', selected: true },
-  { id: uuidv4(), title: 'untitled-2', selected: false },
-  { id: uuidv4(), title: 'untitled-3', selected: false },
-];
+describe('rendered with mocks', () => {
+  const tabs = [
+    { id: createUuid(), title: 'untitled', selected: true },
+    { id: createUuid(), title: 'untitled-2', selected: false },
+    { id: createUuid(), title: 'untitled-3', selected: false },
+  ];
 
-describe('views', () => {
-  test('add new tab', () => {
-    const addNewTab = jest.fn();
-    render(
-      <TabsMockProvider
-        modifyViewModel={(viewModel) => ({ ...viewModel, addNewTab })}
-      >
-        <Tabs context={TabsMockContext} />
-      </TabsMockProvider>
-    );
+  describe('views', () => {
+    test('add new tab', () => {
+      const addNewTab = createMockFn();
+      renderWithMock({ addNewTab });
 
-    fireEvent.click(screen.getByLabelText(/^add new tab$/i));
-    expect(addNewTab).toHaveBeenCalled();
-  });
-
-  test('render of tabs in state', () => {
-    render(
-      <TabsMockProvider
-        modifyViewModel={(viewModel) => ({
-          ...viewModel,
-          state: {
-            tabs,
-          },
-        })}
-      >
-        <Tabs context={TabsMockContext} />
-      </TabsMockProvider>
-    );
-
-    tabs.forEach((tab) => {
-      expect(screen.getByText(tab.title)).toBeVisible();
+      ui.createNewTab();
+      expect(addNewTab).toHaveBeenCalled();
     });
-  });
-});
 
-describe('tab selection', () => {
-  test('function call to view model', () => {
-    const selectTab = jest.fn();
+    test('render of tabs in state', () => {
+      renderWithMock({ state: { tabs } });
 
-    render(
-      <TabsMockProvider
-        modifyViewModel={(viewModel) => ({
-          ...viewModel,
-          state: {
-            tabs,
-          },
-          selectTab,
-        })}
-      >
-        <Tabs context={TabsMockContext} />
-      </TabsMockProvider>
-    );
-
-    tabs.forEach((tab, i) => {
-      fireEvent.click(screen.getByText(tab.title));
-      expect(selectTab).toHaveBeenCalledTimes(i + 1);
-      expect(selectTab.mock.calls[i]).toEqual([tab.id]);
+      tabs.forEach((tab) => {
+        expect(queryTab(tab)).toBeVisible();
+      });
     });
   });
 
-  test('state result from view model', () => {
-    render(
-      <TabsMockProvider
-        modifyViewModel={(viewModel) => ({ ...viewModel, state: { tabs } })}
-      >
-        <Tabs context={TabsMockContext} />
-      </TabsMockProvider>
-    );
+  describe('tab selection', () => {
+    test('function call to view model', () => {
+      const selectTab = createMockFn();
+      renderWithMock({ state: { tabs }, selectTab });
 
-    tabs.forEach((tab) => {
-      const Tab = screen.getByText(tab.title);
-      expect(Tab).toHaveStyle(
-        `font-weight: ${tab.selected ? 'bold' : 'normal'}`
-      );
+      tabs.forEach(({ title, id }, i) => {
+        fireEvent.click(queryTab({ title }));
+        expect(selectTab).toHaveBeenCalledTimes(i + 1);
+        expect(selectTab.mock.calls[i]).toEqual([id]);
+      });
     });
-  });
-});
 
-describe('tab renaming', () => {
-  test('function call to view model', () => {
-    const initiateRenameTab = jest.fn();
+    test('state result from view model', () => {
+      renderWithMock({ state: { tabs } });
 
-    render(
-      <TabsMockProvider
-        modifyViewModel={(viewModel) => ({
-          ...viewModel,
-          state: {
-            tabs,
-          },
-          initiateRenameTab,
-        })}
-      >
-        <Tabs context={TabsMockContext} />
-      </TabsMockProvider>
-    );
-
-    tabs.forEach((tab, i) => {
-      fireEvent.dblClick(screen.getByText(tab.title));
-      expect(initiateRenameTab).toHaveBeenCalledTimes(i + 1);
-      expect(initiateRenameTab.mock.calls[i]).toEqual([tab.id]);
+      tabs.forEach((tab) => {
+        const Tab = queryTab(tab);
+        expect(Tab).toHaveStyle(
+          `font-weight: ${tab.selected ? 'bold' : 'normal'}`
+        );
+      });
     });
   });
 
-  test('result from rename initiation', () => {
-    const tabTarget = tabs[2];
-    const tabsWithOneRenaming = produce(tabs, (newTabs) => {
-      newTabs.find((tab) => tab.id === tabTarget.id).renaming = true;
-    });
-    const finishRenameTab = jest.fn();
+  describe('tab renaming', () => {
+    test('function call to view model', () => {
+      const initiateRenameTab = createMockFn();
+      renderWithMock({ state: { tabs }, initiateRenameTab });
 
-    render(
-      <TabsMockProvider
-        modifyViewModel={(viewModel) => ({
-          ...viewModel,
-          state: {
-            tabs: tabsWithOneRenaming,
-          },
+      tabs.forEach((tab, i) => {
+        fireEvent.dblClick(queryTab(tab));
+        expect(initiateRenameTab).toHaveBeenCalledTimes(i + 1);
+        expect(initiateRenameTab.mock.calls[i]).toEqual([tab.id]);
+      });
+    });
+
+    test('result from rename initiation', () => {
+      const {
+        tabTarget,
+        nonTargetTabs,
+        finishRenameTab,
+      } = renderWithTabInRenameMode();
+
+      expect(queryTab(tabTarget)).toBeNull();
+
+      nonTargetTabs.forEach((tab) => expect(queryTab(tab)).toBeVisible());
+
+      const Focus = getFocus();
+      expect(getInputSelection(Focus)).toBe(tabTarget.title);
+
+      const someNewTitle = 'some new title';
+      ui.typeAndPressEnter(someNewTitle);
+
+      expect(finishRenameTab).toBeCalledTimes(1);
+      expect(getArgsOfLastCall(finishRenameTab)).toEqual([
+        {
+          id: tabTarget.id,
+          newTitle: someNewTitle,
+        },
+      ]);
+
+      function renderWithTabInRenameMode() {
+        const {
+          tabTarget,
+          nonTargetTabs,
+          state,
+        } = createSituationWithOneRenaming();
+
+        const finishRenameTab = createMockFn();
+        renderWithMock({ state, finishRenameTab });
+
+        return {
+          tabTarget,
+          nonTargetTabs,
           finishRenameTab,
-        })}
-      >
-        <Tabs context={TabsMockContext} />
-      </TabsMockProvider>
-    );
+        };
 
-    expect(screen.queryByText(tabTarget.title)).toBeNull();
+        function createSituationWithOneRenaming() {
+          const tabTarget = tabs[2];
+          const tabsWithOneRenaming = tabs.map((tab) => ({
+            ...tab,
+            renaming: tab.id === tabTarget.id,
+          }));
+          const nonTargetTabs = tabsWithOneRenaming.filter(
+            (tab) => tab.id !== tabTarget.id
+          );
 
-    const nonTargetTabs = tabsWithOneRenaming.filter(
-      (tab) => tab.id !== tabTarget.id
-    );
-    nonTargetTabs.forEach((tab) =>
-      expect(screen.getByText(tab.title)).toBeVisible()
-    );
+          const state = { tabs: tabsWithOneRenaming };
 
-    const TabRename = screen.getByLabelText('renaming this tab');
-    expect(TabRename).toHaveFocus();
-    expect(getInputSelection(TabRename)).toBe(tabTarget.title);
-
-    const someNewTitle = 'some new title';
-    userEvent.type(TabRename, someNewTitle);
-    userEvent.type(TabRename, '{enter}');
-
-    expect(finishRenameTab).toHaveBeenCalled();
-    expect(finishRenameTab.mock.calls[0]).toEqual([
-      {
-        id: tabTarget.id,
-        newTitle: someNewTitle,
-      },
-    ]);
+          return { tabTarget, nonTargetTabs, state };
+        }
+      }
+    });
   });
+
+  function renderWithMock(modifications) {
+    const [MockContext, MockProvider] = createMockContextProvider({
+      modifications,
+    });
+
+    render(
+      <MockProvider viewModelModifications={modifications}>
+        <Tabs theTabsContext={MockContext} />
+      </MockProvider>
+    );
+  }
 });
 
-const TabsMockContext = createContext();
+function createUuid() {
+  return uuidv4();
+}
 
-function TabsMockProvider({ children, modifyViewModel = (x) => x }) {
-  const viewModel = {};
-  const modifiedViewModel = modifyViewModel(viewModel);
+function queryTab({ title }) {
+  return screen.queryByText(title);
+}
 
-  return (
-    <TabsMockContext.Provider value={modifiedViewModel}>
-      {children}
-    </TabsMockContext.Provider>
-  );
+const ui = {
+  selectNode({ text }) {
+    const Target = queryNode({ text });
+    userEvent.click(Target);
+  },
+  foldSelectedNode() {
+    const Target = getFocus();
+    userEvent.type(Target, 'f');
+  },
+  createChildNodeOfSelectedNode() {
+    const Target = getFocus();
+    userEvent.type(Target, 'c');
+  },
+  createRootNode() {
+    fireEvent.doubleClick(screen.getByLabelText('main view'));
+  },
+  typeAndPressEnter(text) {
+    const Target = getFocus();
+    userEvent.type(Target, `${text}{enter}`);
+  },
+  editSelectedNode() {
+    const Target = getFocus();
+    userEvent.type(Target, '{enter}');
+  },
+  createNewTab() {
+    const NewTabButton = queryByLabelText(/^add new tab$/i);
+    fireEvent.click(NewTabButton);
+  },
+};
+
+function queryByLabelText(stringOrRegExp) {
+  return screen.queryByLabelText(stringOrRegExp);
+}
+
+function getFocus() {
+  return document.activeElement || document.body;
+}
+
+function createMockFn(...args) {
+  return jest.fn(...args);
+}
+
+function getArgsOfLastCall(mockFn) {
+  const argsOfCalls = getArgsOfCalls(mockFn);
+  return argsOfCalls[argsOfCalls.length - 1];
+}
+
+function getArgsOfCalls(mockFn) {
+  return mockFn.mock.calls;
 }

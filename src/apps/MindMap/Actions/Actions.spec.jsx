@@ -1,56 +1,51 @@
-import React, { createContext } from 'react';
+import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { Actions } from './Actions';
-import { MainViewProvider } from '../MainView/MainViewContext';
+import { ProjectProvider } from '../Contexts/ProjectContext';
 
 describe('inherited from MindMap.spec', () => {
   test('label: actions', () => {
-    render(
-      <MainViewProvider>
-        <Actions />
-      </MainViewProvider>
-    );
+    renderAsIntended();
     screen.getByLabelText(/^actions$/i);
   });
+
+  function renderAsIntended() {
+    return render(
+      <ProjectProvider>
+        <Actions />
+      </ProjectProvider>
+    );
+  }
 });
 
 describe('with mock providers', () => {
-  describe('node creation', () => {
-    test('mocked', () => {
-      const createRootNode = jest.fn();
-      renderWithMockHook({ createRootNode });
+  test('node creation', () => {
+    const createRootNode = jest.fn();
+    renderWithMockHook({ createRootNode });
 
-      const CreateRootNodeButton = getButton.CreateRootNode();
-      fireEvent.click(CreateRootNodeButton);
+    ui.createRootNode();
 
-      expect(createRootNode).toHaveBeenCalled();
-    });
+    expect(createRootNode).toHaveBeenCalled();
   });
 
-  describe('undo/redo action', () => {
-    describe('mocked ActionsContext', () => {
-      test('undo', () => {
-        const undoAction = jest.fn();
-        renderWithMockHook({ undoAction });
+  test('undo', () => {
+    const undoAction = jest.fn();
+    renderWithMockHook({ undoAction });
 
-        const UndoButton = getButton.Undo();
-        fireEvent.click(UndoButton);
+    ui.undo();
 
-        expect(undoAction).toHaveBeenCalled();
-        expect(undoAction.mock.calls[0]).toEqual([]);
-      });
+    expect(undoAction).toHaveBeenCalled();
+    expect(undoAction.mock.calls[0]).toEqual([]);
+  });
 
-      test('redo', () => {
-        const redoAction = jest.fn();
-        renderWithMockHook({ redoAction });
+  test('redo', () => {
+    const redoAction = jest.fn();
+    renderWithMockHook({ redoAction });
 
-        const RedoButton = getButton.Redo();
-        fireEvent.click(RedoButton);
+    ui.redo();
 
-        expect(redoAction).toHaveBeenCalled();
-        expect(redoAction.mock.calls[0]).toEqual([]);
-      });
-    });
+    expect(redoAction).toHaveBeenCalled();
+    expect(redoAction.mock.calls[0]).toEqual([]);
   });
 
   function renderWithMockHook(hookModifications) {
@@ -67,14 +62,25 @@ describe('with mock providers', () => {
   }
 });
 
-const getButton = {
-  Undo() {
-    return screen.getByLabelText('undo action');
+const ui = {
+  undo() {
+    const Button = getButton('undo action');
+    click(Button);
   },
-  Redo() {
-    return screen.getByLabelText('redo action');
+  redo() {
+    const Button = getButton('redo action');
+    click(Button);
   },
-  CreateRootNode() {
-    return screen.getByLabelText('create root node');
+  createRootNode() {
+    const Button = getButton('create root node');
+    click(Button);
   },
 };
+
+function getButton(labeltext) {
+  return screen.getByLabelText(labeltext);
+}
+
+function click(Element) {
+  fireEvent.click(Element);
+}

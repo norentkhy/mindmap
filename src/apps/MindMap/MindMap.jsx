@@ -1,29 +1,24 @@
-import React, { createContext } from 'react';
+import React from 'react';
 import { Actions } from './Actions/Actions';
 import { MainView } from './MainView/MainView';
-import { MainViewContext, MainViewProvider } from './MainView/MainViewContext';
+import { ProjectProvider } from './Contexts/ProjectContext';
 import { Tabs } from './Tabs/Tabs';
-import { TabsContext, TabsProvider } from './Tabs/TabsContext';
+import { TabsProvider } from './Tabs/TabsContext';
 
 export function MindMap() {
   return (
-    <MainProvider>
-      <Tabs context={TabsContext} />
+    <Providers>
+      <Tabs />
       <Actions />
-      <MainView context={MainViewContext} />
-    </MainProvider>
+      <MainView />
+    </Providers>
   );
 }
 
-const MainContext = createContext();
-
-function MainProvider({ children }) {
-  const viewModel = {};
+function Providers({ children }) {
   return (
-    <MainContext.Provider value={viewModel}>
-      <MainViewProvider>
-        <TabsProvider>{children}</TabsProvider>
-      </MainViewProvider>
-    </MainContext.Provider>
+    <ProjectProvider>
+      <TabsProvider>{children}</TabsProvider>
+    </ProjectProvider>
   );
 }

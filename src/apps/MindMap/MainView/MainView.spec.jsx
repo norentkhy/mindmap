@@ -1,212 +1,322 @@
-import React, { createContext } from 'react';
-import { fireEvent, render, screen } from '@testing-library/react';
+import React from 'react';
+import { render, screen } from '@testing-library/react';
 import { MainView } from './MainView';
-import userEvent from '@testing-library/user-event';
 import { v4 as uuidv4 } from 'uuid';
 import { getInputSelection } from '../utils/getInputSelection';
-
-const editNodeLabel = 'editing node';
+import {
+  createDataStructure,
+  queryNode,
+  queryNodeInput,
+  ui,
+  getFocus,
+} from './testUtilities';
+import { createMockContextProvider } from '../utils/createMockContextProvider';
 
 describe('inherited from MindMap.spec', () => {
   test('label', () => {
-    renderMockedMainView();
+    renderTest();
     screen.getByLabelText(/^main view$/i);
   });
 });
 
-describe('making a rootnode', () => {
-  test('display of rootnode', () => {
-    const id = uuidv4();
-    const text = 'original text';
-    const initialState = { trees: [{ id, text }] };
-    renderMockedMainView({ initialState });
+describe('main view contents', () => {
+  describe('display of various nodes', () => {
+    test('display of root node', () => {
+      const node = renderWithOneRootNode();
+      expect(queryNode({ text: node.text })).toBeVisible();
 
-    expect(screen.getByText(text)).toBeVisible();
-  });
+      function renderWithOneRootNode() {
+        const node = createDataStructure.node({ text: 'original text' });
+        const initialState = createDataStructure.state({ rootNodes: [node] });
+        renderTest({ initialState });
 
-  test('signal initiation to viewmodel', () => {
-    const createRootNode = jest.fn();
-    renderMockedMainView({ viewModelModifications: { createRootNode } });
-
-    expect(screen.queryByLabelText(editNodeLabel)).toBeNull();
-
-    fireEvent.doubleClick(screen.getByLabelText('main view'));
-    expect(createRootNode).toHaveBeenCalled();
-  });
-
-  test('signal end to viewmodel', () => {
-    const id = uuidv4();
-    const text = 'original text';
-    const initialState = { trees: [{ id, text, editing: true }] };
-    const finalizeEditNode = jest.fn();
-    renderMockedMainView({
-      initialState,
-      viewModelModifications: { finalizeEditNode },
+        return node;
+      }
     });
 
-    const InputNode = screen.getByLabelText(editNodeLabel);
-    expect(InputNode).toBeVisible();
-    expect(InputNode).toHaveFocus();
-    expect(getInputSelection(InputNode)).toBe(text);
+    test('display of multiple root nodes', () => {
+      const rootNodes = renderWithMultipleRootNodes();
 
-    const someNewText = 'some new text';
-    userEvent.type(InputNode, someNewText);
-    userEvent.type(InputNode, '{enter}');
+      rootNodes.forEach(({ text }) =>
+        expect(queryNode({ text })).toBeVisible()
+      );
 
-    expect(finalizeEditNode).toHaveBeenCalled();
-    expect(finalizeEditNode.mock.calls[0]).toEqual([{ id, text: someNewText }]);
+      function renderWithMultipleRootNodes() {
+        const {
+          rootNodes,
+          initialState,
+        } = createInitialStateWithMultipleRootNodes();
+        renderTest({ initialState });
+
+        return rootNodes;
+
+        function createInitialStateWithMultipleRootNodes() {
+          const nodeTexts = ['a', 'b', 'c', 'd'];
+          const rootNodes = nodeTexts.map((text) =>
+            createDataStructure.node({ text })
+          );
+          const initialState = createDataStructure.state({
+            rootNodes,
+          });
+          return { rootNodes, initialState };
+        }
+      }
+    });
   });
 
-  test('display of multiple rootnodes', () => {
-    const rootNode1 = { id: uuidv4(), text: '1' };
-    const rootNode2 = { id: uuidv4(), text: '2' };
-    const initialState = { trees: [rootNode1, rootNode2] };
-    renderMockedMainView({ initialState });
+  describe('root node creation', () => {
+    test('creation of a root node', () => {
+      const createRootNode = renderTestForRootNodeCreation();
+      expect(queryNodeInput()).toBeNull();
 
-    expect(screen.getByText(rootNode1.text)).toBeVisible();
-    expect(screen.getByText(rootNode2.text)).toBeVisible();
-  });
-});
+      ui.createRootNode();
+      expect(createRootNode).toHaveBeenCalled();
 
-describe('adding a child node', () => {
-  test('press t while focusing node to call createChildNode', () => {
-    const id = uuidv4();
-    const text = 'root node';
-    const initialState = { trees: [{ id, text }] };
-    const createChildNode = jest.fn();
-    renderMockedMainView({
-      initialState,
-      viewModelModifications: { createChildNode },
+      function renderTestForRootNodeCreation() {
+        const createRootNode = jest.fn();
+        renderTest({ modifications: { createRootNode } });
+
+        return createRootNode;
+      }
     });
 
-    userEvent.type(screen.getByText(text), 'c');
-    expect(createChildNode).toHaveBeenCalled();
-    expect(createChildNode.mock.calls[0]).toEqual([id]);
+    test('naming of a created root node', () => {
+      const { node, finalizeEditNode } = renderNodeInEditMode();
+
+      const Focus = getFocus();
+      expect(getInputSelection(Focus)).toBe(node.text);
+
+      const someNewText = 'some new text';
+      ui.typeAndPressEnter(someNewText);
+
+      expect(finalizeEditNode).toHaveBeenCalled();
+      expect(finalizeEditNode.mock.calls[0]).toEqual([
+        { id: node.id, text: someNewText },
+      ]);
+
+      function renderNodeInEditMode() {
+        const { node, initialState } = createInitialStateWithNodeInEditMode();
+        const finalizeEditNode = jest.fn();
+        renderTest({
+          initialState,
+          modifications: { finalizeEditNode },
+        });
+
+        return { node, finalizeEditNode };
+
+        function createInitialStateWithNodeInEditMode() {
+          const node = createDataStructure.node({
+            text: 'original text',
+            editing: true,
+          });
+          const initialState = createDataStructure.state({ rootNodes: [node] });
+          return { node, initialState };
+        }
+      }
+    });
   });
 
-  test('signal end to viewmodel', () => {
-    const childNode = { id: uuidv4(), text: 'child', editing: true };
-    const initialState = {
-      trees: [{ id: uuidv4(), text: 'parent', children: [childNode] }],
-    };
-    const finalizeEditNode = jest.fn();
-    renderMockedMainView({
-      initialState,
-      viewModelModifications: { finalizeEditNode },
+  describe('child node creation', () => {
+    test('creation of a child node', () => {
+      const {
+        rootNode,
+        createChildNode,
+      } = renderWithOneRootNodeForChildNodeCreation();
+
+      ui.selectNode({ text: rootNode.text });
+      ui.createChildNodeOfSelectedNode();
+
+      expect(createChildNode).toHaveBeenCalled();
+      expect(createChildNode.mock.calls[0]).toEqual([rootNode.id]);
+
+      function renderWithOneRootNodeForChildNodeCreation() {
+        const { rootNode, initialState } = createInitialStateWithOneRootNode();
+        const createChildNode = jest.fn();
+        renderTest({
+          initialState,
+          modifications: { createChildNode },
+        });
+
+        return { rootNode, createChildNode };
+
+        function createInitialStateWithOneRootNode() {
+          const rootNode = createDataStructure.node({ text: 'root node' });
+          const initialState = createDataStructure.state({
+            rootNodes: [rootNode],
+          });
+          return { rootNode, initialState };
+        }
+      }
     });
 
-    const InputNode = screen.getByLabelText(editNodeLabel);
-    expect(InputNode).toBeVisible();
-    expect(InputNode).toHaveFocus();
-    expect(getInputSelection(InputNode)).toBe(childNode.text);
+    test('naming of a created child node', () => {
+      const {
+        childNode,
+        finalizeEditNode,
+      } = renderTestWithChildNodeInEditMode();
 
-    const someNewText = 'some new text';
-    userEvent.type(InputNode, someNewText);
-    userEvent.type(InputNode, '{enter}');
+      const Focus = getFocus();
+      expect(getInputSelection(Focus)).toBe(childNode.text);
 
-    expect(finalizeEditNode).toHaveBeenCalled();
-    expect(finalizeEditNode.mock.calls[0]).toEqual([
-      { id: childNode.id, text: someNewText },
-    ]);
+      const someNewText = 'some new text';
+      ui.typeAndPressEnter(someNewText);
+
+      expect(finalizeEditNode).toHaveBeenCalled();
+      expect(finalizeEditNode.mock.calls[0]).toEqual([
+        { id: childNode.id, text: someNewText },
+      ]);
+
+      function renderTestWithChildNodeInEditMode() {
+        const {
+          childNode,
+          initialState,
+        } = createInitialStateWithChildNodeInEditMode();
+        const finalizeEditNode = jest.fn();
+        renderTest({
+          initialState,
+          modifications: { finalizeEditNode },
+        });
+
+        return { childNode, finalizeEditNode };
+
+        function createInitialStateWithChildNodeInEditMode() {
+          const childNode = createDataStructure.node({
+            text: 'child',
+            editing: true,
+          });
+          const rootNode = createDataStructure.node({
+            text: 'parent',
+            children: [childNode],
+          });
+          const initialState = createDataStructure.state({
+            rootNodes: [rootNode],
+          });
+
+          return { childNode, initialState };
+        }
+      }
+    });
   });
-});
 
-describe('editing a node', () => {
-  test('edit text', () => {
-    const childNode = { id: uuidv4(), text: 'child' };
-    const parentNode = { id: uuidv4(), text: 'parent', children: [childNode] };
-    const initialState = {
-      trees: [parentNode],
-    };
-    const initiateEditNode = jest.fn();
-    renderMockedMainView({
-      initialState,
-      viewModelModifications: { initiateEditNode },
-    });
+  test('edit text of a node', () => {
+    const { parentNode, initiateEditNode } = renderTestWithParentAndChildNode();
 
-    const node = parentNode;
-    const Node = screen.getByText(node.text);
-    userEvent.type(Node, '{enter}');
+    ui.selectNode({ text: parentNode.text });
+    ui.editSelectedNode();
+
     expect(initiateEditNode).toHaveBeenCalled();
-    expect(initiateEditNode.mock.calls[0]).toEqual([node.id]);
+    expect(initiateEditNode.mock.calls[0]).toEqual([parentNode.id]);
+
+    function renderTestWithParentAndChildNode() {
+      const {
+        initialState,
+        parentNode,
+      } = createInitialStateWithParentAndChildNode();
+      const initiateEditNode = jest.fn();
+
+      renderTest({
+        initialState,
+        modifications: { initiateEditNode },
+      });
+
+      return { parentNode, initiateEditNode };
+
+      function createInitialStateWithParentAndChildNode() {
+        const childNode = { id: uuidv4(), text: 'child' };
+        const parentNode = {
+          id: uuidv4(),
+          text: 'parent',
+          children: [childNode],
+        };
+        const initialState = {
+          trees: [parentNode],
+        };
+
+        return { initialState, parentNode };
+      }
+    }
   });
 });
 
 describe('folding a node', () => {
   test('display of a folded node', () => {
-    const FoldedNode = { id: uuidv4(), text: 'fold this' };
-    const InvisibleNode = { id: uuidv4(), text: 'folded away' };
-    const initialState = {
-      trees: [{ ...FoldedNode, folded: true, children: [InvisibleNode] }],
-    };
-    renderMockedMainView({ initialState });
+    const { invisibleNode, foldedNode } = renderFoldedNodeWithInvisibleNode();
 
-    expect(screen.getByText(FoldedNode.text)).toBeVisible();
-    expect(screen.queryByText(InvisibleNode.text)).toBeNull();
+    expect(screen.getByText(foldedNode.text)).toBeVisible();
+    expect(screen.queryByText(invisibleNode.text)).toBeNull();
+
+    function renderFoldedNodeWithInvisibleNode() {
+      const {
+        initialState,
+        rootNode: foldedNode,
+        childNode: invisibleNode,
+      } = createInitialStateWithRootAndChildNode();
+      renderTest({ initialState });
+
+      return { invisibleNode, foldedNode };
+
+      function createInitialStateWithRootAndChildNode() {
+        const childNode = createDataStructure.node({ text: 'folded away' });
+        const rootNode = createDataStructure.node({
+          text: 'fold this',
+          folded: true,
+          children: [childNode],
+        });
+        const initialState = createDataStructure.state({
+          rootNodes: [rootNode],
+        });
+
+        return { initialState, rootNode, childNode };
+      }
+    }
   });
 
   test('fold call to view model', () => {
-    const NodeToFold = { id: uuidv4(), text: 'fold this' };
-    const initialState = {
-      trees: [NodeToFold],
-    };
-    const foldNode = jest.fn();
+    const { nodeToFold, foldNode } = renderNodeToFold();
 
-    renderMockedMainView({
-      initialState,
-      viewModelModifications: { foldNode },
-    });
+    ui.selectNode({ text: nodeToFold.text });
+    ui.foldSelectedNode();
 
-    userEvent.type(screen.getByText(NodeToFold.text), 'f');
     expect(foldNode).toHaveBeenCalled();
-    expect(foldNode.mock.calls[0]).toEqual([NodeToFold.id]);
+    expect(foldNode.mock.calls[0]).toEqual([nodeToFold.id]);
+
+    function renderNodeToFold() {
+      const { rootNode, initialState } = createInitialStateWithRootNode();
+      const foldNode = jest.fn();
+
+      renderTest({
+        initialState,
+        modifications: { foldNode },
+      });
+
+      return { nodeToFold: rootNode, foldNode };
+
+      function createInitialStateWithRootNode() {
+        const rootNode = createDataStructure.node({ text: 'fold this' });
+        const initialState = createDataStructure.state({
+          rootNodes: [rootNode],
+        });
+
+        return { rootNode, initialState };
+      }
+    }
   });
 });
 
-function renderMockedMainView(
-  { initialState = {}, viewModelModifications = {} } = {
+function renderTest(
+  { initialState = {}, modifications = {} } = {
     initialState: {},
-    viewModelModifications: {},
+    modifications: {},
   }
 ) {
-  const modifyViewModel = (viewModel) => ({
-    ...viewModel,
-    ...viewModelModifications,
+  const [MockContext, MockProvider] = createMockContextProvider({
+    initialState,
+    modifications,
   });
 
   return render(
-    <MainViewMockProvider
-      initialState={initialState}
-      modifyViewModel={modifyViewModel}
-    >
-      <MainView context={MainViewMockContext} />
-    </MainViewMockProvider>
+    <MockProvider>
+      <MainView theProjectContext={MockContext} />
+    </MockProvider>
   );
 }
-
-const MainViewMockContext = createContext();
-
-function MainViewMockProvider({
-  children,
-  modifyViewModel = (x) => x,
-  initialState = {},
-}) {
-  const viewModel = { state: initialState };
-  const modifiedViewModel = modifyViewModel(viewModel);
-
-  return (
-    <MainViewMockContext.Provider value={modifiedViewModel}>
-      {children}
-    </MainViewMockContext.Provider>
-  );
-}
-
-function queryNodeInput() {
-  return screen.queryByLabelText('editing node');
-}
-
-function foldNode(Node) {
-  userEvent.type(Node, 'f');
-}
-
-export { queryNodeInput, foldNode };
