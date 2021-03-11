@@ -10,14 +10,30 @@ export function MainView({ context, features = { nodeCreation: true } }) {
       onDoubleClick={nodeCreation ? createRootNode : () => {}}
     >
       {state?.trees?.map((tree, i) => (
-        <Node node={tree} key={tree.id} context={context} />
+        <Tree tree={tree} key={tree.id} context={context} />
+      ))}
+    </div>
+  );
+}
+
+function Tree({ tree, context }) {
+  return (
+    <div>
+      <Node node={tree} key={tree.id} context={context} />
+      {tree?.children?.map((childTree) => (
+        <Tree
+          tree={childTree}
+          key={childTree.id}
+          context={context}
+          parentId={tree.id}
+        />
       ))}
     </div>
   );
 }
 
 function Node({ node: { editing, id, text }, context }) {
-  const { finalizeEditNode } = useContext(context);
+  const { finalizeEditNode, createChildNode } = useContext(context);
   const [newText, setNewText] = useState(text);
   const inputRef = useRef();
 
@@ -25,7 +41,16 @@ function Node({ node: { editing, id, text }, context }) {
     editing && inputRef.current?.focus();
   }, [editing]);
 
-  if (!editing) return <button>{text}</button>;
+  if (!editing)
+    return (
+      <button
+        onKeyUp={({ key }) => {
+          key === 'c' && createChildNode(id);
+        }}
+      >
+        {text}
+      </button>
+    );
   else
     return (
       <input

@@ -5,6 +5,8 @@ import userEvent from '@testing-library/user-event';
 import { v4 as uuidv4 } from 'uuid';
 import { getInputSelection } from '../utils/getInputSelection';
 
+const editNodeLabel = 'editing node';
+
 describe('inherited from MindMap.spec', () => {
   test('label', () => {
     render(
@@ -17,8 +19,6 @@ describe('inherited from MindMap.spec', () => {
 });
 
 describe('making a rootnode', () => {
-  const editNodeLabel = 'editing node';
-
   test('feature flag', () => {
     const createRootNode = jest.fn();
 
@@ -98,6 +98,57 @@ describe('making a rootnode', () => {
   });
 });
 
+describe('adding a child node', () => {
+  test('press t while focusing node to call createChildNode', () => {
+    const id = uuidv4();
+    const text = 'root node';
+    const initialState = { trees: [{ id, text }] };
+    const createChildNode = jest.fn();
+    render(
+      <MainViewMockProvider
+        initialState={initialState}
+        modifyViewModel={(viewModel) => ({ ...viewModel, createChildNode })}
+      >
+        <MainView context={MainViewMockContext} />
+      </MainViewMockProvider>
+    );
+
+    userEvent.type(screen.getByText(text), 'c');
+    expect(createChildNode).toHaveBeenCalled();
+    expect(createChildNode.mock.calls[0]).toEqual([id]);
+  });
+
+  test('signal end to viewmodel', () => {
+    const childNode = { id: uuidv4(), text: 'child', editing: true };
+    const initialState = {
+      trees: [{ id: uuidv4(), text: 'parent', children: [childNode] }],
+    };
+    const finalizeEditNode = jest.fn();
+    render(
+      <MainViewMockProvider
+        initialState={initialState}
+        modifyViewModel={(viewModel) => ({ ...viewModel, finalizeEditNode })}
+      >
+        <MainView context={MainViewMockContext} />
+      </MainViewMockProvider>
+    );
+
+    const InputNode = screen.getByLabelText(editNodeLabel);
+    expect(InputNode).toBeVisible();
+    expect(InputNode).toHaveFocus();
+    expect(getInputSelection(InputNode)).toBe(childNode.text);
+
+    const someNewText = 'some new text';
+    userEvent.type(InputNode, someNewText);
+    userEvent.type(InputNode, '{enter}');
+
+    expect(finalizeEditNode).toHaveBeenCalled();
+    expect(finalizeEditNode.mock.calls[0]).toEqual([
+      { id: childNode.id, text: someNewText },
+    ]);
+  });
+});
+
 const MainViewMockContext = createContext();
 
 function MainViewMockProvider({
@@ -113,4 +164,8 @@ function MainViewMockProvider({
       {children}
     </MainViewMockContext.Provider>
   );
+}
+
+export function queryNodeInput() {
+  return screen.queryByLabelText('editing node');
 }

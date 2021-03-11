@@ -12,6 +12,8 @@ export function MainViewProvider({
   const viewModel = {
     state,
     createRootNode: () => dispatch({ type: 'CREATE_ROOT_NODE' }),
+    createChildNode: (parentId) =>
+      dispatch({ type: 'CREATE_CHILD_NODE', payload: parentId }),
     finalizeEditNode: (payload) => {
       dispatch({ type: 'EDIT_NODE', payload: { ...payload, editing: false } });
     },
@@ -27,9 +29,17 @@ export function MainViewProvider({
     switch (action.type) {
       case 'CREATE_ROOT_NODE':
         return produce(state, (newState) => {
-          const id = uuidv4();
-          const node = { id, text: '', editing: true };
+          const node = createNode();
           newState.trees.push(node);
+        });
+      case 'CREATE_CHILD_NODE':
+        return produce(state, (newState) => {
+          const parentId = action.payload;
+          const parentNode = getNode({ id: parentId, trees: newState.trees });
+          if (!parentNode.children) parentNode.children = [];
+
+          const node = createNode();
+          parentNode.children.push(node);
         });
       case 'EDIT_NODE':
         return produce(state, (newState) => {
@@ -54,4 +64,8 @@ function modifyNode({ id, trees, modifications }) {
   Object.entries(modifications).forEach(([key, value]) => {
     node[key] = value;
   });
+}
+
+function createNode() {
+  return { id: uuidv4(), text: '', editing: true };
 }

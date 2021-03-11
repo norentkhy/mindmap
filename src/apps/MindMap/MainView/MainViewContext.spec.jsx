@@ -31,10 +31,35 @@ describe('create a root node', () => {
     });
 
     act(() => result.current.createRootNode());
-    const { id } = result.current.state.trees[0];
+    const { id } = getRootNode(result);
     const someNewText = 'some new text';
 
     act(() => result.current.finalizeEditNode({ id, text: someNewText }));
-    expect(result.current.state.trees[0].text).toBe(someNewText);
+    expect(getRootNode(result).text).toBe(someNewText);
   });
 });
+
+describe('create a child node', () => {
+  test('create a child node and set it to edit mode', () => {
+    const wrapper = ({ children }) => (
+      <MainViewProvider>{children}</MainViewProvider>
+    );
+    const { result } = renderHook(() => useContext(MainViewContext), {
+      wrapper,
+    });
+    act(() => result.current.createRootNode());
+    const parentNode = getRootNode(result);
+    act(() =>
+      result.current.finalizeEditNode({
+        id: parentNode.id,
+        text: 'root node',
+      })
+    );
+
+    act(() => result.current.createChildNode(parentNode.id));
+  });
+});
+
+function getRootNode(result) {
+  return result.current.state.trees[0];
+}

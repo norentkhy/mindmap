@@ -1,7 +1,8 @@
 import React from 'react';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MindMap } from './MindMap';
 import userEvent from '@testing-library/user-event';
+import { queryNodeInput } from './MainView/MainView.spec';
 
 describe('view elements', () => {
   test('tabs', () => {
@@ -51,8 +52,7 @@ describe('main view integration', () => {
 
     fireEvent.doubleClick(screen.getByLabelText('main view'));
 
-    const labelEditingNode = 'editing node';
-    const InputNode = screen.getByLabelText(labelEditingNode);
+    const InputNode = queryNodeInput();
     expect(InputNode).toBeVisible();
     expect(InputNode).toHaveFocus();
 
@@ -60,7 +60,39 @@ describe('main view integration', () => {
     userEvent.type(InputNode, someNewText);
     userEvent.type(InputNode, '{enter}');
 
-    expect(screen.queryByLabelText(labelEditingNode)).toBeNull();
+    expect(queryNodeInput()).toBeNull();
     expect(screen.getByText(someNewText)).toBeVisible();
   });
+
+  test('create a childnode', async () => {
+    render(<MindMap />);
+    const rootText = 'root text';
+    createRootNodeWithProperties({ text: rootText });
+
+    createChildNode(screen.getByText(rootText));
+    const ChildInput = queryNodeInput();
+    expect(ChildInput).toBeVisible();
+    await waitFor(() => {
+      expect(ChildInput).toHaveFocus();
+    });
+    expect(ChildInput).toHaveFocus();
+
+    const childText = 'child text';
+    userEvent.type(ChildInput, childText);
+    userEvent.type(ChildInput, '{enter}');
+
+    expect(queryNodeInput()).toBeNull();
+    expect(screen.getByText(childText)).toBeVisible();
+  });
+
+  function createRootNodeWithProperties({ text }) {
+    fireEvent.doubleClick(screen.getByLabelText('main view'));
+    const InputNode = queryNodeInput();
+    userEvent.type(InputNode, text);
+    userEvent.type(InputNode, '{enter}');
+  }
+
+  function createChildNode(ParentNode) {
+    userEvent.type(ParentNode, 'c');
+  }
 });
