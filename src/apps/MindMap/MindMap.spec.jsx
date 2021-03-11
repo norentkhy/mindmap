@@ -44,3 +44,23 @@ describe('tabs integration', () => {
     expect(screen.getByText(someNewTitle)).toBeVisible();
   });
 });
+
+describe('main view integration', () => {
+  test('create a rootnode and edit its content', () => {
+    render(<MindMap />);
+
+    fireEvent.doubleClick(screen.getByLabelText('main view'));
+
+    const labelEditingNode = 'editing node';
+    const InputNode = screen.getByLabelText(labelEditingNode);
+    expect(InputNode).toBeVisible();
+    expect(InputNode).toHaveFocus();
+
+    const someNewText = 'some new text';
+    userEvent.type(InputNode, someNewText);
+    userEvent.type(InputNode, '{enter}');
+
+    expect(screen.queryByLabelText(labelEditingNode)).toBeNull();
+    expect(screen.getByText(someNewText)).toBeVisible();
+  });
+});

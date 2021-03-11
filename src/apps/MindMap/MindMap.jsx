@@ -1,4 +1,6 @@
 import React, { createContext } from 'react';
+import { MainView } from './MainView/MainView';
+import { MainViewContext, MainViewProvider } from './MainView/MainViewContext';
 import { Tabs } from './Tabs/Tabs';
 import { TabsContext, TabsProvider } from './Tabs/TabsContext';
 
@@ -7,7 +9,7 @@ export function MindMap() {
     <MainProvider>
       <Tabs context={TabsContext} />
       <Actions />
-      <MainView />
+      <MainView context={MainViewContext} />
     </MainProvider>
   );
 }
@@ -16,17 +18,15 @@ function Actions() {
   return <div aria-label="actions"></div>;
 }
 
-function MainView() {
-  return <div aria-label="main view"></div>;
-}
-
 const MainContext = createContext();
 
 function MainProvider({ children }) {
   const viewModel = {};
   return (
     <MainContext.Provider value={viewModel}>
-      <TabsProvider>{children}</TabsProvider>
+      <MainViewProvider>
+        <TabsProvider>{children}</TabsProvider>
+      </MainViewProvider>
     </MainContext.Provider>
   );
 }
