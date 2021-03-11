@@ -13,8 +13,12 @@ export function TabsProvider({ children, initialState }) {
       dispatch({ type: 'ADD_NEW_TAB', payload: { id } });
       dispatch({ type: 'SELECT_TAB', payload: id });
     },
-    renameTab: ({ id, newTitle }) =>
-      dispatch({ type: 'RENAME_TAB', payload: { id, newTitle } }),
+    initiateRenameTab: (id) =>
+      dispatch({ type: 'SET_TAB_EDIT', payload: { id, value: true } }),
+    finishRenameTab: ({ id, newTitle }) => {
+      dispatch({ type: 'RENAME_TAB', payload: { id, newTitle } });
+      dispatch({ type: 'SET_TAB_EDIT', payload: { id, value: false } });
+    },
   };
 
   return (
@@ -34,6 +38,14 @@ export function TabsProvider({ children, initialState }) {
       case 'ADD_NEW_TAB':
         return produce(state, (newState) => {
           newState.tabs.push({ id: action.payload.id, title: 'untitled' });
+        });
+      case 'SET_TAB_EDIT':
+        return produce(state, (newState) => {
+          newState.tabs = state.tabs.map((tab) =>
+            tab.id === action.payload.id
+              ? { ...tab, renaming: action.payload.value }
+              : tab
+          );
         });
       case 'RENAME_TAB':
         return produce(state, (newState) => {

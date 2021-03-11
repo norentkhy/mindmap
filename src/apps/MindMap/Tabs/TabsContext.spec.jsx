@@ -2,14 +2,15 @@ import React, { useContext } from 'react';
 import { act, renderHook } from '@testing-library/react-hooks';
 import { v4 as uuidv4 } from 'uuid';
 import { TabsProvider, TabsContext } from './TabsContext';
+import produce from 'immer';
+
+const tabs = [
+  { id: uuidv4(), title: 'untitled' },
+  { id: uuidv4(), title: 'untitled-2' },
+  { id: uuidv4(), title: 'untitled-3' },
+];
 
 describe('overlap with Tabs.spec', () => {
-  const tabs = [
-    { id: uuidv4(), title: 'untitled' },
-    { id: uuidv4(), title: 'untitled-2' },
-    { id: uuidv4(), title: 'untitled-3' },
-  ];
-
   test('selectTab', () => {
     const initialState = { tabs };
     const wrapper = ({ children }) => (
@@ -63,20 +64,48 @@ describe('overlap with Tabs.spec', () => {
     }
   });
 
-  test('renameTab', () => {
-    const initialState = { tabs };
-    const wrapper = ({ children }) => (
-      <TabsProvider initialState={initialState}>{children}</TabsProvider>
-    );
-    const { result } = renderHook(() => useContext(TabsContext), { wrapper });
+  describe('renaming a tab', () => {
+    test('initiateRenameTab', () => {
+      const initialState = { tabs };
+      const wrapper = ({ children }) => (
+        <TabsProvider initialState={initialState}>{children}</TabsProvider>
+      );
+      const { result } = renderHook(() => useContext(TabsContext), { wrapper });
 
-    const idTarget = tabs[0].id;
-    const newTitle = 'renamed title';
-    act(() => result.current.renameTab({ id: idTarget, newTitle }));
+      const idTarget = tabs[0].id;
+      act(() => result.current.initiateRenameTab(idTarget));
+      const targettedTab = result.current.state.tabs.find(
+        (tab) => tab.id === idTarget
+      );
+      const nonTargettedTabs = result.current.state.tabs.filter(
+        (tab) => tab.id !== idTarget
+      );
+      expect(targettedTab.renaming).toBe(true);
+      nonTargettedTabs.forEach((tab) => expect(tab.renaming).toBeFalsy());
+    });
 
-    const tabTarget = result.current.state.tabs.find(
-      (tab) => tab.id === idTarget
-    );
-    expect(tabTarget.title).toBe(newTitle);
+    test('finishRenameTab', () => {
+      const indexTarget = 1;
+      const tabsWithOneRenaming = produce(tabs, (newTabs) => {
+        newTabs[1].renaming = true;
+      });
+      const initialState = { tabs: tabsWithOneRenaming };
+      const wrapper = ({ children }) => (
+        <TabsProvider initialState={initialState}>{children}</TabsProvider>
+      );
+      const { result } = renderHook(() => useContext(TabsContext), { wrapper });
+
+      const idTarget = tabs[indexTarget].id;
+      const newTitle = 'renamed title';
+      act(() => result.current.finishRenameTab({ id: idTarget, newTitle }));
+
+      const tabTarget = result.current.state.tabs.find(
+        (tab) => tab.id === idTarget
+      );
+      expect(tabTarget.title).toBe(newTitle);
+      result.current.state.tabs.forEach((tab) =>
+        expect(tab.renaming).toBeFalsy()
+      );
+    });
   });
 });
