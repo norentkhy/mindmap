@@ -1,10 +1,11 @@
 import React, { createContext } from 'react';
 import { Tabs } from './Tabs/Tabs';
+import { TabsContext, TabsProvider } from './Tabs/TabsContext';
 
 export function MindMap() {
   return (
     <MainProvider>
-      <Tabs context={MainContext} />
+      <Tabs context={TabsContext} />
       <Actions />
       <MainView />
     </MainProvider>
@@ -24,6 +25,8 @@ const MainContext = createContext();
 function MainProvider({ children }) {
   const viewModel = {};
   return (
-    <MainContext.Provider value={viewModel}>{children}</MainContext.Provider>
+    <MainContext.Provider value={viewModel}>
+      <TabsProvider>{children}</TabsProvider>
+    </MainContext.Provider>
   );
 }

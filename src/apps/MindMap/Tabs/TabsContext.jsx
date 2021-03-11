@@ -3,7 +3,7 @@ import produce from 'immer';
 import { v4 as uuidv4 } from 'uuid';
 
 export const TabsContext = createContext();
-export function TabsProvider({ children, initialState }) {
+export function TabsProvider({ children, initialState = { tabs: [] } }) {
   const [state, dispatch] = useReducer(handleDispatch, initialState);
   const viewModel = {
     state,
