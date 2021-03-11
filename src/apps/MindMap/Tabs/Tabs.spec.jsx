@@ -34,8 +34,8 @@ describe('views', () => {
   });
 
   test('renders tabs', () => {
-    let idShow, idRename;
-    const showTab = jest.fn((id) => (idShow = id));
+    let idSelect, idRename;
+    const selectTab = jest.fn((id) => (idSelect = id));
     const renameTab = jest.fn((id) => (idRename = id));
 
     render(
@@ -45,7 +45,7 @@ describe('views', () => {
           state: {
             tabs,
           },
-          showTab,
+          selectTab,
           renameTab,
         })}
       >
@@ -58,7 +58,7 @@ describe('views', () => {
       expect(Tab).toBeVisible();
 
       fireEvent.click(Tab);
-      expect(idShow).toBe(tab.id);
+      expect(idSelect).toBe(tab.id);
 
       fireEvent.dblClick(Tab);
       expect(idRename).toBe(tab.id);

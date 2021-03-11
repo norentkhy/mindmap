@@ -6,7 +6,7 @@ export function TabsProvider({ children, initialState }) {
   const [state, dispatch] = useReducer(handleDispatch, initialState);
   const viewModel = {
     state,
-    showTab: (id) => dispatch({ type: 'SHOW_TAB', payload: id }),
+    selectTab: (id) => dispatch({ type: 'SELECT_TAB', payload: id }),
   };
 
   return (
@@ -15,7 +15,7 @@ export function TabsProvider({ children, initialState }) {
 
   function handleDispatch(state, action) {
     switch (action.type) {
-      case 'SHOW_TAB':
+      case 'SELECT_TAB':
         return produce(state, (newState) => {
           newState.tabs = state.tabs.map((tab) =>
             produce(tab, (newTab) => {

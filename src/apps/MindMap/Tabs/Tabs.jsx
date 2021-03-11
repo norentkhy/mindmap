@@ -2,14 +2,14 @@ import React, { useContext } from 'react';
 import styled from 'styled-components';
 
 export function Tabs({ context }) {
-  const { state, addNewTab, showTab, renameTab } = useContext(context);
+  const { state, addNewTab, selectTab, renameTab } = useContext(context);
 
   return (
     <div aria-label="tabs">
       {state?.tabs?.map((tab) => (
         <Tab
           key={tab.id}
-          onClick={() => showTab(tab.id)}
+          onClick={() => selectTab(tab.id)}
           onDoubleClick={() => renameTab(tab.id)}
           selected={tab.selected}
         >

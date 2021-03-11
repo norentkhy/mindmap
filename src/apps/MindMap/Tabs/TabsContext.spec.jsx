@@ -10,7 +10,7 @@ describe('overlap with Tabs.spec', () => {
     { id: uuidv4(), title: 'untitled-3' },
   ];
 
-  test('showTab', () => {
+  test('selectTab', () => {
     const initialState = { tabs };
     const wrapper = ({ children }) => (
       <TabsProvider initialState={initialState}>{children}</TabsProvider>
@@ -18,7 +18,7 @@ describe('overlap with Tabs.spec', () => {
     const { result } = renderHook(() => useContext(TabsContext), { wrapper });
 
     tabs.forEach(({ id }) => {
-      act(() => result.current.showTab(id));
+      act(() => result.current.selectTab(id));
 
       const targettedTab = result.current.state.tabs.find(
         (tab) => tab.id === id
