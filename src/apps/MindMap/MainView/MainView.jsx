@@ -20,20 +20,21 @@ function Tree({ tree, context }) {
   return (
     <div>
       <Node node={tree} key={tree.id} context={context} />
-      {tree?.children?.map((childTree) => (
-        <Tree
-          tree={childTree}
-          key={childTree.id}
-          context={context}
-          parentId={tree.id}
-        />
-      ))}
+      {!tree.folded &&
+        tree?.children?.map((childTree) => (
+          <Tree
+            tree={childTree}
+            key={childTree.id}
+            context={context}
+            parentId={tree.id}
+          />
+        ))}
     </div>
   );
 }
 
 function Node({ node: { editing, id, text }, context }) {
-  const { finalizeEditNode, createChildNode } = useContext(context);
+  const { finalizeEditNode, createChildNode, foldNode } = useContext(context);
   const [newText, setNewText] = useState(text);
   const inputRef = useRef();
 
@@ -46,6 +47,7 @@ function Node({ node: { editing, id, text }, context }) {
       <button
         onKeyUp={({ key }) => {
           key === 'c' && createChildNode(id);
+          key === 'f' && foldNode(id);
         }}
       >
         {text}

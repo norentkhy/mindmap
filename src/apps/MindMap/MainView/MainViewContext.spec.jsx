@@ -75,6 +75,32 @@ describe('create a child node', () => {
   });
 });
 
+describe('fold a node', () => {
+  test('fold a node', () => {
+    const wrapper = ({ children }) => (
+      <MainViewProvider>{children}</MainViewProvider>
+    );
+    const { result } = renderHook(() => useContext(MainViewContext), {
+      wrapper,
+    });
+    createRootNodeWithProperties(result, { text: 'root node' });
+
+    const initialNode = getNewestRootNode(result);
+    const { id } = initialNode;
+    expect(initialNode.folded).toBeFalsy();
+
+    act(() => result.current.foldNode(id));
+
+    const foldedNode = getNewestRootNode(result);
+    expect(foldedNode.folded).toBe(true);
+
+    act(() => result.current.foldNode(id));
+
+    const unfoldedNode = getNewestRootNode(result);
+    expect(unfoldedNode.folded).toBe(false);
+  });
+});
+
 function createRootNodeWithProperties(result, { text, ...others }) {
   act(() => result.current.createRootNode());
   const { id } = getNewestRootNode(result);

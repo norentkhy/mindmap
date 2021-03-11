@@ -166,6 +166,44 @@ describe('adding a child node', () => {
   });
 });
 
+describe('folding a node', () => {
+  test('display of a folded node', () => {
+    const FoldedNode = { id: uuidv4(), text: 'fold this' };
+    const InvisibleNode = { id: uuidv4(), text: 'folded away' };
+    const initialState = {
+      trees: [{ ...FoldedNode, folded: true, children: [InvisibleNode] }],
+    };
+    render(
+      <MainViewMockProvider initialState={initialState}>
+        <MainView context={MainViewMockContext} />
+      </MainViewMockProvider>
+    );
+
+    expect(screen.getByText(FoldedNode.text)).toBeVisible();
+    expect(screen.queryByText(InvisibleNode.text)).toBeNull();
+  });
+
+  test('fold call to view model', () => {
+    const NodeToFold = { id: uuidv4(), text: 'fold this' };
+    const initialState = {
+      trees: [NodeToFold],
+    };
+    const foldNode = jest.fn();
+    render(
+      <MainViewMockProvider
+        initialState={initialState}
+        modifyViewModel={(viewModel) => ({ ...viewModel, foldNode })}
+      >
+        <MainView context={MainViewMockContext} />
+      </MainViewMockProvider>
+    );
+
+    userEvent.type(screen.getByText(NodeToFold.text), 'f');
+    expect(foldNode).toHaveBeenCalled();
+    expect(foldNode.mock.calls[0]).toEqual([NodeToFold.id]);
+  });
+});
+
 const MainViewMockContext = createContext();
 
 function MainViewMockProvider({
@@ -183,6 +221,12 @@ function MainViewMockProvider({
   );
 }
 
-export function queryNodeInput() {
+function queryNodeInput() {
   return screen.queryByLabelText('editing node');
 }
+
+function foldNode(Node) {
+  userEvent.type(Node, 'f');
+}
+
+export { queryNodeInput, foldNode };

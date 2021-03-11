@@ -17,6 +17,7 @@ export function MainViewProvider({
     finalizeEditNode: (payload) => {
       dispatch({ type: 'EDIT_NODE', payload: { ...payload, editing: false } });
     },
+    foldNode: (id) => dispatch({ type: 'TOGGLE_NODE_FOLD', payload: id }),
   };
 
   return (
@@ -45,6 +46,12 @@ export function MainViewProvider({
         return produce(state, (newState) => {
           const { id, ...modifications } = action.payload;
           modifyNode({ id, trees: newState.trees, modifications });
+        });
+      case 'TOGGLE_NODE_FOLD':
+        return produce(state, (newState) => {
+          const id = action.payload;
+          const node = getNode({ id, trees: newState.trees });
+          node.folded = !node.folded;
         });
     }
   }
