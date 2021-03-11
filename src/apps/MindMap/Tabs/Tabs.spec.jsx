@@ -4,6 +4,7 @@ import { Tabs } from './Tabs';
 import { v4 as uuidv4 } from 'uuid';
 import produce from 'immer';
 import userEvent from '@testing-library/user-event';
+import { getInputSelection } from '../utils/getInputSelection';
 
 test('overlap with MindMap.spec', () => {
   render(
@@ -182,9 +183,4 @@ function TabsMockProvider({ children, modifyViewModel = (x) => x }) {
       {children}
     </TabsMockContext.Provider>
   );
-}
-
-function getInputSelection(Element) {
-  const { value, selectionStart, selectionEnd } = Element;
-  return value.substring(selectionStart, selectionEnd);
 }
