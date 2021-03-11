@@ -19,24 +19,6 @@ describe('inherited from MindMap.spec', () => {
 });
 
 describe('making a rootnode', () => {
-  test('feature flag', () => {
-    const createRootNode = jest.fn();
-
-    render(
-      <MainViewMockProvider
-        modifyViewModel={(viewModel) => ({ ...viewModel, createRootNode })}
-      >
-        <MainView
-          context={MainViewMockContext}
-          features={{ nodeCreation: false }}
-        />
-      </MainViewMockProvider>
-    );
-
-    fireEvent.doubleClick(screen.getByLabelText('main view'));
-    expect(createRootNode).not.toHaveBeenCalled();
-  });
-
   test('display of rootnode', () => {
     const id = uuidv4();
     const text = 'original text';

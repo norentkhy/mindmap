@@ -1,14 +1,10 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 
-export function MainView({ context, features = { nodeCreation: true } }) {
-  const { nodeCreation } = features;
+export function MainView({ context }) {
   const { state, createRootNode } = useContext(context);
 
   return (
-    <div
-      aria-label="main view"
-      onDoubleClick={nodeCreation ? createRootNode : () => {}}
-    >
+    <div aria-label="main view" onDoubleClick={createRootNode}>
       {state?.trees?.map((tree, i) => (
         <Tree tree={tree} key={tree.id} context={context} />
       ))}
