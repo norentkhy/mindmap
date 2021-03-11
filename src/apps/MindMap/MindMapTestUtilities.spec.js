@@ -8,6 +8,7 @@ import {
   createTrees,
   expectTreesToBeVisible,
   findDifferences,
+  queryNode,
 } from './MindMapTestUtilities';
 
 describe('utilities', () => {
@@ -72,7 +73,21 @@ describe('utilities', () => {
     }
   });
 
-  test('create a childnode with properties', () => {});
+  test('query a node', () => {
+    render(<MindMap />);
+
+    const rootNode = { text: 'root' };
+    expect(queryNode(rootNode)).toBeNull();
+
+    createRootNodeWithProperties(rootNode);
+    expect(queryNode(rootNode)).toBeVisible();
+
+    const childNode = { text: 'child' };
+    expect(queryNode(childNode)).toBeNull();
+
+    createRootNodeWithProperties(childNode);
+    expect(queryNode(childNode)).toBeVisible();
+  });
 
   test('find differences', () => {
     render(<MindMap />);

@@ -34,7 +34,12 @@ function Tree({ tree, context }) {
 }
 
 function Node({ node: { editing, id, text }, context }) {
-  const { finalizeEditNode, createChildNode, foldNode } = useContext(context);
+  const {
+    finalizeEditNode,
+    createChildNode,
+    foldNode,
+    initiateEditNode,
+  } = useContext(context);
   const [newText, setNewText] = useState(text);
   const inputRef = useRef();
 
@@ -46,6 +51,7 @@ function Node({ node: { editing, id, text }, context }) {
     return (
       <button
         onKeyUp={({ key }) => {
+          key === 'Enter' && initiateEditNode(id);
           key === 'c' && createChildNode(id);
           key === 'f' && foldNode(id);
         }}

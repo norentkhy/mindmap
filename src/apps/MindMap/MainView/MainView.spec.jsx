@@ -166,6 +166,33 @@ describe('adding a child node', () => {
   });
 });
 
+describe('editing a node', () => {
+  test('edit text', () => {
+    const childNode = { id: uuidv4(), text: 'child' };
+    const parentNode = { id: uuidv4(), text: 'parent', children: [childNode] };
+    const initialState = {
+      trees: [parentNode],
+    };
+    const initiateEditNode = jest.fn();
+    render(
+      <MainViewMockProvider
+        initialState={initialState}
+        modifyViewModel={(viewModel) => ({
+          ...viewModel,
+          initiateEditNode,
+        })}
+      >
+        <MainView context={MainViewMockContext} />
+      </MainViewMockProvider>
+    );
+    const node = parentNode;
+    const Node = screen.getByText(node.text);
+    userEvent.type(Node, '{enter}');
+    expect(initiateEditNode).toHaveBeenCalled();
+    expect(initiateEditNode.mock.calls[0]).toEqual([node.id]);
+  });
+});
+
 describe('folding a node', () => {
   test('display of a folded node', () => {
     const FoldedNode = { id: uuidv4(), text: 'fold this' };

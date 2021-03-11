@@ -22,6 +22,16 @@ describe('create a root node', () => {
     expect(node.id).toBeTruthy();
   });
 
+  test('receive command to initiate editing', () => {
+    const { result } = renderUseMainViewContext();
+    const initialText = 'initial';
+    const id = createRootNodeWithProperties(result, { text: initialText });
+
+    act(() => result.current.initiateEditNode(id));
+
+    expect(getNewestRootNode(result).editing).toBe(true);
+  });
+
   test('receive command to finalize editing', () => {
     const wrapper = ({ children }) => (
       <MainViewProvider>{children}</MainViewProvider>
@@ -101,10 +111,20 @@ describe('fold a node', () => {
   });
 });
 
+function renderUseMainViewContext() {
+  const wrapper = ({ children }) => (
+    <MainViewProvider>{children}</MainViewProvider>
+  );
+  return renderHook(() => useContext(MainViewContext), {
+    wrapper,
+  });
+}
+
 function createRootNodeWithProperties(result, { text, ...others }) {
   act(() => result.current.createRootNode());
   const { id } = getNewestRootNode(result);
   act(() => result.current.finalizeEditNode({ id, text, ...others }));
+  return id;
 }
 
 function getRootNodes(result) {

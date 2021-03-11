@@ -14,6 +14,8 @@ export function MainViewProvider({
     createRootNode: () => dispatch({ type: 'CREATE_ROOT_NODE' }),
     createChildNode: (parentId) =>
       dispatch({ type: 'CREATE_CHILD_NODE', payload: parentId }),
+    initiateEditNode: (id) =>
+      dispatch({ type: 'EDIT_NODE', payload: { id, editing: true } }),
     finalizeEditNode: (payload) => {
       dispatch({ type: 'EDIT_NODE', payload: { ...payload, editing: false } });
     },

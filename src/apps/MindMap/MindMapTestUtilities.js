@@ -86,6 +86,14 @@ function findNodeDifferences(callback) {
   }
 }
 
+function queryNode(args) {
+  const { text } = args;
+
+  if (text) return screen.queryByText(text);
+
+  throw new Error('unknown args');
+}
+
 export {
   findNodeDifferences as findDifferences,
   generateUniqueText,
@@ -96,4 +104,5 @@ export {
   createChildNodeWithProperties,
   createRootNodeWithProperties,
   completeNodeNaming,
+  queryNode,
 };

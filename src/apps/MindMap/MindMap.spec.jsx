@@ -9,6 +9,8 @@ import {
   createRootNodeWithProperties,
   createChildNode,
   createTrees,
+  createChildNodeWithProperties,
+  queryNode,
 } from './MindMapTestUtilities';
 
 describe('view elements', () => {
@@ -136,5 +138,23 @@ describe('main view integration', () => {
         children: [{ text: toFold, children: [{ text: foldedAway }] }],
       };
     }
+  });
+
+  test('editing node text', async () => {
+    render(<MindMap />);
+    const rootNode = { text: 'root node' };
+    const RootNode = createRootNodeWithProperties(rootNode);
+
+    userEvent.type(RootNode, '{enter}');
+    const NodeInput = queryNodeInput();
+    expect(NodeInput).toBeVisible();
+    await waitFor(() => {
+      expect(NodeInput).toHaveFocus();
+    });
+
+    const newText = 'some new text';
+    userEvent.type(NodeInput, newText);
+    userEvent.type(NodeInput, '{enter}');
+    expect(queryNode({ text: newText }));
   });
 });
