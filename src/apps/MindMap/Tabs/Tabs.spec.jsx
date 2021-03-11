@@ -2,6 +2,8 @@ import React, { createContext } from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { Tabs } from './Tabs';
 import { v4 as uuidv4 } from 'uuid';
+import produce from 'immer';
+import userEvent from '@testing-library/user-event';
 
 test('overlap with MindMap.spec', () => {
   render(
@@ -120,6 +122,53 @@ describe('tab renaming', () => {
       expect(idRename).toBe(tab.id);
     });
   });
+
+  test('result from rename initiation', () => {
+    const tabTarget = tabs[2];
+    const tabsWithOneRenaming = produce(tabs, (newTabs) => {
+      newTabs.find((tab) => tab.id === tabTarget.id).renaming = true;
+    });
+    const finishRenameTab = jest.fn();
+
+    render(
+      <TabsMockProvider
+        modifyViewModel={(viewModel) => ({
+          ...viewModel,
+          state: {
+            tabs: tabsWithOneRenaming,
+          },
+          finishRenameTab,
+        })}
+      >
+        <Tabs context={TabsMockContext} />
+      </TabsMockProvider>
+    );
+
+    expect(screen.queryByText(tabTarget.title)).toBeNull();
+
+    const nonTargetTabs = tabsWithOneRenaming.filter(
+      (tab) => tab.id !== tabTarget.id
+    );
+    nonTargetTabs.forEach((tab) =>
+      expect(screen.getByText(tab.title)).toBeVisible()
+    );
+
+    const TabRename = screen.getByLabelText('renaming this tab');
+    expect(TabRename).toHaveFocus();
+    expect(getInputSelection(TabRename)).toBe(tabTarget.title);
+
+    const someNewTitle = 'some new title';
+    userEvent.type(TabRename, someNewTitle);
+    userEvent.type(TabRename, '{enter}');
+
+    expect(finishRenameTab).toHaveBeenCalled();
+    expect(finishRenameTab.mock.calls[0]).toEqual([
+      {
+        id: tabTarget.id,
+        newTitle: someNewTitle,
+      },
+    ]);
+  });
 });
 
 const TabsMockContext = createContext();
@@ -133,4 +182,9 @@ function TabsMockProvider({ children, modifyViewModel = (x) => x }) {
       {children}
     </TabsMockContext.Provider>
   );
+}
+
+function getInputSelection(Element) {
+  const { value, selectionStart, selectionEnd } = Element;
+  return value.substring(selectionStart, selectionEnd);
 }
