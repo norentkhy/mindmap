@@ -1,17 +1,14 @@
-import React from 'react';
+import React, { createContext } from 'react';
+import { Tabs } from './Tabs/Tabs';
 
 export function MindMap() {
   return (
-    <div>
-      <Tabs />
+    <MainProvider>
+      <Tabs context={MainContext} />
       <Actions />
       <MainView />
-    </div>
+    </MainProvider>
   );
-}
-
-function Tabs() {
-  return <div aria-label="tabs"></div>;
 }
 
 function Actions() {
@@ -20,4 +17,13 @@ function Actions() {
 
 function MainView() {
   return <div aria-label="main view"></div>;
+}
+
+const MainContext = createContext();
+
+function MainProvider({ children }) {
+  const viewModel = {};
+  return (
+    <MainContext.Provider value={viewModel}>{children}</MainContext.Provider>
+  );
 }
