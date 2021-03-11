@@ -3,6 +3,12 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MindMap } from './MindMap';
 import userEvent from '@testing-library/user-event';
 import { queryNodeInput } from './MainView/MainView.spec';
+import {
+  createRootNode,
+  completeNodeNaming,
+  createRootNodeWithProperties,
+  createChildNode,
+} from './MindMapTestUtilities';
 
 describe('view elements', () => {
   test('tabs', () => {
@@ -50,15 +56,14 @@ describe('main view integration', () => {
   test('create a rootnode and edit its content', () => {
     render(<MindMap />);
 
-    fireEvent.doubleClick(screen.getByLabelText('main view'));
+    createRootNode();
 
     const InputNode = queryNodeInput();
     expect(InputNode).toBeVisible();
     expect(InputNode).toHaveFocus();
 
     const someNewText = 'some new text';
-    userEvent.type(InputNode, someNewText);
-    userEvent.type(InputNode, '{enter}');
+    completeNodeNaming(someNewText);
 
     expect(queryNodeInput()).toBeNull();
     expect(screen.getByText(someNewText)).toBeVisible();
@@ -79,32 +84,20 @@ describe('main view integration', () => {
     const rootText = 'root text';
     createRootNodeWithProperties({ text: rootText });
 
-    createChildNode(screen.getByText(rootText));
+    const ParentNode = screen.getByText(rootText);
+    createChildNode(ParentNode);
     const ChildInput = queryNodeInput();
     expect(ChildInput).toBeVisible();
     await waitFor(() => {
       expect(ChildInput).toHaveFocus();
     });
-    expect(ChildInput).toHaveFocus();
 
     const childText = 'child text';
-    userEvent.type(ChildInput, childText);
-    userEvent.type(ChildInput, '{enter}');
+    completeNodeNaming(childText);
 
     expect(queryNodeInput()).toBeNull();
-    expect(screen.getByText(childText)).toBeVisible();
+    [rootText, childText].forEach((text) => {
+      expect(screen.getByText(text)).toBeVisible();
+    });
   });
-
-  function createChildNode(ParentNode) {
-    userEvent.type(ParentNode, 'c');
-  }
 });
-
-function createRootNodeWithProperties({ text, ...rest }) {
-  const MainView = screen.getByLabelText('main view');
-  fireEvent.doubleClick(MainView);
-
-  const InputNode = queryNodeInput();
-  userEvent.type(InputNode, text);
-  userEvent.type(InputNode, '{enter}');
-}
