@@ -62,4 +62,21 @@ describe('overlap with Tabs.spec', () => {
       expect(ids.length).toBe(setIds.size);
     }
   });
+
+  test('renameTab', () => {
+    const initialState = { tabs };
+    const wrapper = ({ children }) => (
+      <TabsProvider initialState={initialState}>{children}</TabsProvider>
+    );
+    const { result } = renderHook(() => useContext(TabsContext), { wrapper });
+
+    const idTarget = tabs[0].id;
+    const newTitle = 'renamed title';
+    act(() => result.current.renameTab({ id: idTarget, newTitle }));
+
+    const tabTarget = result.current.state.tabs.find(
+      (tab) => tab.id === idTarget
+    );
+    expect(tabTarget.title).toBe(newTitle);
+  });
 });

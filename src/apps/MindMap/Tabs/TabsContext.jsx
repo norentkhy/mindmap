@@ -13,6 +13,8 @@ export function TabsProvider({ children, initialState }) {
       dispatch({ type: 'ADD_NEW_TAB', payload: { id } });
       dispatch({ type: 'SELECT_TAB', payload: id });
     },
+    renameTab: ({ id, newTitle }) =>
+      dispatch({ type: 'RENAME_TAB', payload: { id, newTitle } }),
   };
 
   return (
@@ -32,6 +34,13 @@ export function TabsProvider({ children, initialState }) {
       case 'ADD_NEW_TAB':
         return produce(state, (newState) => {
           newState.tabs.push({ id: action.payload.id, title: 'untitled' });
+        });
+      case 'RENAME_TAB':
+        return produce(state, (newState) => {
+          const tabTarget = newState.tabs.find(
+            (tab) => tab.id === action.payload.id
+          );
+          tabTarget.title = action.payload.newTitle;
         });
     }
   }
