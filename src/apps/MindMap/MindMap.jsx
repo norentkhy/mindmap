@@ -1,9 +1,9 @@
-import React from 'react';
-import { Actions } from './Actions/Actions';
-import { MainView } from './MainView/MainView';
-import { ProjectProvider } from './Contexts/ProjectContext';
-import { Tabs } from './Tabs/Tabs';
-import { TabsProvider } from './Tabs/TabsContext';
+import React from 'react'
+import { Actions } from './Actions/Actions'
+import { MainView } from './MainView/MainView'
+import { ProjectProvider } from './Contexts/ProjectContext'
+import { Tabs } from './Tabs/Tabs'
+import { TabsProvider } from './Tabs/TabsContext'
 
 export function MindMap() {
   return (
@@ -12,7 +12,7 @@ export function MindMap() {
       <Actions />
       <MainView />
     </Providers>
-  );
+  )
 }
 
 function Providers({ children }) {
@@ -20,5 +20,5 @@ function Providers({ children }) {
     <ProjectProvider>
       <TabsProvider>{children}</TabsProvider>
     </ProjectProvider>
-  );
+  )
 }

@@ -1,10 +1,10 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
-import styled from 'styled-components';
-import { TabsContext } from './TabsContext';
+import React, { useContext, useEffect, useRef, useState } from 'react'
+import styled from 'styled-components'
+import { TabsContext } from './TabsContext'
 
 export function Tabs({ theTabsContext = TabsContext }) {
-  const { state, addNewTab } = useContext(theTabsContext);
-  const tabsToRender = getTabsToRender(state);
+  const { state, addNewTab } = useContext(theTabsContext)
+  const tabsToRender = getTabsToRender(state)
 
   return (
     <div aria-label="tabs">
@@ -15,26 +15,26 @@ export function Tabs({ theTabsContext = TabsContext }) {
         +
       </button>
     </div>
-  );
+  )
 }
 
 function getTabsToRender(state) {
-  return state?.tabs || [];
+  return state?.tabs || []
 }
 
 function Tab({ tab, theTabsContext }) {
-  const { renaming } = tab;
+  const { renaming } = tab
 
-  if (renaming) return <TabInput tab={tab} theTabsContext={theTabsContext} />;
-  else return <TabButton tab={tab} theTabsContext={theTabsContext} />;
+  if (renaming) return <TabInput tab={tab} theTabsContext={theTabsContext} />
+  else return <TabButton tab={tab} theTabsContext={theTabsContext} />
 }
 
 function TabInput({ tab: { id, title, renaming }, theTabsContext }) {
-  const { finishRenameTab } = useContext(theTabsContext);
-  const [newTitle, setNewTitle] = useState(title);
-  const inputRef = useRef();
+  const { finishRenameTab } = useContext(theTabsContext)
+  const [newTitle, setNewTitle] = useState(title)
+  const inputRef = useRef()
 
-  useEffect(() => inputRef.current?.focus(), [renaming]);
+  useEffect(() => inputRef.current?.focus(), [renaming])
 
   return (
     <input
@@ -47,11 +47,11 @@ function TabInput({ tab: { id, title, renaming }, theTabsContext }) {
       }
       onFocus={({ target }) => target.select()}
     />
-  );
+  )
 }
 
 function TabButton({ tab: { id, title, selected }, theTabsContext }) {
-  const { selectTab, initiateRenameTab } = useContext(theTabsContext);
+  const { selectTab, initiateRenameTab } = useContext(theTabsContext)
 
   return (
     <Button
@@ -61,9 +61,9 @@ function TabButton({ tab: { id, title, selected }, theTabsContext }) {
     >
       {title}
     </Button>
-  );
+  )
 }
 
 const Button = styled.button`
   font-weight: ${({ selected }) => (selected ? 'bold' : 'normal')};
-`;
+`

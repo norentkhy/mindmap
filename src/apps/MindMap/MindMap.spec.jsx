@@ -1,8 +1,8 @@
-import React from 'react';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { MindMap } from './MindMap';
-import userEvent from '@testing-library/user-event';
-import { foldNode, queryNodeInput } from './MainView/testUtilities';
+import React from 'react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { MindMap } from './MindMap'
+import userEvent from '@testing-library/user-event'
+import { foldNode, queryNodeInput } from './MainView/testUtilities'
 import {
   createRootNode,
   completeNodeNaming,
@@ -11,105 +11,105 @@ import {
   createTrees,
   queryNode,
   findNodeInput,
-} from './MindMapTestUtilities';
+} from './MindMapTestUtilities'
 
-const spy = jest.spyOn(global.console, 'error');
-afterEach(() => expect(spy).not.toHaveBeenCalled());
+const spy = jest.spyOn(global.console, 'error')
+afterEach(() => expect(spy).not.toHaveBeenCalled())
 
 describe('view elements', () => {
   test('tabs', () => {
-    render(<MindMap />);
-    screen.getByLabelText(/^tabs$/i);
-  });
+    render(<MindMap />)
+    screen.getByLabelText(/^tabs$/i)
+  })
 
   test('actions', () => {
-    render(<MindMap />);
-    screen.getByLabelText(/^actions$/i);
-  });
+    render(<MindMap />)
+    screen.getByLabelText(/^actions$/i)
+  })
 
   test('main view', () => {
-    render(<MindMap />);
-    screen.getByLabelText(/^main view$/i);
-  });
-});
+    render(<MindMap />)
+    screen.getByLabelText(/^main view$/i)
+  })
+})
 
 describe('tabs integration', () => {
   test('add a new tab', () => {
-    render(<MindMap />);
-    expect(screen.queryByText('untitled')).toBeNull();
+    render(<MindMap />)
+    expect(screen.queryByText('untitled')).toBeNull()
 
-    fireEvent.click(screen.getByLabelText('add new tab'));
-    expect(screen.getByText('untitled')).toBeVisible();
+    fireEvent.click(screen.getByLabelText('add new tab'))
+    expect(screen.getByText('untitled')).toBeVisible()
 
-    fireEvent.click(screen.getByLabelText('add new tab'));
-    expect(screen.getAllByText('untitled').length).toBe(2);
-  });
+    fireEvent.click(screen.getByLabelText('add new tab'))
+    expect(screen.getAllByText('untitled').length).toBe(2)
+  })
 
   test('rename a tab', () => {
-    render(<MindMap />);
-    fireEvent.click(screen.getByLabelText('add new tab'));
-    fireEvent.doubleClick(screen.getByText('untitled'));
+    render(<MindMap />)
+    fireEvent.click(screen.getByLabelText('add new tab'))
+    fireEvent.doubleClick(screen.getByText('untitled'))
 
-    const someNewTitle = 'some new title';
-    userEvent.type(document.activeElement, someNewTitle);
-    userEvent.type(document.activeElement, '{enter}');
+    const someNewTitle = 'some new title'
+    userEvent.type(document.activeElement, someNewTitle)
+    userEvent.type(document.activeElement, '{enter}')
 
-    expect(screen.getByText(someNewTitle)).toBeVisible();
-  });
-});
+    expect(screen.getByText(someNewTitle)).toBeVisible()
+  })
+})
 
 describe('main view integration', () => {
   test('create a rootnode and edit its content', async () => {
-    render(<MindMap />);
+    render(<MindMap />)
 
-    createRootNode();
+    createRootNode()
 
-    const InputNode = queryNodeInput();
-    expect(InputNode).toBeVisible();
-    expect(InputNode).toHaveFocus();
+    const InputNode = queryNodeInput()
+    expect(InputNode).toBeVisible()
+    expect(InputNode).toHaveFocus()
 
-    const someNewText = 'some new text';
-    await completeNodeNaming(someNewText);
+    const someNewText = 'some new text'
+    await completeNodeNaming(someNewText)
 
-    await waitFor(() => expect(queryNodeInput()).toBeNull());
-    expect(screen.getByText(someNewText)).toBeVisible();
-  });
+    await waitFor(() => expect(queryNodeInput()).toBeNull())
+    expect(screen.getByText(someNewText)).toBeVisible()
+  })
 
   test('create multiple rootnodes', async () => {
-    render(<MindMap />);
+    render(<MindMap />)
 
-    const rootTexts = ['root node 1', 'root node 2'];
+    const rootTexts = ['root node 1', 'root node 2']
     for (const text of rootTexts) {
-      await createRootNodeWithProperties({ text });
-      const CreatedNode = await screen.findByText(text);
-      expect(CreatedNode).toBeVisible();
+      await createRootNodeWithProperties({ text })
+      const CreatedNode = await screen.findByText(text)
+      expect(CreatedNode).toBeVisible()
     }
-  });
+  })
 
   test('create a childnode', async () => {
-    render(<MindMap />);
-    const rootText = 'root text';
-    await createRootNodeWithProperties({ text: rootText });
+    render(<MindMap />)
+    const rootText = 'root text'
+    await createRootNodeWithProperties({ text: rootText })
 
-    const ParentNode = screen.getByText(rootText);
-    createChildNode(ParentNode);
-    const ChildInput = await findNodeInput();
-    expect(ChildInput).toBeVisible();
+    const ParentNode = screen.getByText(rootText)
+    createChildNode(ParentNode)
+    const ChildInput = await findNodeInput()
+    expect(ChildInput).toBeVisible()
     await waitFor(() => {
-      expect(ChildInput).toHaveFocus();
-    });
+      expect(ChildInput).toHaveFocus()
+    })
 
-    const childText = 'child text';
-    await completeNodeNaming(childText);
+    const childText = 'child text'
+    await completeNodeNaming(childText)
 
-    expect(queryNodeInput()).toBeNull();
-    [rootText, childText].forEach((text) => {
-      expect(screen.getByText(text)).toBeVisible();
-    });
-  });
+    expect(queryNodeInput()).toBeNull()
+    ;[rootText, childText].forEach((text) => {
+      expect(screen.getByText(text)).toBeVisible()
+    })
+  })
 
   test('fold a node', async () => {
-    render(<MindMap />);
+    render(<MindMap />)
     const texts = [
       {
         notFoldedAway: 'unaffected1',
@@ -121,83 +121,83 @@ describe('main view integration', () => {
         toFold: 'fold this2',
         foldedAway: 'folded away2',
       },
-    ];
-    const trees = texts.map(generateFoldTree);
-    await createTrees(trees);
+    ]
+    const trees = texts.map(generateFoldTree)
+    await createTrees(trees)
 
     for (const text of texts) {
-      expect(screen.getByText(text.foldedAway)).toBeVisible();
+      expect(screen.getByText(text.foldedAway)).toBeVisible()
 
-      const NodeToFold = screen.getByText(text.toFold);
-      foldNode(NodeToFold);
+      const NodeToFold = screen.getByText(text.toFold)
+      foldNode(NodeToFold)
       await waitFor(() =>
         expect(screen.queryByText(text.foldedAway)).toBeNull()
-      );
+      )
 
-      foldNode(NodeToFold);
+      foldNode(NodeToFold)
       await waitFor(() =>
         expect(screen.getByText(text.foldedAway)).toBeVisible()
-      );
+      )
     }
 
     function generateFoldTree({ notFoldedAway, toFold, foldedAway }) {
       return {
         text: notFoldedAway,
         children: [{ text: toFold, children: [{ text: foldedAway }] }],
-      };
+      }
     }
-  });
+  })
 
   test('editing node text', async () => {
-    render(<MindMap />);
-    const rootNode = { text: 'root node' };
-    const RootNode = await createRootNodeWithProperties(rootNode);
+    render(<MindMap />)
+    const rootNode = { text: 'root node' }
+    const RootNode = await createRootNodeWithProperties(rootNode)
 
-    userEvent.type(RootNode, '{enter}');
-    const NodeInput = await findNodeInput();
-    expect(NodeInput).toBeVisible();
+    userEvent.type(RootNode, '{enter}')
+    const NodeInput = await findNodeInput()
+    expect(NodeInput).toBeVisible()
     await waitFor(() => {
-      expect(NodeInput).toHaveFocus();
-    });
+      expect(NodeInput).toHaveFocus()
+    })
 
-    const newText = 'some new text';
-    userEvent.type(NodeInput, newText);
-    userEvent.type(NodeInput, '{enter}');
-    expect(queryNode({ text: newText }));
-  });
+    const newText = 'some new text'
+    userEvent.type(NodeInput, newText)
+    userEvent.type(NodeInput, '{enter}')
+    expect(queryNode({ text: newText }))
+  })
 
   describe('undo/redo', () => {
     test('creation of rootnode', async () => {
-      render(<MindMap />);
+      render(<MindMap />)
 
-      const rootNode = { text: 'root node' };
+      const rootNode = { text: 'root node' }
 
-      const RootNode = await createRootNodeWithProperties(rootNode);
-      expect(RootNode).toBeVisible();
+      const RootNode = await createRootNodeWithProperties(rootNode)
+      expect(RootNode).toBeVisible()
 
-      const UndoActionButton = screen.getByLabelText('undo action');
-      fireEvent.click(UndoActionButton);
-      await waitFor(() => expect(screen.queryByText(rootNode.text)).toBeNull());
-      expect(queryNodeInput()).toBeVisible();
-      expect(queryNodeInput()).toHaveFocus();
+      const UndoActionButton = screen.getByLabelText('undo action')
+      fireEvent.click(UndoActionButton)
+      await waitFor(() => expect(screen.queryByText(rootNode.text)).toBeNull())
+      expect(queryNodeInput()).toBeVisible()
+      expect(queryNodeInput()).toHaveFocus()
 
-      const EmptyScreen = screen;
-      fireEvent.click(UndoActionButton);
-      expect(screen).toEqual(EmptyScreen);
+      const EmptyScreen = screen
+      fireEvent.click(UndoActionButton)
+      expect(screen).toEqual(EmptyScreen)
 
-      fireEvent.click(UndoActionButton);
-      await waitFor(() => expect(screen.queryByText(rootNode.text)).toBeNull());
+      fireEvent.click(UndoActionButton)
+      await waitFor(() => expect(screen.queryByText(rootNode.text)).toBeNull())
 
-      const RedoActionButton = screen.getByLabelText('redo action');
-      fireEvent.click(RedoActionButton);
-      await waitFor(() => expect(queryNodeInput()).toBeVisible);
+      const RedoActionButton = screen.getByLabelText('redo action')
+      fireEvent.click(RedoActionButton)
+      await waitFor(() => expect(queryNodeInput()).toBeVisible)
 
-      fireEvent.click(RedoActionButton);
-      await waitFor(() => expect(screen.getByText(rootNode.text)).toBeVisible);
+      fireEvent.click(RedoActionButton)
+      await waitFor(() => expect(screen.getByText(rootNode.text)).toBeVisible)
 
-      const NonEmptyScreen = screen;
-      fireEvent.click(RedoActionButton);
-      expect(screen).toEqual(NonEmptyScreen);
-    });
-  });
-});
+      const NonEmptyScreen = screen
+      fireEvent.click(RedoActionButton)
+      expect(screen).toEqual(NonEmptyScreen)
+    })
+  })
+})

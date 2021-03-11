@@ -1,4 +1,4 @@
-import React, { createContext } from 'react';
+import React, { createContext } from 'react'
 
 export function createMockContextProvider(
   { initialState = {}, modifications = {} } = {
@@ -6,12 +6,12 @@ export function createMockContextProvider(
     modifications: {},
   }
 ) {
-  const Context = createContext();
+  const Context = createContext()
 
-  return [Context, Provider];
+  return [Context, Provider]
 
   function Provider({ children }) {
-    const model = { state: initialState, ...modifications };
-    return <Context.Provider value={model}>{children}</Context.Provider>;
+    const model = { state: initialState, ...modifications }
+    return <Context.Provider value={model}>{children}</Context.Provider>
   }
 }

@@ -1,8 +1,8 @@
-import React from 'react';
-import { useActions } from './useActions';
+import React from 'react'
+import { useActions } from './useActions'
 
 export function Actions({ useHook = useActions }) {
-  const { undoAction, redoAction, createRootNode } = useHook();
+  const { undoAction, redoAction, createRootNode } = useHook()
 
   return (
     <div aria-label="actions">
@@ -10,5 +10,5 @@ export function Actions({ useHook = useActions }) {
       <button onClick={() => undoAction()} aria-label="undo action"></button>
       <button onClick={() => redoAction()} aria-label="redo action"></button>
     </div>
-  );
+  )
 }
