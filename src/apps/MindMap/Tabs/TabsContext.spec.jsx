@@ -33,4 +33,33 @@ describe('overlap with Tabs.spec', () => {
       });
     });
   });
+
+  test('addNewTab', () => {
+    const initialState = { tabs: [] };
+    const wrapper = ({ children }) => (
+      <TabsProvider initialState={initialState}>{children}</TabsProvider>
+    );
+    const { result } = renderHook(() => useContext(TabsContext), { wrapper });
+
+    [0, 1, 2].forEach((i) => {
+      act(() => result.current.addNewTab());
+      expect(result.current.state.tabs.length).toBe(i + 1);
+
+      const selectedTab = result.current.state.tabs[i];
+      const notSelectedTabs = result.current.state.tabs.filter(
+        (tab, index) => index !== i
+      );
+      expect(selectedTab.id).not.toBeFalsy();
+      expect(selectedTab.selected).toBe(true);
+      notSelectedTabs.forEach((tab) => expect(tab.selected).toBe(false));
+    });
+
+    expectIdsToBeUnique();
+
+    function expectIdsToBeUnique() {
+      const ids = result.current.state.tabs.map((tab) => tab.id);
+      const setIds = new Set(ids);
+      expect(ids.length).toBe(setIds.size);
+    }
+  });
 });
