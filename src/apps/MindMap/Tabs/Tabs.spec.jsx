@@ -14,9 +14,9 @@ test('overlap with MindMap.spec', () => {
 
 describe('views', () => {
   const tabs = [
-    { id: uuidv4(), title: 'untitled' },
-    { id: uuidv4(), title: 'untitled-2' },
-    { id: uuidv4(), title: 'untitled-3' },
+    { id: uuidv4(), title: 'untitled', selected: true },
+    { id: uuidv4(), title: 'untitled-2', selected: false },
+    { id: uuidv4(), title: 'untitled-3', selected: false },
   ];
 
   test('add new tab', () => {
@@ -62,6 +62,23 @@ describe('views', () => {
 
       fireEvent.dblClick(Tab);
       expect(idRename).toBe(tab.id);
+    });
+  });
+
+  test('tab selection', () => {
+    render(
+      <TabsMockProvider
+        modifyViewModel={(viewModel) => ({ ...viewModel, state: { tabs } })}
+      >
+        <Tabs context={TabsMockContext} />
+      </TabsMockProvider>
+    );
+
+    tabs.forEach((tab) => {
+      const Tab = screen.getByText(tab.title);
+      expect(Tab).toHaveStyle(
+        `font-weight: ${tab.selected ? 'bold' : 'normal'}`
+      );
     });
   });
 });
