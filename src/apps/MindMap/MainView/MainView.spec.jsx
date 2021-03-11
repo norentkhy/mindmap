@@ -9,11 +9,7 @@ const editNodeLabel = 'editing node';
 
 describe('inherited from MindMap.spec', () => {
   test('label', () => {
-    render(
-      <MainViewMockProvider>
-        <MainView context={MainViewMockContext} />
-      </MainViewMockProvider>
-    );
+    renderMockedMainView();
     screen.getByLabelText(/^main view$/i);
   });
 });
@@ -23,28 +19,14 @@ describe('making a rootnode', () => {
     const id = uuidv4();
     const text = 'original text';
     const initialState = { trees: [{ id, text }] };
-    render(
-      <MainViewMockProvider
-        initialState={initialState}
-        modifyViewModel={(viewModel) => ({ ...viewModel })}
-      >
-        <MainView context={MainViewMockContext} />
-      </MainViewMockProvider>
-    );
+    renderMockedMainView({ initialState });
 
     expect(screen.getByText(text)).toBeVisible();
   });
 
   test('signal initiation to viewmodel', () => {
     const createRootNode = jest.fn();
-
-    render(
-      <MainViewMockProvider
-        modifyViewModel={(viewModel) => ({ ...viewModel, createRootNode })}
-      >
-        <MainView context={MainViewMockContext} />
-      </MainViewMockProvider>
-    );
+    renderMockedMainView({ viewModelModifications: { createRootNode } });
 
     expect(screen.queryByLabelText(editNodeLabel)).toBeNull();
 
@@ -57,14 +39,10 @@ describe('making a rootnode', () => {
     const text = 'original text';
     const initialState = { trees: [{ id, text, editing: true }] };
     const finalizeEditNode = jest.fn();
-    render(
-      <MainViewMockProvider
-        initialState={initialState}
-        modifyViewModel={(viewModel) => ({ ...viewModel, finalizeEditNode })}
-      >
-        <MainView context={MainViewMockContext} />
-      </MainViewMockProvider>
-    );
+    renderMockedMainView({
+      initialState,
+      viewModelModifications: { finalizeEditNode },
+    });
 
     const InputNode = screen.getByLabelText(editNodeLabel);
     expect(InputNode).toBeVisible();
@@ -83,14 +61,7 @@ describe('making a rootnode', () => {
     const rootNode1 = { id: uuidv4(), text: '1' };
     const rootNode2 = { id: uuidv4(), text: '2' };
     const initialState = { trees: [rootNode1, rootNode2] };
-    render(
-      <MainViewMockProvider
-        initialState={initialState}
-        modifyViewModel={(viewModel) => ({ ...viewModel })}
-      >
-        <MainView context={MainViewMockContext} />
-      </MainViewMockProvider>
-    );
+    renderMockedMainView({ initialState });
 
     expect(screen.getByText(rootNode1.text)).toBeVisible();
     expect(screen.getByText(rootNode2.text)).toBeVisible();
@@ -103,14 +74,10 @@ describe('adding a child node', () => {
     const text = 'root node';
     const initialState = { trees: [{ id, text }] };
     const createChildNode = jest.fn();
-    render(
-      <MainViewMockProvider
-        initialState={initialState}
-        modifyViewModel={(viewModel) => ({ ...viewModel, createChildNode })}
-      >
-        <MainView context={MainViewMockContext} />
-      </MainViewMockProvider>
-    );
+    renderMockedMainView({
+      initialState,
+      viewModelModifications: { createChildNode },
+    });
 
     userEvent.type(screen.getByText(text), 'c');
     expect(createChildNode).toHaveBeenCalled();
@@ -123,14 +90,10 @@ describe('adding a child node', () => {
       trees: [{ id: uuidv4(), text: 'parent', children: [childNode] }],
     };
     const finalizeEditNode = jest.fn();
-    render(
-      <MainViewMockProvider
-        initialState={initialState}
-        modifyViewModel={(viewModel) => ({ ...viewModel, finalizeEditNode })}
-      >
-        <MainView context={MainViewMockContext} />
-      </MainViewMockProvider>
-    );
+    renderMockedMainView({
+      initialState,
+      viewModelModifications: { finalizeEditNode },
+    });
 
     const InputNode = screen.getByLabelText(editNodeLabel);
     expect(InputNode).toBeVisible();
@@ -156,17 +119,11 @@ describe('editing a node', () => {
       trees: [parentNode],
     };
     const initiateEditNode = jest.fn();
-    render(
-      <MainViewMockProvider
-        initialState={initialState}
-        modifyViewModel={(viewModel) => ({
-          ...viewModel,
-          initiateEditNode,
-        })}
-      >
-        <MainView context={MainViewMockContext} />
-      </MainViewMockProvider>
-    );
+    renderMockedMainView({
+      initialState,
+      viewModelModifications: { initiateEditNode },
+    });
+
     const node = parentNode;
     const Node = screen.getByText(node.text);
     userEvent.type(Node, '{enter}');
@@ -182,11 +139,7 @@ describe('folding a node', () => {
     const initialState = {
       trees: [{ ...FoldedNode, folded: true, children: [InvisibleNode] }],
     };
-    render(
-      <MainViewMockProvider initialState={initialState}>
-        <MainView context={MainViewMockContext} />
-      </MainViewMockProvider>
-    );
+    renderMockedMainView({ initialState });
 
     expect(screen.getByText(FoldedNode.text)).toBeVisible();
     expect(screen.queryByText(InvisibleNode.text)).toBeNull();
@@ -198,20 +151,38 @@ describe('folding a node', () => {
       trees: [NodeToFold],
     };
     const foldNode = jest.fn();
-    render(
-      <MainViewMockProvider
-        initialState={initialState}
-        modifyViewModel={(viewModel) => ({ ...viewModel, foldNode })}
-      >
-        <MainView context={MainViewMockContext} />
-      </MainViewMockProvider>
-    );
+
+    renderMockedMainView({
+      initialState,
+      viewModelModifications: { foldNode },
+    });
 
     userEvent.type(screen.getByText(NodeToFold.text), 'f');
     expect(foldNode).toHaveBeenCalled();
     expect(foldNode.mock.calls[0]).toEqual([NodeToFold.id]);
   });
 });
+
+function renderMockedMainView(
+  { initialState = {}, viewModelModifications = {} } = {
+    initialState: {},
+    viewModelModifications: {},
+  }
+) {
+  const modifyViewModel = (viewModel) => ({
+    ...viewModel,
+    ...viewModelModifications,
+  });
+
+  return render(
+    <MainViewMockProvider
+      initialState={initialState}
+      modifyViewModel={modifyViewModel}
+    >
+      <MainView context={MainViewMockContext} />
+    </MainViewMockProvider>
+  );
+}
 
 const MainViewMockContext = createContext();
 
