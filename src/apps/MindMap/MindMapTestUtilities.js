@@ -1,73 +1,86 @@
-import { fireEvent, screen } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { queryNodeInput } from './MainView/MainView.spec';
 import { v4 as uuidv4 } from 'uuid';
 
-function generateUniqueText() {
+export function generateUniqueText() {
   return uuidv4();
 }
-function createTrees(trees) {
-  trees?.forEach((tree) => {
-    const NodeDifferences = findNodeDifferences(() => {
-      createRootNodeWithProperties({ text: tree.text });
-    });
-    const RootNode = NodeDifferences[0];
-    createChildTrees(RootNode, tree?.children);
-  });
+
+export async function createTrees(trees) {
+  if (trees?.length) {
+    for (const tree of trees) {
+      const RootNode = await createRootNodeWithProperties({ text: tree.text });
+      await createChildTrees(RootNode, tree?.children);
+    }
+  }
 }
-function createChildTrees(ParentNode, trees) {
-  trees?.forEach((tree) => {
-    const NodeDifferences = findNodeDifferences(() => {
-      createChildNodeWithProperties(ParentNode, { text: tree.text });
-    });
-    const RootNode = NodeDifferences[0];
-    createChildTrees(RootNode, tree?.children);
-  });
+
+export async function createChildTrees(ParentNode, trees) {
+  if (trees?.length) {
+    for (const tree of trees) {
+      const RootNode = await createChildNodeWithProperties(ParentNode, {
+        text: tree.text,
+      });
+      await createChildTrees(RootNode, tree?.children);
+    }
+  }
 }
-function expectTreesToBeVisible(trees) {
+
+export function expectTreesToBeVisible(trees) {
   trees?.forEach((tree) => {
     expect(screen.getByText(tree.text)).toBeVisible();
     expectTreesToBeVisible(tree.children);
   });
 }
-function createRootNode() {
+
+export function createRootNode() {
   const MainView = screen.getByLabelText('main view');
   fireEvent.doubleClick(MainView);
 }
-function createChildNode(ParentNode) {
+
+export function createChildNode(ParentNode) {
   userEvent.type(ParentNode, 'c');
 }
-function createChildNodeWithProperties(ParentNode, { text, ...rest }) {
-  const NodesDifference = findNodeDifferences(() => {
+
+export async function createChildNodeWithProperties(
+  ParentNode,
+  { text, ...rest }
+) {
+  const NodesDifference = await findNodeDifferences(async () => {
     createChildNode(ParentNode);
-    completeNodeNaming(text);
+    await completeNodeNaming(text);
   });
 
   return NodesDifference[0];
 }
-function createRootNodeWithProperties({ text, ...rest }) {
-  const NodesDifference = findNodeDifferences(() => {
+
+export async function createRootNodeWithProperties({ text, ...rest }) {
+  const NodesDifference = await findNodeDifferences(async () => {
     createRootNode();
-    completeNodeNaming(text);
+    await completeNodeNaming(text);
   });
 
   return NodesDifference[0];
 }
-function completeNodeNaming(text) {
-  const InputNode = queryNodeInput();
+
+export async function completeNodeNaming(text) {
+  const InputNode = await findNodeInput();
   userEvent.type(InputNode, text);
   userEvent.type(InputNode, '{enter}');
+
+  await waitForNodeInputToDisappear();
 }
 
-function findNodeDifferences(callback) {
+export async function findNodeDifferences(callback) {
   const NodesBefore = getButtons();
-  callback();
+  await callback();
   const NodesAfter = getButtons();
 
   return findDifferencesOnKey({ NodesBefore, NodesAfter });
 
   function getButtons() {
-    return screen.getAllByRole('button');
+    return screen.queryAllByRole('button');
   }
 
   function findDifferencesOnKey({ NodesBefore, NodesAfter }) {
@@ -86,7 +99,15 @@ function findNodeDifferences(callback) {
   }
 }
 
-function queryNode(args) {
+export function findNodeInput() {
+  return screen.findByLabelText(nodeInputLabel);
+}
+
+export async function waitForNodeInputToDisappear() {
+  await waitFor(() => expect(queryNodeInput()).toBeNull());
+}
+
+export function queryNode(args) {
   const { text } = args;
 
   if (text) return screen.queryByText(text);
@@ -94,15 +115,4 @@ function queryNode(args) {
   throw new Error('unknown args');
 }
 
-export {
-  findNodeDifferences as findDifferences,
-  generateUniqueText,
-  createTrees,
-  expectTreesToBeVisible,
-  createRootNode,
-  createChildNode,
-  createChildNodeWithProperties,
-  createRootNodeWithProperties,
-  completeNodeNaming,
-  queryNode,
-};
+const nodeInputLabel = 'editing node';

@@ -1,63 +1,91 @@
+import React, { createContext, useEffect, useReducer } from 'react';
 import produce from 'immer';
-import React, { createContext, useReducer } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import { useTime } from '../hooks/useTime';
 
 export const MainViewContext = createContext();
 
-export function MainViewProvider({
-  children,
-  initialState = { trees: [], nodes: new Map() },
-}) {
-  const [state, dispatch] = useReducer(reducer, initialState);
-  const viewModel = {
-    state,
-    createRootNode: () => dispatch({ type: 'CREATE_ROOT_NODE' }),
-    createChildNode: (parentId) =>
-      dispatch({ type: 'CREATE_CHILD_NODE', payload: parentId }),
-    initiateEditNode: (id) =>
-      dispatch({ type: 'EDIT_NODE', payload: { id, editing: true } }),
-    finalizeEditNode: (payload) => {
-      dispatch({ type: 'EDIT_NODE', payload: { ...payload, editing: false } });
-    },
-    foldNode: (id) => dispatch({ type: 'TOGGLE_NODE_FOLD', payload: id }),
-  };
+export function MainViewProvider({ children, initialState = { trees: [] } }) {
+  const newViewModel = useMainView({ initialState });
 
   return (
-    <MainViewContext.Provider value={viewModel}>
+    <MainViewContext.Provider value={newViewModel}>
       {children}
     </MainViewContext.Provider>
   );
+}
 
-  function reducer(state, action) {
-    switch (action.type) {
-      case 'CREATE_ROOT_NODE':
-        return produce(state, (newState) => {
-          const node = createNode();
-          newState.trees.push(node);
-        });
-      case 'CREATE_CHILD_NODE':
-        return produce(state, (newState) => {
-          const parentId = action.payload;
-          const parentNode = getNode({ id: parentId, trees: newState.trees });
-          if (!parentNode.children) parentNode.children = [];
+function useMainView({ initialState }) {
+  const [state, dispatch] = useReducer(reduce, initialState);
+  const { timeline, insertIntoTimeline, goBack, goForward } = useTime();
 
-          const node = createNode();
-          parentNode.children.push(node);
-        });
-      case 'EDIT_NODE':
-        return produce(state, (newState) => {
-          const { id, ...modifications } = action.payload;
-          modifyNode({ id, trees: newState.trees, modifications });
-        });
-      case 'TOGGLE_NODE_FOLD':
-        return produce(state, (newState) => {
-          const id = action.payload;
-          const node = getNode({ id, trees: newState.trees });
-          node.folded = !node.folded;
-        });
-    }
+  useEffect(() => {
+    insertIntoTimeline(state);
+  }, [state]);
+
+  return {
+    state: timeline.present,
+    createRootNode() {
+      dispatch({ type: 'CREATE_ROOT_NODE' });
+    },
+    createChildNode(parentId) {
+      dispatch({ type: 'CREATE_CHILD_NODE', payload: parentId });
+    },
+    initiateEditNode(id) {
+      dispatch({ type: 'EDIT_NODE', payload: { id, editing: true } });
+    },
+    finalizeEditNode(payload) {
+      dispatch({ type: 'EDIT_NODE', payload: { ...payload, editing: false } });
+    },
+    foldNode(id) {
+      dispatch({ type: 'TOGGLE_NODE_FOLD', payload: id });
+    },
+    replaceState(newState) {
+      dispatch({ type: 'REPLACE_STATE', payload: newState });
+    },
+    undo: goBack,
+    redo: goForward,
+  };
+
+  function reduce(state, action) {
+    const transition = stateTransitions[action.type];
+    const newState = transition(state, action.payload);
+
+    return newState;
   }
 }
+
+const stateTransitions = {
+  CREATE_ROOT_NODE(state) {
+    return produce(state, (newState) => {
+      const node = createNode();
+      newState.trees.push(node);
+    });
+  },
+  CREATE_CHILD_NODE(state, parentId) {
+    return produce(state, (newState) => {
+      const parentNode = getNode({ id: parentId, trees: newState.trees });
+      if (!parentNode.children) parentNode.children = [];
+
+      const node = createNode();
+      parentNode.children.push(node);
+    });
+  },
+  EDIT_NODE(state, { id, ...modifications }) {
+    return produce(state, (newState) => {
+      modifyNode({ id, trees: newState.trees, modifications });
+    });
+  },
+  TOGGLE_NODE_FOLD(state, id) {
+    return produce(state, (newState) => {
+      const node = getNode({ id, trees: newState.trees });
+      node.folded = !node.folded;
+    });
+  },
+  REPLACE_STATE(state, newState) {
+    return newState;
+  },
+};
 
 function getNode({ id, trees }) {
   if (trees.length === 0) return null;

@@ -1,5 +1,10 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import {
+  render,
+  screen,
+  waitFor,
+  waitForElementToBeRemoved,
+} from '@testing-library/react';
 import { MindMap } from './MindMap';
 import {
   createRootNodeWithProperties,
@@ -7,9 +12,15 @@ import {
   createChildNodeWithProperties,
   createTrees,
   expectTreesToBeVisible,
-  findDifferences,
+  findNodeDifferences,
   queryNode,
+  createRootNode,
+  findNodeInput,
+  completeNodeNaming,
+  waitForNodeInputToDisappear,
+  createChildNode,
 } from './MindMapTestUtilities';
+import { queryNodeInput } from './MainView/MainView.spec';
 
 describe('utilities', () => {
   test('unique random text', () => {
@@ -23,80 +34,85 @@ describe('utilities', () => {
   });
 
   describe('create a root node with properties', () => {
-    test('basic functionality', () => {
+    test('basic functionality', async () => {
       render(<MindMap />);
 
       const text = generateUniqueText();
-      createRootNodeWithProperties({ text });
+      await createRootNodeWithProperties({ text });
 
-      const FoundNode = screen.getByText(text);
+      const FoundNode = await screen.findByText(text);
       expect(FoundNode).toBeVisible();
     });
 
-    test('returns the created node', () => {
+    test('returns the created node', async () => {
       render(<MindMap />);
 
       const text = generateUniqueText();
-      const CreatedNode = createRootNodeWithProperties({ text });
+      const CreatedNode = await createRootNodeWithProperties({ text });
 
-      const FoundNode = screen.getByText(text);
+      const FoundNode = await screen.findByText(text);
+      expect(CreatedNode).not.toBe(undefined);
       expect(FoundNode).toBe(CreatedNode);
     });
   });
 
   describe('create a child node with properties', () => {
-    test('basic functionality', () => {
-      const ParentNode = renderMindMapWithParentNode();
+    test('basic functionality', async () => {
+      const ParentNode = await renderMindMapWithParentNode();
 
       const text = generateUniqueText();
-      createChildNodeWithProperties(ParentNode, { text });
+      await createChildNodeWithProperties(ParentNode, { text });
 
-      expect(screen.getByText(text)).toBeVisible();
+      const FoundNode = await screen.findByText(text);
+      expect(FoundNode).toBeVisible();
     });
 
-    test('returns the created node', () => {
-      const ParentNode = renderMindMapWithParentNode();
+    test('returns the created node', async () => {
+      const ParentNode = await renderMindMapWithParentNode();
 
       const text = generateUniqueText();
-      const CreatedNode = createChildNodeWithProperties(ParentNode, {
+
+      const CreatedNode = await createChildNodeWithProperties(ParentNode, {
         text,
       });
 
-      const FoundNode = screen.getByText(text);
+      const FoundNode = await screen.findByText(text);
+      expect(CreatedNode).not.toBe(undefined);
       expect(CreatedNode).toBeVisible(FoundNode);
     });
 
-    function renderMindMapWithParentNode() {
+    async function renderMindMapWithParentNode() {
       render(<MindMap />);
       let parentText = generateUniqueText();
-      return createRootNodeWithProperties({ text: parentText });
+      return await createRootNodeWithProperties({ text: parentText });
     }
   });
 
-  test('query a node', () => {
+  test('query a node', async () => {
     render(<MindMap />);
 
     const rootNode = { text: 'root' };
     expect(queryNode(rootNode)).toBeNull();
 
-    createRootNodeWithProperties(rootNode);
+    await createRootNodeWithProperties(rootNode);
     expect(queryNode(rootNode)).toBeVisible();
 
     const childNode = { text: 'child' };
     expect(queryNode(childNode)).toBeNull();
 
-    createRootNodeWithProperties(childNode);
+    await createRootNodeWithProperties(childNode);
     expect(queryNode(childNode)).toBeVisible();
   });
 
-  test('find differences', () => {
+  test('find differences', async () => {
     render(<MindMap />);
-    createRootNodeWithProperties({ text: 'not this one' });
+    await createRootNodeWithProperties({ text: 'not this one' });
 
     const targettedText = 'this one';
-    const Differences = findDifferences(() =>
-      createRootNodeWithProperties({ text: targettedText })
-    );
+    const Differences = await findNodeDifferences(async () => {
+      await createRootNodeWithProperties({ text: targettedText });
+      await screen.findByText(targettedText);
+    });
     expect(Differences.length).toBe(1);
     Differences[0].focus();
     expect(Differences[0]).toEqual(screen.getByText(targettedText));
@@ -126,9 +142,9 @@ describe('utilities', () => {
         },
       ],
     ],
-  ])('create a mindmap from tree datastructures', (trees) => {
+  ])('create a mindmap from tree datastructures', async (trees) => {
     render(<MindMap />);
-    createTrees(trees);
+    await createTrees(trees);
     expectTreesToBeVisible(trees);
   });
 });

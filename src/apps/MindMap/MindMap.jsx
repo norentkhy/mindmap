@@ -1,4 +1,5 @@
 import React, { createContext } from 'react';
+import { Actions } from './Actions/Actions';
 import { MainView } from './MainView/MainView';
 import { MainViewContext, MainViewProvider } from './MainView/MainViewContext';
 import { Tabs } from './Tabs/Tabs';
@@ -12,10 +13,6 @@ export function MindMap() {
       <MainView context={MainViewContext} />
     </MainProvider>
   );
-}
-
-function Actions() {
-  return <div aria-label="actions"></div>;
 }
 
 const MainContext = createContext();

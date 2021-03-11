@@ -9,9 +9,12 @@ import {
   createRootNodeWithProperties,
   createChildNode,
   createTrees,
-  createChildNodeWithProperties,
   queryNode,
+  findNodeInput,
 } from './MindMapTestUtilities';
+
+const spy = jest.spyOn(global.console, 'error');
+afterEach(() => expect(spy).not.toHaveBeenCalled());
 
 describe('view elements', () => {
   test('tabs', () => {
@@ -56,7 +59,7 @@ describe('tabs integration', () => {
 });
 
 describe('main view integration', () => {
-  test('create a rootnode and edit its content', () => {
+  test('create a rootnode and edit its content', async () => {
     render(<MindMap />);
 
     createRootNode();
@@ -66,37 +69,38 @@ describe('main view integration', () => {
     expect(InputNode).toHaveFocus();
 
     const someNewText = 'some new text';
-    completeNodeNaming(someNewText);
+    await completeNodeNaming(someNewText);
 
-    expect(queryNodeInput()).toBeNull();
+    await waitFor(() => expect(queryNodeInput()).toBeNull());
     expect(screen.getByText(someNewText)).toBeVisible();
   });
 
-  test('create multiple rootnodes', () => {
+  test('create multiple rootnodes', async () => {
     render(<MindMap />);
 
     const rootTexts = ['root node 1', 'root node 2'];
-    rootTexts.forEach((text) => {
-      createRootNodeWithProperties({ text });
-      expect(screen.getByText(text)).toBeVisible();
-    });
+    for (const text of rootTexts) {
+      await createRootNodeWithProperties({ text });
+      const CreatedNode = await screen.findByText(text);
+      expect(CreatedNode).toBeVisible();
+    }
   });
 
   test('create a childnode', async () => {
     render(<MindMap />);
     const rootText = 'root text';
-    createRootNodeWithProperties({ text: rootText });
+    await createRootNodeWithProperties({ text: rootText });
 
     const ParentNode = screen.getByText(rootText);
     createChildNode(ParentNode);
-    const ChildInput = queryNodeInput();
+    const ChildInput = await findNodeInput();
     expect(ChildInput).toBeVisible();
     await waitFor(() => {
       expect(ChildInput).toHaveFocus();
     });
 
     const childText = 'child text';
-    completeNodeNaming(childText);
+    await completeNodeNaming(childText);
 
     expect(queryNodeInput()).toBeNull();
     [rootText, childText].forEach((text) => {
@@ -104,7 +108,7 @@ describe('main view integration', () => {
     });
   });
 
-  test('fold a node', () => {
+  test('fold a node', async () => {
     render(<MindMap />);
     const texts = [
       {
@@ -119,18 +123,22 @@ describe('main view integration', () => {
       },
     ];
     const trees = texts.map(generateFoldTree);
-    createTrees(trees);
+    await createTrees(trees);
 
-    texts.forEach((text) => {
+    for (const text of texts) {
       expect(screen.getByText(text.foldedAway)).toBeVisible();
 
       const NodeToFold = screen.getByText(text.toFold);
       foldNode(NodeToFold);
-      expect(screen.queryByText(text.foldedAway)).toBeNull();
+      await waitFor(() =>
+        expect(screen.queryByText(text.foldedAway)).toBeNull()
+      );
 
       foldNode(NodeToFold);
-      expect(screen.getByText(text.foldedAway)).toBeVisible();
-    });
+      await waitFor(() =>
+        expect(screen.getByText(text.foldedAway)).toBeVisible()
+      );
+    }
 
     function generateFoldTree({ notFoldedAway, toFold, foldedAway }) {
       return {
@@ -143,10 +151,10 @@ describe('main view integration', () => {
   test('editing node text', async () => {
     render(<MindMap />);
     const rootNode = { text: 'root node' };
-    const RootNode = createRootNodeWithProperties(rootNode);
+    const RootNode = await createRootNodeWithProperties(rootNode);
 
     userEvent.type(RootNode, '{enter}');
-    const NodeInput = queryNodeInput();
+    const NodeInput = await findNodeInput();
     expect(NodeInput).toBeVisible();
     await waitFor(() => {
       expect(NodeInput).toHaveFocus();
@@ -156,5 +164,40 @@ describe('main view integration', () => {
     userEvent.type(NodeInput, newText);
     userEvent.type(NodeInput, '{enter}');
     expect(queryNode({ text: newText }));
+  });
+
+  describe('undo/redo', () => {
+    test('creation of rootnode', async () => {
+      render(<MindMap />);
+
+      const rootNode = { text: 'root node' };
+
+      const RootNode = await createRootNodeWithProperties(rootNode);
+      expect(RootNode).toBeVisible();
+
+      const UndoActionButton = screen.getByLabelText('undo action');
+      fireEvent.click(UndoActionButton);
+      await waitFor(() => expect(screen.queryByText(rootNode.text)).toBeNull());
+      expect(queryNodeInput()).toBeVisible();
+      expect(queryNodeInput()).toHaveFocus();
+
+      const EmptyScreen = screen;
+      fireEvent.click(UndoActionButton);
+      expect(screen).toEqual(EmptyScreen);
+
+      fireEvent.click(UndoActionButton);
+      await waitFor(() => expect(screen.queryByText(rootNode.text)).toBeNull());
+
+      const RedoActionButton = screen.getByLabelText('redo action');
+      fireEvent.click(RedoActionButton);
+      await waitFor(() => expect(queryNodeInput()).toBeVisible);
+
+      fireEvent.click(RedoActionButton);
+      await waitFor(() => expect(screen.getByText(rootNode.text)).toBeVisible);
+
+      const NonEmptyScreen = screen;
+      fireEvent.click(RedoActionButton);
+      expect(screen).toEqual(NonEmptyScreen);
+    });
   });
 });
