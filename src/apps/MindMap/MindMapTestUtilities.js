@@ -95,7 +95,13 @@ export async function findNodeDifferences(callback) {
   function getKey(Element) {
     const objectKeys = Object.keys(Element)
     const fiberSomething = Element[objectKeys[0]]
-    return fiberSomething?.return?.key
+    return getMeaningfulKey(fiberSomething)
+
+    function getMeaningfulKey(obj) {
+      if (obj?.key) return obj.key
+      if (obj.return) return getMeaningfulKey(obj.return)
+      return null
+    }
   }
 }
 

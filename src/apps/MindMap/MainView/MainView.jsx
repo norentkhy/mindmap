@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from 'react'
+import styled from 'styled-components'
 import { ProjectContext } from '../Contexts/ProjectContext'
 
 export function MainView({ theProjectContext = ProjectContext }) {
@@ -61,7 +62,7 @@ function Node({ node: { editing, id, text }, theProjectContext }) {
 
   if (!editing)
     return (
-      <button
+      <Button
         onKeyUp={({ key }) => {
           key === 'Enter' && initiateEditNode(id)
           key === 'c' && createChildNode(id)
@@ -69,7 +70,7 @@ function Node({ node: { editing, id, text }, theProjectContext }) {
         }}
       >
         {text}
-      </button>
+      </Button>
     )
   else
     return (
@@ -85,3 +86,5 @@ function Node({ node: { editing, id, text }, theProjectContext }) {
       />
     )
 }
+
+const Button = styled.button``
