@@ -5,7 +5,7 @@ import {
   waitFor,
   waitForElementToBeRemoved,
 } from '@testing-library/react'
-import { MindMap } from './MindMap'
+import MindMap from './MindMap'
 import {
   createRootNodeWithProperties,
   generateUniqueText,

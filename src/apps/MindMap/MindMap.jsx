@@ -5,7 +5,7 @@ import { ProjectProvider } from './Contexts/ProjectContext'
 import { Tabs } from './Tabs/Tabs'
 import { TabsProvider } from './Tabs/TabsContext'
 
-export function MindMap() {
+export default function MindMap() {
   return (
     <Providers>
       <Tabs />
