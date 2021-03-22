@@ -7,14 +7,14 @@ export function Tabs({ theTabsContext = TabsContext }) {
   const tabsToRender = getTabsToRender(state)
 
   return (
-    <div aria-label="tabs">
+    <TabsBar aria-label="tabs">
       {tabsToRender.map((tab) => (
         <Tab key={tab.id} tab={tab} theTabsContext={theTabsContext} />
       ))}
       <button aria-label="add new tab" onClick={addNewTab}>
         +
       </button>
-    </div>
+    </TabsBar>
   )
 }
 
@@ -66,4 +66,9 @@ function TabButton({ tab: { id, title, selected }, theTabsContext }) {
 
 const Button = styled.button`
   font-weight: ${({ selected }) => (selected ? 'bold' : 'normal')};
+`
+
+const TabsBar = styled.div`
+  display: flex;
+  flex-direction: row;
 `
