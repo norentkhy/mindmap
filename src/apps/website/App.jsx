@@ -3,6 +3,7 @@ import React, { useContext } from 'react'
 import styled from 'styled-components'
 
 import { withAppContext, AppContext } from './components'
+import MindMap from '../MindMap/MindMap'
 
 const App = withAppContext(AppWithoutContext)
 
@@ -10,7 +11,9 @@ function AppWithoutContext() {
   const { appState } = useContext(AppContext)
   const { onMoveEffects } = appState
 
-  return <AppContainer onMouseMove={triggerOnMoveEffects}></AppContainer>
+  return <AppContainer onMouseMove={triggerOnMoveEffects}>
+    <MindMap path="mindmap" />
+  </AppContainer>
 
   function triggerOnMoveEffects() {
     onMoveEffects.forEach((effect) => {
