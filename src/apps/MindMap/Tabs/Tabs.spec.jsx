@@ -6,6 +6,7 @@ import userEvent from '@testing-library/user-event'
 import { getInputSelection } from '../utils/getInputSelection'
 import { TabsProvider } from './TabsContext'
 import { createMockContextProvider } from '../utils/createMockContextProvider'
+import { getArgsOfLastCall } from '../utils/jestUtils'
 
 describe('rendered as intended', () => {
   test('overlap with MindMap.spec', () => {
@@ -203,13 +204,4 @@ function getFocus() {
 
 function createMockFn(...args) {
   return jest.fn(...args)
-}
-
-function getArgsOfLastCall(mockFn) {
-  const argsOfCalls = getArgsOfCalls(mockFn)
-  return argsOfCalls[argsOfCalls.length - 1]
-}
-
-function getArgsOfCalls(mockFn) {
-  return mockFn.mock.calls
 }

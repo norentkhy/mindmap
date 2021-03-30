@@ -1,5 +1,6 @@
 import { fireEvent, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { createRef } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 
 export function queryNodeInput() {
@@ -45,8 +46,22 @@ export function getFocus() {
 }
 
 export const createDataStructure = {
-  node({ text, editing = false, folded = false, children = [] }) {
-    return { id: createUuid(), text, editing, folded, children }
+  node({
+    text,
+    editing = false,
+    folded = false,
+    children = [],
+    processResizeEvent,
+  }) {
+    return {
+      id: createUuid(),
+      ref: createRef(),
+      text,
+      editing,
+      folded,
+      children,
+      processResizeEvent,
+    }
   },
   childNode({ parentNode, text }) {
     return produce(parentNode, (node) => {

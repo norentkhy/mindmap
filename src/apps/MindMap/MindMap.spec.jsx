@@ -1,5 +1,5 @@
 import React from 'react'
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import MindMap from './MindMap'
 import userEvent from '@testing-library/user-event'
 import { foldNode, queryNodeInput } from './MainView/testUtilities'
@@ -12,6 +12,8 @@ import {
   queryNode,
   findNodeInput,
 } from './MindMapTestUtilities'
+import createMockResizeObserverHook from './Contexts/createMockResizeObserverHook.spec'
+import { getArgsOfCalls } from './utils/jestUtils'
 
 const spy = jest.spyOn(global.console, 'error')
 afterEach(() => expect(spy).not.toHaveBeenCalled())
@@ -200,4 +202,38 @@ describe('main view integration', () => {
       expect(screen).toEqual(NonEmptyScreen)
     })
   })
+})
+
+describe('mocks due to test environment', () => {
+  test('mock resize observer', async () => {
+    const { fireResizeEvent, logResize } = renderMindMapWithMockResizeObserver()
+
+    const Node = await createRootNodeWithProperties({ text: 'test' })
+    expect(logResize).toBeCalled()
+
+    act(() => fireResizeEvent(Node, 'some dimensions'))
+    const dimensionsInLogResizeCalls = getDimensionsinCallsOf(logResize)
+    expect(dimensionsInLogResizeCalls).toContain('some dimensions')
+
+    function getDimensionsinCallsOf(mockFn) {
+      return getArgsOfCalls(mockFn).map(([{ dimensions }]) => dimensions)
+    }
+  })
+
+  function renderMindMapWithMockResizeObserver() {
+    const {
+      useMockResizeObserver,
+      fireResizeEvent,
+    } = createMockResizeObserverHook()
+    const logResize = jest.fn()
+
+    render(
+      <MindMap
+        useThisResizeObserver={useMockResizeObserver}
+        logResize={logResize}
+      />
+    )
+
+    return { fireResizeEvent, logResize }
+  }
 })

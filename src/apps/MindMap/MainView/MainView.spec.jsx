@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
+import { render, screen, act } from '@testing-library/react'
 import { MainView } from './MainView'
 import { v4 as uuidv4 } from 'uuid'
 import { getInputSelection } from '../utils/getInputSelection'
@@ -11,6 +11,8 @@ import {
   getFocus,
 } from './testUtilities'
 import { createMockContextProvider } from '../utils/createMockContextProvider'
+import createMockResizeObserverHook from '../Contexts/createMockResizeObserverHook.spec'
+import { getArgsOfLastCall } from '../utils/jestUtils'
 
 describe('inherited from MindMap.spec', () => {
   test('label', () => {
@@ -301,6 +303,68 @@ describe('folding a node', () => {
   })
 })
 
+describe('dimensions of each node', () => {
+  test('Observation of node dimensions', () => {
+    const {
+      fireResizeEvent,
+      node,
+      updateNodeDimensions,
+    } = renderTestWithMockResizeObserver()
+
+    const Node = queryNode(node)
+    const newDimensions = getSomeDimensions()
+    act(() => fireResizeEvent(Node, newDimensions))
+
+    expect(updateNodeDimensions).toBeCalled()
+    expect(getArgsOfLastCall(updateNodeDimensions)).toEqual([
+      { id: node.id, dimensions: newDimensions },
+    ])
+
+    function renderTestWithMockResizeObserver() {
+      const {
+        useMockResizeObserver,
+        fireResizeEvent,
+      } = createMockResizeObserverHook()
+
+      const { initialState, node } = createInitialStateWithNodeForResizing()
+      const updateNodeDimensions = jest.fn()
+
+      const rendered = renderTest({
+        initialState,
+        modifications: {
+          useThisResizeObserver: useMockResizeObserver,
+          updateNodeDimensions,
+        },
+      })
+
+      return { rendered, fireResizeEvent, node, updateNodeDimensions }
+
+      function createInitialStateWithNodeForResizing() {
+        const node = createDataStructure.node({ text: 'this will resize' })
+
+        const initialState = createDataStructure.state({
+          rootNodes: [node],
+        })
+
+        return { initialState, node }
+      }
+    }
+
+    function getSomeDimensions() {
+      return {
+        left: 10,
+        top: 10,
+        right: 20,
+        bottom: 20,
+        width: 10,
+        height: 10,
+        x: 10,
+        y: 10,
+      }
+    }
+  })
+})
+
 function renderTest(
   { initialState = {}, modifications = {} } = {
     initialState: {},
@@ -309,7 +373,10 @@ function renderTest(
 ) {
   const [MockContext, MockProvider] = createMockContextProvider({
     initialState,
-    modifications,
+    modifications: {
+      useThisResizeObserver() {},
+      ...modifications,
+    },
   })
 
   return render(

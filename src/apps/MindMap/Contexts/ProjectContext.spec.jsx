@@ -1,11 +1,13 @@
 import { renderHook, act } from '@testing-library/react-hooks'
-import React, { useContext } from 'react'
 import { ProjectProvider, ProjectContext } from './ProjectContext'
+import React, { useContext } from 'react'
+import createMockResizeObserverHook from './createMockResizeObserverHook.spec'
+import { getArgsOfLastCall } from '../utils/jestUtils'
 
 describe('core', () => {
   describe('create a root node', () => {
     test('create root node and set it to edit mode', () => {
-      const { result } = renderUseMainViewContext()
+      const { result } = renderHookTest()
       expect(getTrees(result)).toEqual([])
 
       act(() => result.current.createRootNode())
@@ -20,7 +22,7 @@ describe('core', () => {
     })
 
     test('receive command to initiate editing', () => {
-      const { result } = renderUseMainViewContext()
+      const { result } = renderHookTest()
       const initialText = 'initial'
       const id = createRootNodeWithProperties(result, { text: initialText })
 
@@ -30,7 +32,7 @@ describe('core', () => {
     })
 
     test('receive command to finalize editing', () => {
-      const { result } = renderUseMainViewContext()
+      const { result } = renderHookTest()
 
       act(() => result.current.createRootNode())
       const { id } = getNewestRootNode(result)
@@ -41,7 +43,7 @@ describe('core', () => {
     })
 
     test('make multiple rootnodes', () => {
-      const { result } = renderUseMainViewContext()
+      const { result } = renderHookTest()
 
       const nodeTexts = ['root1', 'root2']
       nodeTexts.forEach((text) => {
@@ -53,7 +55,7 @@ describe('core', () => {
 
   describe('create a child node', () => {
     test('create a child node and set it to edit mode', () => {
-      const { result } = renderUseMainViewContext()
+      const { result } = renderHookTest()
       const parentId = createRootNodeWithProperties(result, {
         text: 'root node',
       })
@@ -64,7 +66,7 @@ describe('core', () => {
 
   describe('fold a node', () => {
     test('fold a node', () => {
-      const { result } = renderUseMainViewContext()
+      const { result } = renderHookTest()
       const id = createRootNodeWithProperties(result, { text: 'root node' })
 
       const initialNode = getNewestRootNode(result)
@@ -83,7 +85,7 @@ describe('core', () => {
 
 describe('undo and redo', () => {
   test('undo and redo', () => {
-    const { result } = renderUseMainViewContext()
+    const { result } = renderHookTest()
     const stateBefore = getState(result)
     createNode()
     const stateAfter = getState(result)
@@ -132,7 +134,7 @@ describe('undo and redo', () => {
 
 describe('utilities', () => {
   test('createRootNodeWithProperties', () => {
-    const { result } = renderUseMainViewContext()
+    const { result } = renderHookTest()
     const text = 'tesadf'
     const rootNodeId = createRootNodeWithProperties(result, { text })
 
@@ -143,7 +145,7 @@ describe('utilities', () => {
   })
 
   test('captureNodeChanges', () => {
-    const { result } = renderUseMainViewContext()
+    const { result } = renderHookTest()
     const firstRootNode = createAndCaptureFirstRootNode()
     createAndCaptureSecondRootNode()
     createAndCaptureFirstChildNode(firstRootNode.id)
@@ -184,7 +186,7 @@ describe('utilities', () => {
   })
 
   test('createChildNodeWithProperties', () => {
-    const { result } = renderUseMainViewContext()
+    const { result } = renderHookTest()
 
     const parentId = createRootNodeWithProperties(result, { text: 'parent' })
 
@@ -201,6 +203,64 @@ describe('utilities', () => {
 
     expect(newNodes.length).toBe(1)
     expect(newNodes[0]).toMatchObject({ text })
+  })
+})
+
+describe('dimensions', () => {
+  test('update of node dimensions', () => {
+    const { result } = renderHookTestAndCreateRootNode()
+
+    const { id, dimensions } = getNewestRootNode(result)
+    expect(dimensions).toEqual({})
+
+    const newDimensions = {
+      left: 10,
+      top: 10,
+      right: 20,
+      bottom: 20,
+      width: 10,
+      height: 10,
+      x: 10,
+      y: 10,
+    }
+    act(() =>
+      result.current.updateNodeDimensions({
+        id,
+        dimensions: newDimensions,
+      })
+    )
+
+    const node = getNewestRootNode(result)
+    expect(node.dimensions).toEqual(newDimensions)
+
+    function renderHookTestAndCreateRootNode() {
+      const rendered = renderHookTest()
+      act(() => rendered.result.current.createRootNode())
+      return rendered
+    }
+  })
+})
+
+describe('logging of changes', () => {
+  test('dimensions update', () => {
+    const { result, log } = renderHookTestWithNodeForLogging()
+
+    const { id } = getNewestRootNode(result)
+    const newDimensions = 'new dimensions'
+    act(() =>
+      result.current.updateNodeDimensions({ id, dimensions: newDimensions })
+    )
+
+    expect(log).toBeCalled()
+    expect(getArgsOfLastCall(log)).toEqual([{ id, dimensions: newDimensions }])
+
+    function renderHookTestWithNodeForLogging() {
+      const log = jest.fn()
+      const { result } = renderHookTest(log)
+      act(() => result.current.createRootNode())
+
+      return { result, log }
+    }
   })
 })
 
@@ -245,9 +305,18 @@ function captureNewNodes({ result, change }) {
   }
 }
 
-function renderUseMainViewContext() {
+function renderHookTest(log) {
+  const { useMockResizeObserver } = createMockResizeObserverHook()
+
   return renderHook(() => useContext(ProjectContext), {
-    wrapper: ({ children }) => <ProjectProvider>{children}</ProjectProvider>,
+    wrapper: ({ children }) => (
+      <ProjectProvider
+        useThisResizeObserver={useMockResizeObserver}
+        logResize={log}
+      >
+        {children}
+      </ProjectProvider>
+    ),
   })
 }
 

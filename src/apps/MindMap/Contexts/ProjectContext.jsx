@@ -1,12 +1,22 @@
-import React, { createContext, useEffect, useReducer } from 'react'
+import React, { createContext, createRef, useEffect, useReducer } from 'react'
 import produce from 'immer'
 import { v4 as uuidv4 } from 'uuid'
 import { useTime } from '../hooks/useTime'
+import useResizeObserver from '@react-hook/resize-observer'
 
 export const ProjectContext = createContext()
 
-export function ProjectProvider({ children, initialState = { trees: [] } }) {
-  const newViewModel = useMainView({ initialState })
+export function ProjectProvider({
+  children,
+  initialState = { trees: [] },
+  useThisResizeObserver = useResizeObserver,
+  logResize = () => {},
+}) {
+  const newViewModel = useMainView({
+    initialState,
+    useThisResizeObserver,
+    logResize,
+  })
 
   return (
     <ProjectContext.Provider value={newViewModel}>
@@ -15,7 +25,7 @@ export function ProjectProvider({ children, initialState = { trees: [] } }) {
   )
 }
 
-function useMainView({ initialState }) {
+function useMainView({ initialState, useThisResizeObserver, logResize }) {
   const [state, dispatch] = useReducer(reduce, initialState)
   const { timeline, insertIntoTimeline, goBack, goForward } = useTime()
 
@@ -45,6 +55,14 @@ function useMainView({ initialState }) {
     replaceState(newState) {
       dispatch({ type: 'REPLACE_STATE', payload: newState })
     },
+    updateNodeDimensions({ id, dimensions }) {
+      dispatch({
+        type: 'EDIT_NODE',
+        payload: { id, dimensions },
+      })
+      logResize({ id, dimensions })
+    },
+    useThisResizeObserver,
   }
 
   function reduce(state, action) {
@@ -101,5 +119,10 @@ function modifyNode({ id, trees, modifications }) {
 }
 
 function createNode() {
-  return { id: uuidv4(), text: '', editing: true }
+  return {
+    id: uuidv4(),
+    text: '',
+    editing: true,
+    dimensions: {},
+  }
 }

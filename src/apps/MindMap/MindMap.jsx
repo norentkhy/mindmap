@@ -5,9 +5,12 @@ import { ProjectProvider } from './Contexts/ProjectContext'
 import { Tabs } from './Tabs/Tabs'
 import { TabsProvider } from './Tabs/TabsContext'
 
-export default function MindMap() {
+export default function MindMap({ logResize, useThisResizeObserver }) {
   return (
-    <Providers>
+    <Providers
+      logResize={logResize}
+      useThisResizeObserver={useThisResizeObserver}
+    >
       <Tabs />
       <Actions />
       <MainView />
@@ -15,9 +18,12 @@ export default function MindMap() {
   )
 }
 
-function Providers({ children }) {
+function Providers({ children, logResize, useThisResizeObserver }) {
   return (
-    <ProjectProvider>
+    <ProjectProvider
+      logResize={logResize}
+      useThisResizeObserver={useThisResizeObserver}
+    >
       <TabsProvider>{children}</TabsProvider>
     </ProjectProvider>
   )
