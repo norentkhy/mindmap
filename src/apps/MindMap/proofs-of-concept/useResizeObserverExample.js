@@ -8,6 +8,7 @@ function UseResizeObserverInstance() {
       <Resizeable>
         <div>see console log</div>
       </Resizeable>
+      <div style={{ height: 999, width: 999 }}>scrollable</div>
     </div>
   )
 }
@@ -44,6 +45,7 @@ function Resizeable({ children }) {
 function logSomething(e) {
   const { offsetLeft, offsetTop, offsetWidth, offsetHeight } = e.target
   console.log({ offsetLeft, offsetTop, offsetWidth, offsetHeight })
+  console.log(e.target.getBoundingClientRect())
 }
 
 const FillingButton = styled.button`

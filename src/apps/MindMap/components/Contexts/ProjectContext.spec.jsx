@@ -1,15 +1,10 @@
-import { renderHook, act } from '@testing-library/react-hooks'
-import { ProjectProvider, ProjectContext } from './ProjectContext'
-import React, { useContext } from 'react'
-import createMockResizeObserverHook from './createMockResizeObserverHook'
-import { getArgsOfLastCall } from '../../utils/jestUtils'
+import { act } from '@testing-library/react-hooks'
 import {
   getTrees,
   createRootNodeWithProperties,
   getNewestRootNode,
   getState,
-  captureNewNodes,
-  getNode,
+  renderHookTest,
 } from './TestUtilities'
 
 describe('core', () => {
@@ -141,153 +136,77 @@ describe('undo and redo', () => {
 })
 
 describe('dimensions', () => {
-  test('update of node dimensions', () => {
+  test('update of node layout dimensions', () => {
     const { result } = renderHookTestAndCreateRootNode()
 
     const { id, dimensions } = getNewestRootNode(result)
     expect(dimensions).toEqual({})
 
-    const newDimensions = {
-      left: 10,
-      top: 10,
-      right: 20,
-      bottom: 20,
-      width: 10,
-      height: 10,
-      x: 10,
-      y: 10,
-    }
+    const boundingClientRect = 'object containing bounding client rect'
+    const offsetRect = 'object containing offset rect'
     act(() =>
-      result.current.updateNodeDimensions({
+      result.current.registerNodeLayout({
         id,
-        dimensions: newDimensions,
+        boundingClientRect,
+        offsetRect,
       })
     )
 
     const node = getNewestRootNode(result)
-    expect(getObservedDimensions(node)).toEqual(newDimensions)
-
-    function renderHookTestAndCreateRootNode() {
-      const rendered = renderHookTest()
-      act(() => rendered.result.current.createRootNode())
-      return rendered
-    }
+    expect(node.measuredNode).toEqual({ boundingClientRect, offsetRect })
   })
 
-  describe('placement of nodes', () => {
-    test('properties before node creation', () => {
-      const { result } = renderHookTest()
-      expect(getOrigin(result)).toEqual({
-        top: 100,
-        left: 100,
-      })
-    })
+  test('update of tree layout dimensions', () => {
+    const { result } = renderHookTestAndCreateRootNode()
 
-    test('a single root node', () => {
-      const { result } = renderHookTest()
+    const { id, dimensions } = getNewestRootNode(result)
+    expect(dimensions).toEqual({})
 
-      const node = createRootNodeWithDimensions(result)
-
-      const origin = getOrigin(result)
-      expect(getDesiredDimensions(node)).toEqual({
-        left: origin.left,
-        top: origin.top,
-        inResponseTo: node.dimensions,
-      })
-    })
-
-    test('multiple sibling root nodes', () => {
-      const { result } = renderHookTest()
-
-      const nodes = [...Array(9)].map(() =>
-        createRootNodeWithDimensions(result)
-      )
-
-      const spaceBetweenNodes = 10
-      nodes.forEach((node, i) => {
-        if (i) {
-          const closestOlderSibling = nodes[i - 1]
-          expect(getDesiredDimensions(node)).toEqual({
-            left: closestOlderSibling.dimensions.left,
-            top:
-              closestOlderSibling.dimensions.top +
-              closestOlderSibling.dimensions.height +
-              spaceBetweenNodes,
-            inResponseTo: node.dimensions,
-          })
-        }
-      })
-    })
-
-    function createChildNodeWithDimensions({ result, parentId }) {
-      const { id } = createChildNode()
-      simulateResizeEvent({
-        result,
+    const boundingClientRect = 'object containing bounding client rect'
+    const offsetRect = 'object containing offset rect'
+    act(() =>
+      result.current.registerTreeLayout({
         id,
-        newDimensions: createDimensions({ left: 10, top: 10 }),
+        boundingClientRect,
+        offsetRect,
       })
+    )
 
-      return getNode({ result, id })
-
-      function createChildNode() {
-        const newNodes = captureNewNodes({
-          result,
-          change: () => {
-            act(() => result.current.createChildNode(parentId))
-          },
-        })
-
-        return newNodes[0]
-      }
-    }
-
-    function createRootNodeWithDimensions(result) {
-      act(() => result.current.createRootNode())
-      const { id } = getNewestRootNode(result)
-      simulateResizeEvent({
-        result,
-        id,
-        newDimensions: createDimensions({ left: 10, top: 10 }),
-      })
-
-      return getNewestRootNode(result)
-    }
-
-    function simulateResizeEvent({ result, id, newDimensions }) {
-      act(() =>
-        result.current.updateNodeDimensions({ id, dimensions: newDimensions })
-      )
-    }
-
-    function createDimensions({ left, top }) {
-      const windowWidth = 640
-      const windowHeight = 480
-      const width = 50
-      const height = 20
-
-      return {
-        x: left,
-        y: top,
-        left,
-        right: windowWidth - width - left,
-        top,
-        bottom: windowHeight - height - top,
-        width,
-        height,
-      }
-    }
+    const node = getNewestRootNode(result)
+    expect(node.measuredTree).toEqual({ boundingClientRect, offsetRect })
   })
 
-  function getOrigin(result) {
-    return result.current.state.origin
-  }
+  test('update mind surface layout dimensions', () => {
+    const { result } = renderHookTest()
 
-  function getDesiredDimensions(node) {
-    return node.desiredDimensions
-  }
+    const boundingClientRect = 'object containing bounding client rect'
+    const offsetRect = 'object containing offset rect'
+    act(() =>
+      result.current.registerSurfaceLayout({
+        boundingClientRect,
+        offsetRect,
+      })
+    )
 
-  function getObservedDimensions(node) {
-    return node.dimensions
+    const { measuredSurface } = getState(result)
+    expect(measuredSurface).toEqual({
+      boundingClientRect,
+      offsetRect,
+    })
+  })
+
+  // test('desired offset dimensions', () => {
+  //   const { result } = renderHookTestAndCreateRootNode()
+  //   const node = getNewestRootNode(result)
+  //   //expect first node to be created in the center
+  //   expect(node.desiredOffset).toEqual({
+  //   })
+  // })
+
+  function renderHookTestAndCreateRootNode() {
+    const rendered = renderHookTest()
+    act(() => rendered.result.current.createRootNode())
+    return rendered
   }
 })
 
@@ -296,13 +215,23 @@ describe('logging of changes', () => {
     const { result, log } = renderHookTestWithNodeForLogging()
 
     const { id } = getNewestRootNode(result)
-    const newDimensions = 'new dimensions'
+    const boundingClientRect = 'bounding client rectangle'
+    const offsetRect = {
+      offsetLeft: 'offset left',
+      offsetTop: 'offset top',
+      offsetWidth: 'offset width',
+      offsetHeight: 'offset height',
+    }
     act(() =>
-      result.current.updateNodeDimensions({ id, dimensions: newDimensions })
+      result.current.registerNodeLayout({
+        id,
+        boundingClientRect: boundingClientRect,
+        offsetRect,
+      })
     )
 
     expect(log).toBeCalled()
-    expect(getArgsOfLastCall(log)).toEqual([{ id, dimensions: newDimensions }])
+    expect(log).toBeCalledWith({ id, boundingClientRect, offsetRect })
 
     function renderHookTestWithNodeForLogging() {
       const log = jest.fn()
@@ -313,18 +242,3 @@ describe('logging of changes', () => {
     }
   })
 })
-
-export function renderHookTest(log) {
-  const { useMockResizeObserver } = createMockResizeObserverHook()
-
-  return renderHook(() => useContext(ProjectContext), {
-    wrapper: ({ children }) => (
-      <ProjectProvider
-        useThisResizeObserver={useMockResizeObserver}
-        logResize={log}
-      >
-        {children}
-      </ProjectProvider>
-    ),
-  })
-}

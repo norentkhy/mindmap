@@ -1,4 +1,7 @@
-import { act } from '@testing-library/react-hooks'
+import React, { useContext } from 'react'
+import { act, renderHook } from '@testing-library/react-hooks'
+import createMockResizeObserverHook from './createMockResizeObserverHook'
+import { ProjectContext, ProjectProvider } from './ProjectContext'
 
 export function captureNewNodes({ result, change }) {
   const oldNodes = getRootNodes(result)
@@ -87,4 +90,19 @@ export function getNode({ result, id }) {
 
     return findNode({ nodes: nodes.flatMap(({ children }) => children), id })
   }
+}
+
+export function renderHookTest(log) {
+  const { useMockResizeObserver } = createMockResizeObserverHook()
+
+  return renderHook(() => useContext(ProjectContext), {
+    wrapper: ({ children }) => (
+      <ProjectProvider
+        useThisResizeObserver={useMockResizeObserver}
+        logResize={log}
+      >
+        {children}
+      </ProjectProvider>
+    ),
+  })
 }

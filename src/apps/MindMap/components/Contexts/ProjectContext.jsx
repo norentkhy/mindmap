@@ -55,12 +55,24 @@ function useMainView({ initialState, useThisResizeObserver, logResize }) {
     replaceState(newState) {
       dispatch({ type: 'REPLACE_STATE', payload: newState })
     },
-    updateNodeDimensions({ id, dimensions }) {
+    registerNodeLayout({ id, boundingClientRect, offsetRect }) {
       dispatch({
         type: 'EDIT_NODE',
-        payload: { id, dimensions },
+        payload: { id, measuredNode: { boundingClientRect, offsetRect } },
       })
-      logResize({ id, dimensions })
+      logResize({ id, boundingClientRect, offsetRect })
+    },
+    registerTreeLayout({ id, boundingClientRect, offsetRect }) {
+      dispatch({
+        type: 'EDIT_NODE',
+        payload: { id, measuredTree: { boundingClientRect, offsetRect } },
+      })
+    },
+    registerSurfaceLayout({ boundingClientRect, offsetRect }) {
+      dispatch({
+        type: 'EDIT_STATE',
+        payload: { measuredSurface: { boundingClientRect, offsetRect } },
+      })
     },
     useThisResizeObserver,
   }
@@ -74,6 +86,14 @@ function useMainView({ initialState, useThisResizeObserver, logResize }) {
 }
 
 const stateTransitions = {
+  EDIT_STATE(state, newProps) {
+    return produce(state, (newState) => {
+      const keyValues = Object.entries(newProps)
+      keyValues.forEach(([key, value]) => {
+        newState[key] = value
+      })
+    })
+  },
   CREATE_ROOT_NODE(state) {
     return produce(state, (newState) => {
       const node = createNode()
@@ -117,107 +137,12 @@ function getNode({ id, trees }) {
 }
 
 function modifyNode({ id, newState, modifications }) {
-  const { trees, origin } = newState
+  const { trees } = newState
   const node = getNode({ id, trees })
 
   Object.entries(modifications).forEach(([key, value]) => {
-    if (key !== 'dimensions') node[key] = value
-    else
-      updateValuesRelatedToDimensions({
-        node,
-        dimensions: value,
-        state: newState,
-      })
+    node[key] = value
   })
-
-  function updateValuesRelatedToDimensions({ node, dimensions, state }) {
-    node.dimensions = dimensions
-
-    const parent = getParent({ state, node })
-    const closestElderSibling = getClosestElderSibling({ state, node })
-
-    const { desiredDimensions } = node
-    const origin = getOrigin(state)
-
-    const space = 10
-
-    desiredDimensions.left = calculateLeft()
-    desiredDimensions.top = calculateTop()
-    desiredDimensions.inResponseTo = dimensions
-
-    function calculateLeft() {
-      if (closestElderSibling) return closestElderSibling.dimensions.left
-      if (parent)
-        return parent.dimensions.left + parent.dimensions.width + space
-      return origin.left
-    }
-
-    function calculateTop() {
-      if (closestElderSibling)
-        return (
-          closestElderSibling.dimensions.top +
-          closestElderSibling.dimensions.height +
-          space
-        )
-      if (parent) return parent.dimensions.top
-      return origin.top
-    }
-  }
-
-  function getOrigin(state) {
-    return state.origin
-  }
-}
-
-function getParent({ state, node: { id } }) {
-  const rootNodes = getRootNodes(state)
-  if (rootNodes.find((node) => node.id === id)) return
-
-  return findParent({ id, nodes: rootNodes })
-
-  function findParent({ id, nodes }) {
-    const parent = nodes.find(({ children }) =>
-      children?.find((child) => child.id === id)
-    )
-
-    if (parent) return parent
-    return findParent({
-      id,
-      nodes: nodes
-        .filter(({ children }) => children?.length)
-        .flatMap(({ children }) => children),
-    })
-  }
-}
-
-function getClosestElderSibling({ state, node: { id } }) {
-  const rootNodes = getRootNodes(state)
-
-  return findClosestElderSibling({ id, nodes: rootNodes })
-
-  function findClosestElderSibling({ id, nodes }) {
-    const siblings = getSiblings({ id, nodes })
-
-    if (siblings) return siblings.find((_, i) => siblings?.[i + 1]?.id === id)
-    return
-  }
-}
-
-function getSiblings({ id, nodes }) {
-  const matchingNode = nodes.find((node) => node.id === id)
-
-  if (matchingNode) return nodes
-
-  for (const { children } of nodes) {
-    if (children?.length) {
-      const siblings = getSiblings({ id, nodes: children })
-      if (siblings) return siblings
-    }
-  }
-}
-
-function getRootNodes(state) {
-  return state.trees
 }
 
 function createNode() {

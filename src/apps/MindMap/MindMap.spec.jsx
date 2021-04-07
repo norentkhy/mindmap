@@ -205,19 +205,37 @@ describe('main view integration', () => {
 })
 
 describe('mocks due to test environment', () => {
+  const sample = {
+    boundingClientRect: {
+      left: 101,
+      top: 102,
+      right: 203,
+      bottom: 204,
+      width: 105,
+      height: 106,
+      x: 101,
+      y: 102,
+    },
+    offsetRect: {
+      offsetLeft: 5,
+      offsetTop: 3,
+      offsetWidth: 10,
+      offsetHeight: 4,
+    },
+  }
+
   test('mock resize observer', async () => {
     const { fireResizeEvent, logResize } = renderMindMapWithMockResizeObserver()
 
     const Node = await createRootNodeWithProperties({ text: 'test' })
     expect(logResize).toBeCalled()
 
-    act(() => fireResizeEvent(Node, 'some dimensions'))
-    const dimensionsInLogResizeCalls = getDimensionsinCallsOf(logResize)
-    expect(dimensionsInLogResizeCalls).toContain('some dimensions')
+    const { boundingClientRect, offsetRect } = sample
+    act(() => fireResizeEvent(Node, { boundingClientRect, offsetRect }))
 
-    function getDimensionsinCallsOf(mockFn) {
-      return getArgsOfCalls(mockFn).map(([{ dimensions }]) => dimensions)
-    }
+    expect(logResize).toBeCalledWith(
+      expect.objectContaining({ boundingClientRect, offsetRect })
+    )
   })
 
   function renderMindMapWithMockResizeObserver() {

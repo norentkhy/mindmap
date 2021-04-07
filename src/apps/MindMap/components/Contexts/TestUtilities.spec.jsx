@@ -5,8 +5,8 @@ import {
   getRootNodes,
   captureNewNodes,
   createChildNodeWithProperties,
+  renderHookTest,
 } from './TestUtilities'
-import { renderHookTest } from './ProjectContext.spec'
 
 describe('utilities', () => {
   test('createRootNodeWithProperties', () => {

@@ -12,7 +12,6 @@ import {
 } from './testUtilities'
 import { createMockContextProvider } from '../../utils/createMockContextProvider'
 import createMockResizeObserverHook from '../Contexts/createMockResizeObserverHook'
-import { getArgsOfLastCall } from '../../utils/jestUtils'
 import 'jest-styled-components'
 
 describe('inherited from MindMap.spec', () => {
@@ -305,21 +304,77 @@ describe('folding a node', () => {
 })
 
 describe('dimensions of each node', () => {
-  test('Observation of node dimensions', () => {
-    const {
-      fireResizeEvent,
-      node,
-      updateNodeDimensions,
-    } = renderTestWithMockResizeObserver()
+  const sample = {
+    boundingClientRect: {
+      left: 101,
+      top: 102,
+      right: 203,
+      bottom: 204,
+      width: 105,
+      height: 106,
+      x: 101,
+      y: 102,
+    },
+    offsetRect: {
+      offsetLeft: 5,
+      offsetTop: 3,
+      offsetWidth: 10,
+      offsetHeight: 4,
+    },
+  }
+
+  test('Observation of rootnode dimensions', () => {
+    const registerNodeLayout = jest.fn()
+    const { fireResizeEvent, node } = renderTestWithMockResizeObserver({
+      registerNodeLayout,
+    })
 
     const Node = queryNode(node)
-    const newDimensions = getSomeDimensions()
-    act(() => fireResizeEvent(Node, newDimensions))
+    const { boundingClientRect, offsetRect } = sample
+    act(() => fireResizeEvent(Node, { boundingClientRect, offsetRect }))
 
-    expect(updateNodeDimensions).toBeCalled()
-    expect(getArgsOfLastCall(updateNodeDimensions)).toEqual([
-      { id: node.id, dimensions: newDimensions },
-    ])
+    expect(registerNodeLayout).toBeCalledWith({
+      id: node.id,
+      boundingClientRect,
+      offsetRect,
+    })
+  })
+
+  test('Observation of rootnode tree dimensions', () => {
+    const registerTreeLayout = jest.fn()
+    const { fireResizeEvent, node } = renderTestWithMockResizeObserver({
+      registerTreeLayout,
+    })
+
+    const TreeContainer = getRootContainer(queryNode(node))
+    const { boundingClientRect, offsetRect } = sample
+
+    act(() =>
+      fireResizeEvent(TreeContainer, { boundingClientRect, offsetRect })
+    )
+
+    expect(registerTreeLayout).toBeCalledWith({
+      id: node.id,
+      boundingClientRect,
+      offsetRect,
+    })
+  })
+
+  test('Observation of surface dimensions', () => {
+    const registerSurfaceLayout = jest.fn()
+    const { fireResizeEvent } = renderTestWithMockResizeObserver({
+      registerSurfaceLayout,
+    })
+
+    const Surface = screen.getByLabelText(/^main view$/i)
+    const { boundingClientRect, offsetRect } = sample
+
+    act(() => fireResizeEvent(Surface, { boundingClientRect, offsetRect }))
+
+    expect(registerSurfaceLayout).toBeCalledWith({
+      boundingClientRect,
+      offsetRect,
+    })
   })
 
   function getRootContainer(Node) {
@@ -330,24 +385,24 @@ describe('dimensions of each node', () => {
     else return getRootContainer(ParentElement)
   }
 
-  function renderTestWithMockResizeObserver() {
+  function renderTestWithMockResizeObserver(mockFunctions) {
     const {
       useMockResizeObserver,
       fireResizeEvent,
     } = createMockResizeObserverHook()
 
     const { initialState, node } = createInitialStateWithNodeForResizing()
-    const updateNodeDimensions = jest.fn()
 
     const rendered = renderTest({
       initialState,
       modifications: {
         useThisResizeObserver: useMockResizeObserver,
-        updateNodeDimensions,
+        registerSurfaceLayout() {},
+        ...mockFunctions,
       },
     })
 
-    return { rendered, fireResizeEvent, node, updateNodeDimensions }
+    return { rendered, fireResizeEvent, node }
 
     function createInitialStateWithNodeForResizing() {
       const node = createDataStructure.node({ text: 'this will resize' })
@@ -357,19 +412,6 @@ describe('dimensions of each node', () => {
       })
 
       return { initialState, node }
-    }
-  }
-
-  function getSomeDimensions() {
-    return {
-      left: 10,
-      top: 10,
-      right: 20,
-      bottom: 20,
-      width: 10,
-      height: 10,
-      x: 10,
-      y: 10,
     }
   }
 })
@@ -384,6 +426,9 @@ function renderTest(
     initialState,
     modifications: {
       useThisResizeObserver() {},
+      registerNodeLayout() {},
+      registerTreeLayout() {},
+      adjustRootTree() {},
       ...modifications,
     },
   })

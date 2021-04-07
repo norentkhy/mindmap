@@ -8,12 +8,12 @@ export default function useNode({ node, theProjectContext }) {
     foldNode,
     initiateEditNode,
     useThisResizeObserver,
-    updateNodeDimensions,
+    registerNodeLayout,
   } = useContext(theProjectContext)
 
   const nodeRef = useRef()
 
-  useThisResizeObserver(nodeRef, updateTheseNodeDimensions)
+  useThisResizeObserver(nodeRef, registerThisNodeLayout)
 
   return {
     editing,
@@ -25,10 +25,12 @@ export default function useNode({ node, theProjectContext }) {
     nodeRef,
   }
 
-  function updateTheseNodeDimensions(event) {
-    updateNodeDimensions({
+  function registerThisNodeLayout(event) {
+    const { offsetLeft, offsetTop, offsetWidth, offsetHeight } = event.target
+    registerNodeLayout({
       id,
-      dimensions: event.target.getBoundingClientRect(),
+      boundingClientRect: event.target.getBoundingClientRect(),
+      offsetRect: { offsetLeft, offsetTop, offsetWidth, offsetHeight },
     })
   }
 }
