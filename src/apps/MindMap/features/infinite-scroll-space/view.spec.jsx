@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { fireEvent, render, screen } from '@testing-library/react'
 import { getArgsOfLastCall } from '../../utils/jestUtils'
-import WheelFeedbackContainer from './WheelFeedbackContainer'
+import WheelFeedbackContainer from '../../components/WheelFeedbackContainer/WheelFeedbackContainer'
 
 describe('wheel feedback container', () => {
   test('initial feedback', () => {
