@@ -30,7 +30,12 @@ export default function useNode({ node, theProjectContext }) {
     registerNodeLayout({
       id,
       boundingClientRect: event.target.getBoundingClientRect(),
-      offsetRect: { offsetLeft, offsetTop, offsetWidth, offsetHeight },
+      offsetRect: {
+        left: offsetLeft,
+        top: offsetTop,
+        width: offsetWidth,
+        height: offsetHeight,
+      },
     })
   }
 }

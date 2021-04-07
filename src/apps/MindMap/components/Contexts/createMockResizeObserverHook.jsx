@@ -3,6 +3,10 @@ import { useCallback, useLayoutEffect } from 'react'
 export default function createMockResizeObserverHook(
   initialTargetProperties = {
     getBoundingClientRect: () => sample.boundingClientRect,
+    offsetLeft: 0,
+    offsetTop: 0,
+    offsetWidth: 10,
+    offsetHeight: 10,
   }
 ) {
   const callbacks = new Map()

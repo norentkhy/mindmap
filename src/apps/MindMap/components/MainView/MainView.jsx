@@ -1,4 +1,5 @@
 import React, { useContext, useRef } from 'react'
+import styled from 'styled-components'
 import { ProjectContext } from '../Contexts/ProjectContext'
 import determineNodesToRender from './determineNodesToRender'
 import NodeFamily from './NodeFamily'
@@ -12,7 +13,7 @@ export function MainView({ theProjectContext = ProjectContext }) {
     <div ref={surfaceRef} aria-label="main view" onDoubleClick={createRootNode}>
       {nodesToRender?.map((node) => (
         <RootContainer
-          nodeId={node.id}
+          node={node}
           key={`container ${node.id}`}
           theProjectContext={theProjectContext}
         >
@@ -44,12 +45,17 @@ function useMainView(theProjectContext) {
     const { offsetLeft, offsetTop, offsetWidth, offsetHeight } = event.target
     registerSurfaceLayout({
       boundingClientRect: event.target.getBoundingClientRect(),
-      offsetRect: { offsetLeft, offsetTop, offsetWidth, offsetHeight },
+      offsetRect: {
+        left: offsetLeft,
+        top: offsetTop,
+        width: offsetWidth,
+        height: offsetHeight,
+      },
     })
   }
 }
 
-function RootContainer({ theProjectContext, children, nodeId }) {
+function RootContainer({ theProjectContext, children, node }) {
   const ref = useRef()
   const { registerTreeLayout, useThisResizeObserver } = useContext(
     theProjectContext
@@ -57,17 +63,33 @@ function RootContainer({ theProjectContext, children, nodeId }) {
   useThisResizeObserver(ref, registerThisTreeLayout)
 
   return (
-    <div ref={ref} aria-label="container of rootnode">
+    <AbsolutelyPositionedContainer
+      left={node.desiredTreeCss?.offsetLeft}
+      top={node.desiredTreeCss?.offsetTop}
+      ref={ref}
+      aria-label="container of rootnode"
+    >
       {children}
-    </div>
+    </AbsolutelyPositionedContainer>
   )
 
   function registerThisTreeLayout(event) {
     const { offsetLeft, offsetTop, offsetWidth, offsetHeight } = event.target
     registerTreeLayout({
-      id: nodeId,
+      id: node.id,
       boundingClientRect: event.target.getBoundingClientRect(),
-      offsetRect: { offsetLeft, offsetTop, offsetWidth, offsetHeight },
+      offsetRect: {
+        left: offsetLeft,
+        top: offsetTop,
+        width: offsetWidth,
+        height: offsetHeight,
+      },
     })
   }
 }
+
+const AbsolutelyPositionedContainer = styled.div`
+  position: absolute;
+  left: ${({ left }) => (left ? `${left}px` : 'auto')};
+  top: ${({ top }) => (top ? `${top}px` : 'auto')};
+`

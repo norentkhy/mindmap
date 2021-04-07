@@ -16,7 +16,7 @@ export default function Node({ node, theProjectContext }) {
 
   if (editing)
     return (
-      <Button ref={nodeRef} node={node}>
+      <Button aria-label="node" ref={nodeRef} node={node}>
         <NodeInput theProjectContext={theProjectContext} node={node} />
       </Button>
     )
@@ -24,6 +24,7 @@ export default function Node({ node, theProjectContext }) {
   if (!editing)
     return (
       <Button
+        aria-label="node"
         ref={nodeRef}
         node={node}
         onKeyUp={({ key }) => {

@@ -331,12 +331,18 @@ describe('dimensions of each node', () => {
 
     const Node = queryNode(node)
     const { boundingClientRect, offsetRect } = sample
+    const { offsetLeft, offsetTop, offsetWidth, offsetHeight } = offsetRect
     act(() => fireResizeEvent(Node, { boundingClientRect, offsetRect }))
 
     expect(registerNodeLayout).toBeCalledWith({
       id: node.id,
       boundingClientRect,
-      offsetRect,
+      offsetRect: {
+        left: offsetLeft,
+        top: offsetTop,
+        width: offsetWidth,
+        height: offsetHeight,
+      },
     })
   })
 
@@ -348,6 +354,7 @@ describe('dimensions of each node', () => {
 
     const TreeContainer = getRootContainer(queryNode(node))
     const { boundingClientRect, offsetRect } = sample
+    const { offsetLeft, offsetTop, offsetWidth, offsetHeight } = offsetRect
 
     act(() =>
       fireResizeEvent(TreeContainer, { boundingClientRect, offsetRect })
@@ -356,7 +363,12 @@ describe('dimensions of each node', () => {
     expect(registerTreeLayout).toBeCalledWith({
       id: node.id,
       boundingClientRect,
-      offsetRect,
+      offsetRect: {
+        left: offsetLeft,
+        top: offsetTop,
+        width: offsetWidth,
+        height: offsetHeight,
+      },
     })
   })
 
@@ -368,13 +380,41 @@ describe('dimensions of each node', () => {
 
     const Surface = screen.getByLabelText(/^main view$/i)
     const { boundingClientRect, offsetRect } = sample
+    const { offsetLeft, offsetTop, offsetWidth, offsetHeight } = offsetRect
 
     act(() => fireResizeEvent(Surface, { boundingClientRect, offsetRect }))
 
     expect(registerSurfaceLayout).toBeCalledWith({
       boundingClientRect,
-      offsetRect,
+      offsetRect: {
+        left: offsetLeft,
+        top: offsetTop,
+        width: offsetWidth,
+        height: offsetHeight,
+      },
     })
+  })
+
+  test('offsets given to each roottree', () => {
+    const offsetLeft = 10
+    const offsetTop = 11
+    renderTest({
+      initialState: createDataStructure.state({
+        rootNodes: [
+          createDataStructure.node({
+            text: 'offset test',
+            desiredTreeCss: { offsetLeft, offsetTop },
+          }),
+        ],
+      }),
+    })
+
+    const Node = queryNode({ text: 'offset test' })
+    const RootContainer = getRootContainer(Node)
+
+    expect(RootContainer).toHaveStyleRule('position', 'absolute')
+    expect(RootContainer).toHaveStyleRule('left', `${offsetLeft}px`)
+    expect(RootContainer).toHaveStyleRule('top', `${offsetTop}px`)
   })
 
   function getRootContainer(Node) {

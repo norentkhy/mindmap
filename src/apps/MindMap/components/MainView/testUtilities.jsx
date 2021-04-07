@@ -51,9 +51,13 @@ export const createDataStructure = {
     editing = false,
     folded = false,
     children = [],
-    desiredDimensions = {},
-    processResizeEvent,
+    desiredTreeCss,
+    ...unknownProperties
   }) {
+    const unknownPropertyKeys = Object.keys(unknownProperties)
+    if (unknownPropertyKeys.length)
+      throw new Error(`unknown properties: ${unknownPropertyKeys}`)
+
     return {
       id: createUuid(),
       ref: createRef(),
@@ -61,16 +65,17 @@ export const createDataStructure = {
       editing,
       folded,
       children,
-      processResizeEvent,
-      desiredDimensions,
+      desiredTreeCss,
     }
   },
+
   childNode({ parentNode, text }) {
     return produce(parentNode, (node) => {
       if (!node?.children?.length) node.children = []
       node.children.push({ id: createUuid(), text })
     })
   },
+
   state({ rootNodes }) {
     return { trees: rootNodes }
   },

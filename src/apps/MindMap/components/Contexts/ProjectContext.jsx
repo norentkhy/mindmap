@@ -57,21 +57,21 @@ function useMainView({ initialState, useThisResizeObserver, logResize }) {
     },
     registerNodeLayout({ id, boundingClientRect, offsetRect }) {
       dispatch({
-        type: 'EDIT_NODE',
-        payload: { id, measuredNode: { boundingClientRect, offsetRect } },
+        type: 'REGISTER_NODE_LAYOUT',
+        payload: { id, boundingClientRect, offsetRect },
       })
       logResize({ id, boundingClientRect, offsetRect })
     },
     registerTreeLayout({ id, boundingClientRect, offsetRect }) {
       dispatch({
-        type: 'EDIT_NODE',
-        payload: { id, measuredTree: { boundingClientRect, offsetRect } },
+        type: 'REGISTER_TREE_LAYOUT',
+        payload: { id, boundingClientRect, offsetRect },
       })
     },
     registerSurfaceLayout({ boundingClientRect, offsetRect }) {
       dispatch({
-        type: 'EDIT_STATE',
-        payload: { measuredSurface: { boundingClientRect, offsetRect } },
+        type: 'REGISTER_SURFACE_LAYOUT',
+        payload: { boundingClientRect, offsetRect },
       })
     },
     useThisResizeObserver,
@@ -105,7 +105,7 @@ const stateTransitions = {
       const parentNode = getNode({ id: parentId, trees: newState.trees })
       if (!parentNode.children) parentNode.children = []
 
-      const node = createNode()
+      const node = createNode(parentNode)
       parentNode.children.push(node)
     })
   },
@@ -120,9 +120,108 @@ const stateTransitions = {
       node.folded = !node.folded
     })
   },
+  REGISTER_SURFACE_LAYOUT(state, { boundingClientRect, offsetRect }) {
+    return produce(state, (newState) => {
+      newState.measuredSurface = { boundingClientRect, offsetRect }
+
+      const rootNodes = getRootNodes(newState)
+      rootNodes.forEach(({ id }) =>
+        updateTreeOffset({ draftState: newState, id })
+      )
+    })
+  },
+  REGISTER_TREE_LAYOUT(state, { id, boundingClientRect, offsetRect }) {
+    return produce(state, (newState) => {
+      modifyNode({
+        id,
+        newState,
+        modifications: { measuredTree: { boundingClientRect, offsetRect } },
+      })
+
+      updateTreeOffset({ draftState: newState, id })
+    })
+  },
+  REGISTER_NODE_LAYOUT(state, { id, boundingClientRect, offsetRect }) {
+    return produce(state, (newState) => {
+      modifyNode({
+        id,
+        newState,
+        modifications: { measuredNode: { boundingClientRect, offsetRect } },
+      })
+
+      updateTreeOffset({ draftState: newState, id })
+    })
+  },
 }
 
-function getNode({ id, trees }) {
+function throwIfObjectValue({ object, evaluate, errorMessage = 'oops' }) {
+  Object.values(object).forEach((value) => {
+    if (evaluate(value)) throw new Error(errorMessage)
+  })
+}
+
+function updateTreeOffset({ draftState, id }) {
+  const { measuredSurface } = draftState
+  const node = getNode({
+    id,
+    trees: getRootNodes(draftState),
+  })
+
+  if (canUpdate({ measuredSurface, node })) {
+    if (!node.desiredTreeCss) node.desiredTreeCss = {}
+    const desiredOffsets = computeDesiredOffsets({ measuredSurface, node })
+    throwIfObjectValue({
+      object: desiredOffsets,
+      errorMessage: 'found NaN value',
+      evaluate: isNaN,
+    })
+    modifyObject({
+      target: node.desiredTreeCss,
+      modifications: desiredOffsets,
+    })
+  }
+
+  function canUpdate({
+    measuredSurface,
+    node: { measuredTree, measuredNode, parent },
+  }) {
+    return measuredSurface && measuredTree && measuredNode && !parent
+  }
+
+  function computeDesiredOffsets({
+    measuredSurface,
+    node: { measuredTree, measuredNode },
+  }) {
+    const surfaceCenter = getBoundingCenter(measuredSurface)
+    const nodeCenter = getBoundingCenter(measuredNode)
+    const nodeDistance = calculateDistance({ surfaceCenter, nodeCenter })
+
+    return {
+      offsetLeft: measuredTree.offsetRect.left + nodeDistance.left,
+      offsetTop: measuredTree.offsetRect.top + nodeDistance.top,
+    }
+
+    function getBoundingCenter({
+      boundingClientRect: { left, top, width, height },
+    }) {
+      return { left: left + width / 2, top: top + height / 2 }
+    }
+
+    function calculateDistance({ surfaceCenter, nodeCenter }) {
+      return {
+        left: surfaceCenter.left - nodeCenter.left,
+        top: surfaceCenter.top - nodeCenter.top,
+      }
+    }
+  }
+}
+
+function getRootNodes(state) {
+  return state.trees
+}
+
+function getNode({ id, trees, state }) {
+  if (!trees) trees = getRootNodes(state)
   if (trees.length === 0) return null
 
   const foundNode = trees.find((tree) => tree.id === id)
@@ -137,20 +236,26 @@ function getNode({ id, trees }) {
 }
 
 function modifyNode({ id, newState, modifications }) {
-  const { trees } = newState
-  const node = getNode({ id, trees })
-
-  Object.entries(modifications).forEach(([key, value]) => {
-    node[key] = value
+  modifyObject({
+    target: getNode({ id, state: newState }),
+    modifications,
   })
 }
 
-function createNode() {
-  return {
+function modifyObject({ target, modifications }) {
+  Object.entries(modifications).forEach(([key, value]) => {
+    target[key] = value
+  })
+}
+
+function createNode(parent) {
+  const customInitialProperties = {
     id: uuidv4(),
+    parent,
+  }
+  return {
     text: '',
     editing: true,
-    dimensions: {},
-    desiredDimensions: {},
+    ...customInitialProperties,
   }
 }
