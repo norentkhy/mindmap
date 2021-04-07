@@ -11,7 +11,7 @@ import {
   getFocus,
 } from './testUtilities'
 import { createMockContextProvider } from '../utils/createMockContextProvider'
-import createMockResizeObserverHook from '../Contexts/createMockResizeObserverHook.spec'
+import createMockResizeObserverHook from '../components/Contexts/createMockResizeObserverHook'
 import { getArgsOfLastCall } from '../utils/jestUtils'
 
 describe('inherited from MindMap.spec', () => {

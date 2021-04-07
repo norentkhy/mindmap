@@ -1,7 +1,7 @@
 import { renderHook, act } from '@testing-library/react-hooks'
 import { ProjectProvider, ProjectContext } from './ProjectContext'
 import React, { useContext } from 'react'
-import createMockResizeObserverHook from './createMockResizeObserverHook.spec'
+import createMockResizeObserverHook from '../components/Contexts/createMockResizeObserverHook'
 import { getArgsOfLastCall } from '../utils/jestUtils'
 
 describe('core', () => {

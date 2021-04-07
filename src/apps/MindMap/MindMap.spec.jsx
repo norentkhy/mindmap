@@ -12,7 +12,7 @@ import {
   queryNode,
   findNodeInput,
 } from './MindMapTestUtilities'
-import createMockResizeObserverHook from './Contexts/createMockResizeObserverHook.spec'
+import createMockResizeObserverHook from './components/Contexts/createMockResizeObserverHook'
 import { getArgsOfCalls } from './utils/jestUtils'
 
 const spy = jest.spyOn(global.console, 'error')
