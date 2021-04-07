@@ -20,7 +20,7 @@ import {
   waitForNodeInputToDisappear,
   createChildNode,
 } from './MindMapTestUtilities'
-import { queryNodeInput } from './MainView/testUtilities'
+import { queryNodeInput } from './components/MainView/testUtilities'
 
 describe('utilities', () => {
   test('unique random text', () => {

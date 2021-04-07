@@ -1,14 +1,14 @@
 import React, { createContext, createRef, useEffect, useReducer } from 'react'
 import produce from 'immer'
 import { v4 as uuidv4 } from 'uuid'
-import { useTime } from '../hooks/useTime'
+import { useTime } from '../../hooks/useTime'
 import useResizeObserver from '@react-hook/resize-observer'
 
 export const ProjectContext = createContext()
 
 export function ProjectProvider({
   children,
-  initialState = { trees: [] },
+  initialState = { trees: [], origin: { left: 100, top: 100 } },
   useThisResizeObserver = useResizeObserver,
   logResize = () => {},
 }) {
@@ -91,7 +91,7 @@ const stateTransitions = {
   },
   EDIT_NODE(state, { id, ...modifications }) {
     return produce(state, (newState) => {
-      modifyNode({ id, trees: newState.trees, modifications })
+      modifyNode({ id, newState, modifications })
     })
   },
   TOGGLE_NODE_FOLD(state, id) {
@@ -108,14 +108,116 @@ function getNode({ id, trees }) {
   const foundNode = trees.find((tree) => tree.id === id)
   if (foundNode) return foundNode
 
-  return getNode({ id, trees: trees.flatMap((tree) => tree.children) })
+  return getNode({
+    id,
+    trees: trees
+      .filter((tree) => tree.children?.length)
+      .flatMap((tree) => tree.children),
+  })
 }
 
-function modifyNode({ id, trees, modifications }) {
+function modifyNode({ id, newState, modifications }) {
+  const { trees, origin } = newState
   const node = getNode({ id, trees })
+
   Object.entries(modifications).forEach(([key, value]) => {
-    node[key] = value
+    if (key !== 'dimensions') node[key] = value
+    else
+      updateValuesRelatedToDimensions({
+        node,
+        dimensions: value,
+        state: newState,
+      })
   })
+
+  function updateValuesRelatedToDimensions({ node, dimensions, state }) {
+    node.dimensions = dimensions
+
+    const parent = getParent({ state, node })
+    const closestElderSibling = getClosestElderSibling({ state, node })
+
+    const { desiredDimensions } = node
+    const origin = getOrigin(state)
+
+    const space = 10
+
+    desiredDimensions.left = calculateLeft()
+    desiredDimensions.top = calculateTop()
+    desiredDimensions.inResponseTo = dimensions
+
+    function calculateLeft() {
+      if (closestElderSibling) return closestElderSibling.dimensions.left
+      if (parent)
+        return parent.dimensions.left + parent.dimensions.width + space
+      return origin.left
+    }
+
+    function calculateTop() {
+      if (closestElderSibling)
+        return (
+          closestElderSibling.dimensions.top +
+          closestElderSibling.dimensions.height +
+          space
+        )
+      if (parent) return parent.dimensions.top
+      return origin.top
+    }
+  }
+
+  function getOrigin(state) {
+    return state.origin
+  }
+}
+
+function getParent({ state, node: { id } }) {
+  const rootNodes = getRootNodes(state)
+  if (rootNodes.find((node) => node.id === id)) return
+
+  return findParent({ id, nodes: rootNodes })
+
+  function findParent({ id, nodes }) {
+    const parent = nodes.find(({ children }) =>
+      children?.find((child) => child.id === id)
+    )
+
+    if (parent) return parent
+    return findParent({
+      id,
+      nodes: nodes
+        .filter(({ children }) => children?.length)
+        .flatMap(({ children }) => children),
+    })
+  }
+}
+
+function getClosestElderSibling({ state, node: { id } }) {
+  const rootNodes = getRootNodes(state)
+
+  return findClosestElderSibling({ id, nodes: rootNodes })
+
+  function findClosestElderSibling({ id, nodes }) {
+    const siblings = getSiblings({ id, nodes })
+
+    if (siblings) return siblings.find((_, i) => siblings?.[i + 1]?.id === id)
+    return
+  }
+}
+
+function getSiblings({ id, nodes }) {
+  const matchingNode = nodes.find((node) => node.id === id)
+
+  if (matchingNode) return nodes
+
+  for (const { children } of nodes) {
+    if (children?.length) {
+      const siblings = getSiblings({ id, nodes: children })
+      if (siblings) return siblings
+    }
+  }
+}
+
+function getRootNodes(state) {
+  return state.trees
 }
 
 function createNode() {
@@ -124,5 +226,6 @@ function createNode() {
     text: '',
     editing: true,
     dimensions: {},
+    desiredDimensions: {},
   }
 }

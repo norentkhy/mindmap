@@ -3,10 +3,10 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import { Tabs } from './Tabs'
 import { v4 as uuidv4 } from 'uuid'
 import userEvent from '@testing-library/user-event'
-import { getInputSelection } from '../utils/getInputSelection'
+import { getInputSelection } from '../../utils/getInputSelection'
 import { TabsProvider } from './TabsContext'
-import { createMockContextProvider } from '../utils/createMockContextProvider'
-import { getArgsOfLastCall } from '../utils/jestUtils'
+import { createMockContextProvider } from '../../utils/createMockContextProvider'
+import { getArgsOfLastCall } from '../../utils/jestUtils'
 
 describe('rendered as intended', () => {
   test('overlap with MindMap.spec', () => {

@@ -16,7 +16,7 @@ export default function Node({ node, theProjectContext }) {
 
   if (editing)
     return (
-      <Button ref={nodeRef}>
+      <Button ref={nodeRef} node={node}>
         <NodeInput theProjectContext={theProjectContext} node={node} />
       </Button>
     )
@@ -25,6 +25,7 @@ export default function Node({ node, theProjectContext }) {
     return (
       <Button
         ref={nodeRef}
+        node={node}
         onKeyUp={({ key }) => {
           key === 'Enter' && initiateEditNode(id)
           key === 'c' && createChildNode(id)

@@ -1,9 +1,9 @@
 import React from 'react'
-import { Actions } from './Actions/Actions'
-import { MainView } from './MainView/MainView'
-import { ProjectProvider } from './Contexts/ProjectContext'
-import { Tabs } from './Tabs/Tabs'
-import { TabsProvider } from './Tabs/TabsContext'
+import { Actions } from './components/Actions/Actions'
+import { MainView } from './components/MainView/MainView'
+import { ProjectProvider } from './components/Contexts/ProjectContext'
+import { Tabs } from './components/Tabs/Tabs'
+import { TabsProvider } from './components/Tabs/TabsContext'
 
 export default function MindMap({ logResize, useThisResizeObserver }) {
   return (

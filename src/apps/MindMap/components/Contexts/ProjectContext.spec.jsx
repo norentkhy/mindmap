@@ -1,8 +1,16 @@
 import { renderHook, act } from '@testing-library/react-hooks'
 import { ProjectProvider, ProjectContext } from './ProjectContext'
 import React, { useContext } from 'react'
-import createMockResizeObserverHook from '../components/Contexts/createMockResizeObserverHook'
-import { getArgsOfLastCall } from '../utils/jestUtils'
+import createMockResizeObserverHook from './createMockResizeObserverHook'
+import { getArgsOfLastCall } from '../../utils/jestUtils'
+import {
+  getTrees,
+  createRootNodeWithProperties,
+  getNewestRootNode,
+  getState,
+  captureNewNodes,
+  getNode,
+} from './TestUtilities'
 
 describe('core', () => {
   describe('create a root node', () => {
@@ -132,80 +140,6 @@ describe('undo and redo', () => {
   })
 })
 
-describe('utilities', () => {
-  test('createRootNodeWithProperties', () => {
-    const { result } = renderHookTest()
-    const text = 'tesadf'
-    const rootNodeId = createRootNodeWithProperties(result, { text })
-
-    const rootNodes = getRootNodes(result)
-
-    expect(rootNodes.length).toBe(1)
-    expect(rootNodes[0].id).toBe(rootNodeId)
-  })
-
-  test('captureNodeChanges', () => {
-    const { result } = renderHookTest()
-    const firstRootNode = createAndCaptureFirstRootNode()
-    createAndCaptureSecondRootNode()
-    createAndCaptureFirstChildNode(firstRootNode.id)
-
-    function createAndCaptureFirstRootNode() {
-      const nodeChanges = captureNewNodes({
-        result,
-        change: () => createRootNodeWithProperties(result, { text: 'asdf' }),
-      })
-
-      expect(nodeChanges.length).toBe(1)
-      expect(nodeChanges[0]).toMatchObject({ text: 'asdf', editing: false })
-
-      return nodeChanges[0]
-    }
-
-    function createAndCaptureSecondRootNode() {
-      const nodeChanges = captureNewNodes({
-        result,
-        change: () => createRootNodeWithProperties(result, { text: 'second' }),
-      })
-
-      expect(nodeChanges.length).toBe(1)
-      expect(nodeChanges[0]).toMatchObject({ text: 'second', editing: false })
-    }
-
-    function createAndCaptureFirstChildNode(rootId) {
-      const nodeChanges = captureNewNodes({
-        result,
-        change: () => {
-          act(() => result.current.createChildNode(rootId))
-        },
-      })
-
-      expect(nodeChanges.length).toBe(1)
-      expect(nodeChanges[0]).toMatchObject({ text: '', editing: true })
-    }
-  })
-
-  test('createChildNodeWithProperties', () => {
-    const { result } = renderHookTest()
-
-    const parentId = createRootNodeWithProperties(result, { text: 'parent' })
-
-    const text = 'child'
-    const newNodes = captureNewNodes({
-      result,
-      change: () =>
-        createChildNodeWithProperties({
-          result,
-          parentId,
-          properties: { text },
-        }),
-    })
-
-    expect(newNodes.length).toBe(1)
-    expect(newNodes[0]).toMatchObject({ text })
-  })
-})
-
 describe('dimensions', () => {
   test('update of node dimensions', () => {
     const { result } = renderHookTestAndCreateRootNode()
@@ -231,7 +165,7 @@ describe('dimensions', () => {
     )
 
     const node = getNewestRootNode(result)
-    expect(node.dimensions).toEqual(newDimensions)
+    expect(getObservedDimensions(node)).toEqual(newDimensions)
 
     function renderHookTestAndCreateRootNode() {
       const rendered = renderHookTest()
@@ -239,6 +173,122 @@ describe('dimensions', () => {
       return rendered
     }
   })
+
+  describe('placement of nodes', () => {
+    test('properties before node creation', () => {
+      const { result } = renderHookTest()
+      expect(getOrigin(result)).toEqual({
+        top: 100,
+        left: 100,
+      })
+    })
+
+    test('a single root node', () => {
+      const { result } = renderHookTest()
+
+      const node = createRootNodeWithDimensions(result)
+
+      const origin = getOrigin(result)
+      expect(getDesiredDimensions(node)).toEqual({
+        left: origin.left,
+        top: origin.top,
+        inResponseTo: node.dimensions,
+      })
+    })
+
+    test('multiple sibling root nodes', () => {
+      const { result } = renderHookTest()
+
+      const nodes = [...Array(9)].map(() =>
+        createRootNodeWithDimensions(result)
+      )
+
+      const spaceBetweenNodes = 10
+      nodes.forEach((node, i) => {
+        if (i) {
+          const closestOlderSibling = nodes[i - 1]
+          expect(getDesiredDimensions(node)).toEqual({
+            left: closestOlderSibling.dimensions.left,
+            top:
+              closestOlderSibling.dimensions.top +
+              closestOlderSibling.dimensions.height +
+              spaceBetweenNodes,
+            inResponseTo: node.dimensions,
+          })
+        }
+      })
+    })
+
+    function createChildNodeWithDimensions({ result, parentId }) {
+      const { id } = createChildNode()
+      simulateResizeEvent({
+        result,
+        id,
+        newDimensions: createDimensions({ left: 10, top: 10 }),
+      })
+
+      return getNode({ result, id })
+
+      function createChildNode() {
+        const newNodes = captureNewNodes({
+          result,
+          change: () => {
+            act(() => result.current.createChildNode(parentId))
+          },
+        })
+
+        return newNodes[0]
+      }
+    }
+
+    function createRootNodeWithDimensions(result) {
+      act(() => result.current.createRootNode())
+      const { id } = getNewestRootNode(result)
+      simulateResizeEvent({
+        result,
+        id,
+        newDimensions: createDimensions({ left: 10, top: 10 }),
+      })
+
+      return getNewestRootNode(result)
+    }
+
+    function simulateResizeEvent({ result, id, newDimensions }) {
+      act(() =>
+        result.current.updateNodeDimensions({ id, dimensions: newDimensions })
+      )
+    }
+
+    function createDimensions({ left, top }) {
+      const windowWidth = 640
+      const windowHeight = 480
+      const width = 50
+      const height = 20
+
+      return {
+        x: left,
+        y: top,
+        left,
+        right: windowWidth - width - left,
+        top,
+        bottom: windowHeight - height - top,
+        width,
+        height,
+      }
+    }
+  })
+
+  function getOrigin(result) {
+    return result.current.state.origin
+  }
+
+  function getDesiredDimensions(node) {
+    return node.desiredDimensions
+  }
+
+  function getObservedDimensions(node) {
+    return node.dimensions
+  }
 })
 
 describe('logging of changes', () => {
@@ -264,48 +314,7 @@ describe('logging of changes', () => {
   })
 })
 
-function captureNewNodes({ result, change }) {
-  const oldNodes = getRootNodes(result)
-  change()
-  const nodes = getRootNodes(result)
-
-  const newNodes = getNewNodes({ oldNodes, nodes })
-
-  return newNodes
-
-  function getNewNodes({ oldNodes, nodes }) {
-    const oldIds = getIds(oldNodes)
-    const ids = getIds(nodes)
-    const newIds = ids.filter((id) => !oldIds.includes(id))
-
-    const newNodes = newIds.map((id) => getNode({ id, nodes }))
-
-    return newNodes
-
-    function getIds(nodes) {
-      return nodes.flatMap(({ children, id }) => {
-        if (!children) return id
-
-        return [id, ...getIds(children)]
-      })
-    }
-
-    function getNode({ id, nodes }) {
-      if (nodes.length === 0) return null
-
-      const foundNode = nodes.find((node) => node.id === id)
-      if (foundNode) return foundNode
-
-      const childNodes = nodes.reduce((childNodes, { children }) => {
-        if (!children || children.length === 0) return childNodes
-        return [...childNodes, ...children]
-      }, [])
-      return getNode({ id, nodes: childNodes })
-    }
-  }
-}
-
-function renderHookTest(log) {
+export function renderHookTest(log) {
   const { useMockResizeObserver } = createMockResizeObserverHook()
 
   return renderHook(() => useContext(ProjectContext), {
@@ -318,45 +327,4 @@ function renderHookTest(log) {
       </ProjectProvider>
     ),
   })
-}
-
-function createRootNodeWithProperties(result, { text, ...others }) {
-  act(() => result.current.createRootNode())
-  const { id } = getNewestRootNode(result)
-  act(() => result.current.finalizeEditNode({ id, text, ...others }))
-  return id
-}
-
-function createChildNodeWithProperties({
-  result,
-  parentId,
-  properties: { text, ...others },
-}) {
-  const newNodes = captureNewNodes({
-    result,
-    change: () => {
-      act(() => result.current.createChildNode(parentId))
-    },
-  })
-  const { id } = newNodes[0]
-  act(() => result.current.finalizeEditNode({ id, text, ...others }))
-  return id
-}
-
-function getRootNodes(result) {
-  const state = getState(result)
-  return state.trees
-}
-
-function getNewestRootNode(result) {
-  const rootNodes = getRootNodes(result)
-  return rootNodes[rootNodes.length - 1]
-}
-
-function getState(result) {
-  return result.current.state
-}
-
-function getTrees(result) {
-  return getState(result).trees
 }

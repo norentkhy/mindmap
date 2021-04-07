@@ -51,6 +51,7 @@ export const createDataStructure = {
     editing = false,
     folded = false,
     children = [],
+    desiredDimensions = {},
     processResizeEvent,
   }) {
     return {
@@ -61,6 +62,7 @@ export const createDataStructure = {
       folded,
       children,
       processResizeEvent,
+      desiredDimensions,
     }
   },
   childNode({ parentNode, text }) {

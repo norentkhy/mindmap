@@ -10,11 +10,13 @@ export function MainView({ theProjectContext = ProjectContext }) {
   return (
     <div aria-label="main view" onDoubleClick={createRootNode}>
       {nodesToRender?.map((node) => (
-        <NodeFamily
-          headNode={node}
-          key={node.id}
-          theProjectContext={theProjectContext}
-        />
+        <div key={`container ${node.id}`} aria-label="container of rootnode">
+          <NodeFamily
+            headNode={node}
+            key={node.id}
+            theProjectContext={theProjectContext}
+          />
+        </div>
       ))}
     </div>
   )
