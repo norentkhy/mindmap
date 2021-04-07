@@ -15,7 +15,7 @@ function UseResizeObserverInstance() {
 function Resizeable({ children }) {
   const [size, setSize] = useState({ x: 400, y: 300 })
   const ref = useRef()
-  useResizeObserver(ref, (e) => console.log(e.contentRect))
+  useResizeObserver(ref, logSomething)
 
   // copy paste component, this is not high quality
   const handler = useCallback(() => {
@@ -39,6 +39,11 @@ function Resizeable({ children }) {
       <FillingButton ref={ref} onMouseDown={handler} />
     </Div>
   )
+}
+
+function logSomething(e) {
+  const { offsetLeft, offsetTop, offsetWidth, offsetHeight } = e.target
+  console.log({ offsetLeft, offsetTop, offsetWidth, offsetHeight })
 }
 
 const FillingButton = styled.button`
