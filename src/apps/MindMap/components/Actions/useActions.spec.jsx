@@ -12,24 +12,6 @@ test('intended use', () => {
 
 describe('with mock provider', () => {
   describe('undo/redo ', () => {
-    test('undo', () => {
-      const undo = jest.fn()
-      const { result } = renderWithMockProvider({ undo })
-
-      act(() => result.current.undoAction())
-
-      expect(undo).toHaveBeenCalled()
-    })
-
-    test('redo', () => {
-      const redo = jest.fn()
-      const { result } = renderWithMockProvider({ redo })
-
-      act(() => result.current.redoAction())
-
-      expect(redo).toHaveBeenCalled()
-    })
-
     test('createRootNode', () => {
       const createRootNode = jest.fn()
 
