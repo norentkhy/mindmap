@@ -1,18 +1,16 @@
 import React from 'react'
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import MindMap from './MindMap'
 import userEvent from '@testing-library/user-event'
-import { foldNode, queryNodeInput } from './components/MainView/testUtilities'
+import { queryNodeInput } from './components/MainView/testUtilities'
 import {
   createRootNode,
   completeNodeNaming,
   createRootNodeWithProperties,
   createChildNode,
-  createTrees,
   queryNode,
   findNodeInput,
 } from './MindMapTestUtilities'
-import { createMockResizeObserverHook } from 'test-utils/react-mocks'
 import 'jest-styled-components'
 
 const spy = jest.spyOn(global.console, 'error')
@@ -108,46 +106,6 @@ describe('main view integration', () => {
     ;[rootText, childText].forEach((text) => {
       expect(screen.getByText(text)).toBeVisible()
     })
-  })
-
-  test('fold a node', async () => {
-    render(<MindMap />)
-    const texts = [
-      {
-        notFoldedAway: 'unaffected1',
-        toFold: 'fold this1',
-        foldedAway: 'folded away1',
-      },
-      {
-        notFoldedAway: 'unaffected2',
-        toFold: 'fold this2',
-        foldedAway: 'folded away2',
-      },
-    ]
-    const trees = texts.map(generateFoldTree)
-    await createTrees(trees)
-
-    for (const text of texts) {
-      expect(screen.getByText(text.foldedAway)).toBeVisible()
-
-      const NodeToFold = screen.getByText(text.toFold)
-      foldNode(NodeToFold)
-      await waitFor(() =>
-        expect(screen.queryByText(text.foldedAway)).toBeNull()
-      )
-
-      foldNode(NodeToFold)
-      await waitFor(() =>
-        expect(screen.getByText(text.foldedAway)).toBeVisible()
-      )
-    }
-
-    function generateFoldTree({ notFoldedAway, toFold, foldedAway }) {
-      return {
-        text: notFoldedAway,
-        children: [{ text: toFold, children: [{ text: foldedAway }] }],
-      }
-    }
   })
 
   test('editing node text', async () => {

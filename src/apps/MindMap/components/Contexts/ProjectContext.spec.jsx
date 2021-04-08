@@ -66,22 +66,4 @@ describe('core', () => {
       act(() => result.current.createChildNode(parentId))
     })
   })
-
-  describe('fold a node', () => {
-    test('fold a node', () => {
-      const { result } = renderHookTest()
-      const id = createRootNodeWithProperties(result, { text: 'root node' })
-
-      const initialNode = getNewestRootNode(result)
-      expect(initialNode.folded).toBeFalsy()
-
-      act(() => result.current.foldNode(id))
-      const foldedNode = getNewestRootNode(result)
-      expect(foldedNode.folded).toBe(true)
-
-      act(() => result.current.foldNode(id))
-      const unfoldedNode = getNewestRootNode(result)
-      expect(unfoldedNode.folded).toBe(false)
-    })
-  })
 })
