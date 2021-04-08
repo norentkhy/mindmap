@@ -3,6 +3,7 @@
     "baseUrl": ".",
     "jsx": "react",
     "paths": {
+      "~mindmap/*": ["./src/apps/MindMap/*"],
       "hooks/*": ["./src/hooks/*"],
       "utils/*": ["./src/utils/*"],
       "components/*": ["./src/apps/website/components/*"],
