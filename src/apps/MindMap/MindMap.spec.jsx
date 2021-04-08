@@ -205,58 +205,6 @@ describe('main view integration', () => {
 })
 
 describe('mocks due to test environment', () => {
-  const sample = {
-    boundingClientRect: {
-      left: 101,
-      top: 102,
-      right: 203,
-      bottom: 204,
-      width: 105,
-      height: 106,
-      x: 101,
-      y: 102,
-    },
-    offsetRect: {
-      offsetLeft: 5,
-      offsetTop: 3,
-      offsetWidth: 10,
-      offsetHeight: 4,
-    },
-  }
-
-  test('mock resize observer', async () => {
-    const { fireResizeEvent, logResize } = renderMindMapWithMockResizeObserver()
-
-    const Node = await createRootNodeWithProperties({ text: 'test' })
-    expect(logResize).toBeCalled()
-
-    const { boundingClientRect, offsetRect } = sample
-    const { offsetLeft, offsetTop, offsetWidth, offsetHeight } = offsetRect
-    act(() => fireResizeEvent(Node, { boundingClientRect, offsetRect }))
-
-    expect(logResize).toBeCalledWith(
-      expect.objectContaining({
-        boundingClientRect,
-        offsetRect: {
-          left: offsetLeft,
-          top: offsetTop,
-          width: offsetWidth,
-          height: offsetHeight,
-        },
-      })
-    )
-  })
-
-  test('all elements resize', async () => {
-    const { fireResizeEvent, container } = renderMindMapWithMockResizeObserver()
-    await createRootNodeWithProperties({ text: 'test' })
-    const { boundingClientRect, offsetRect } = sample
-
-    getAllElements(container).forEach((Element) =>
-      act(() => fireResizeEvent(Element, { boundingClientRect, offsetRect }))
-    )
-  })
-
   test('resize elements specifically', async () => {
     const { fireResizeEvent, container } = renderMindMapWithMockResizeObserver()
     await createRootNodeWithProperties({ text: 'test' })

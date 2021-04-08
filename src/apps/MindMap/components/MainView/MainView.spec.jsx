@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen, act } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import { MainView } from './MainView'
 import { v4 as uuidv4 } from 'uuid'
 import { getInputSelection } from 'test-utils/dom'
@@ -11,7 +11,6 @@ import {
   getFocus,
 } from './testUtilities'
 import { createMockContextProvider } from 'test-utils/react-mocks'
-import { createMockResizeObserverHook } from 'test-utils/react-mocks'
 import 'jest-styled-components'
 
 describe('inherited from MindMap.spec', () => {
@@ -304,97 +303,6 @@ describe('folding a node', () => {
 })
 
 describe('dimensions of each node', () => {
-  const sample = {
-    boundingClientRect: {
-      left: 101,
-      top: 102,
-      right: 203,
-      bottom: 204,
-      width: 105,
-      height: 106,
-      x: 101,
-      y: 102,
-    },
-    offsetRect: {
-      offsetLeft: 5,
-      offsetTop: 3,
-      offsetWidth: 10,
-      offsetHeight: 4,
-    },
-  }
-
-  test('Observation of rootnode dimensions', () => {
-    const registerNodeLayout = jest.fn()
-    const { fireResizeEvent, node } = renderTestWithMockResizeObserver({
-      registerNodeLayout,
-    })
-
-    const Node = queryNode(node)
-    const { boundingClientRect, offsetRect } = sample
-    const { offsetLeft, offsetTop, offsetWidth, offsetHeight } = offsetRect
-    act(() => fireResizeEvent(Node, { boundingClientRect, offsetRect }))
-
-    expect(registerNodeLayout).toBeCalledWith({
-      id: node.id,
-      boundingClientRect,
-      offsetRect: {
-        left: offsetLeft,
-        top: offsetTop,
-        width: offsetWidth,
-        height: offsetHeight,
-      },
-    })
-  })
-
-  test('Observation of rootnode tree dimensions', () => {
-    const registerTreeLayout = jest.fn()
-    const { fireResizeEvent, node } = renderTestWithMockResizeObserver({
-      registerTreeLayout,
-    })
-
-    const TreeContainer = getRootContainer(queryNode(node))
-    const { boundingClientRect, offsetRect } = sample
-    const { offsetLeft, offsetTop, offsetWidth, offsetHeight } = offsetRect
-
-    act(() =>
-      fireResizeEvent(TreeContainer, { boundingClientRect, offsetRect })
-    )
-
-    expect(registerTreeLayout).toBeCalledWith({
-      id: node.id,
-      boundingClientRect,
-      offsetRect: {
-        left: offsetLeft,
-        top: offsetTop,
-        width: offsetWidth,
-        height: offsetHeight,
-      },
-    })
-  })
-
-  test('Observation of surface dimensions', () => {
-    const registerSurfaceLayout = jest.fn()
-    const { fireResizeEvent } = renderTestWithMockResizeObserver({
-      registerSurfaceLayout,
-    })
-
-    const Surface = screen.getByLabelText(/^main view$/i)
-    const { boundingClientRect, offsetRect } = sample
-    const { offsetLeft, offsetTop, offsetWidth, offsetHeight } = offsetRect
-
-    act(() => fireResizeEvent(Surface, { boundingClientRect, offsetRect }))
-
-    expect(registerSurfaceLayout).toBeCalledWith({
-      boundingClientRect,
-      offsetRect: {
-        left: offsetLeft,
-        top: offsetTop,
-        width: offsetWidth,
-        height: offsetHeight,
-      },
-    })
-  })
-
   test('offsets given to each roottree', () => {
     const offsetLeft = 10
     const offsetTop = 11
@@ -423,36 +331,6 @@ describe('dimensions of each node', () => {
     if (ParentElement.getAttribute('aria-label') === 'container of rootnode')
       return ParentElement
     else return getRootContainer(ParentElement)
-  }
-
-  function renderTestWithMockResizeObserver(mockFunctions) {
-    const {
-      useMockResizeObserver,
-      fireResizeEvent,
-    } = createMockResizeObserverHook()
-
-    const { initialState, node } = createInitialStateWithNodeForResizing()
-
-    const rendered = renderTest({
-      initialState,
-      modifications: {
-        useThisResizeObserver: useMockResizeObserver,
-        registerSurfaceLayout() {},
-        ...mockFunctions,
-      },
-    })
-
-    return { rendered, fireResizeEvent, node }
-
-    function createInitialStateWithNodeForResizing() {
-      const node = createDataStructure.node({ text: 'this will resize' })
-
-      const initialState = createDataStructure.state({
-        rootNodes: [node],
-      })
-
-      return { initialState, node }
-    }
   }
 })
 
