@@ -8,7 +8,8 @@
       "components/*": ["./src/apps/website/components/*"],
       "pages/*": ["./src/website/pages/*"],
       "images/*": ["./mock-files/images/*"],
-      "~website/*": ["./src/apps/website/*"]
+      "~website/*": ["./src/apps/website/*"],
+      "test-utils/*": ["./src/test-utils/*"]
     }
   }
 }

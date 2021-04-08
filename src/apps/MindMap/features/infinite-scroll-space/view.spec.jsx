@@ -1,19 +1,15 @@
 import React, { useEffect } from 'react'
 import { fireEvent, render, screen } from '@testing-library/react'
-import { getArgsOfLastCall } from '../../utils/jestUtils'
 import WheelFeedbackContainer from '../../components/WheelFeedbackContainer/WheelFeedbackContainer'
 
 describe('wheel feedback container', () => {
   test('initial feedback', () => {
     const handleWheelFeedback = renderWithChildHandlingFeedback()
 
-    expect(handleWheelFeedback).toBeCalledTimes(1)
-    expect(getArgsOfLastCall(handleWheelFeedback)).toEqual([
-      {
-        id: 0,
-        atBoundary: { left: true, top: true, right: false, bottom: false },
-      },
-    ])
+    expect(handleWheelFeedback).nthCalledWith(1, {
+      id: 0,
+      atBoundary: { left: true, top: true, right: false, bottom: false },
+    })
   })
 
   test('feedback on hitting left boundary', () => {
@@ -24,14 +20,11 @@ describe('wheel feedback container', () => {
       delta: { left: amountLeft },
     })
 
-    expect(handleWheelFeedback).toBeCalledTimes(2)
-    expect(getArgsOfLastCall(handleWheelFeedback)).toEqual([
-      {
-        id: 1,
-        atBoundary: { left: true, top: true, right: false, bottom: false },
-        amount: { left: amountLeft, right: 0, top: 0, bottom: 0 },
-      },
-    ])
+    expect(handleWheelFeedback).nthCalledWith(2, {
+      id: 1,
+      atBoundary: { left: true, top: true, right: false, bottom: false },
+      amount: { left: amountLeft, right: 0, top: 0, bottom: 0 },
+    })
   })
 
   test('feedback on hitting right boundary', () => {
@@ -42,14 +35,11 @@ describe('wheel feedback container', () => {
       delta: { right: amountRight },
     })
 
-    expect(handleWheelFeedback).toBeCalledTimes(2)
-    expect(getArgsOfLastCall(handleWheelFeedback)).toEqual([
-      {
-        id: 1,
-        atBoundary: { left: false, top: true, right: true, bottom: false },
-        amount: { left: 0, right: amountRight, top: 0, bottom: 0 },
-      },
-    ])
+    expect(handleWheelFeedback).nthCalledWith(2, {
+      id: 1,
+      atBoundary: { left: false, top: true, right: true, bottom: false },
+      amount: { left: 0, right: amountRight, top: 0, bottom: 0 },
+    })
   })
 
   test('feedback on hitting top boundary', () => {
@@ -60,14 +50,11 @@ describe('wheel feedback container', () => {
       delta: { top: amountTop },
     })
 
-    expect(handleWheelFeedback).toBeCalledTimes(2)
-    expect(getArgsOfLastCall(handleWheelFeedback)).toEqual([
-      {
-        id: 1,
-        atBoundary: { left: true, top: true, right: false, bottom: false },
-        amount: { left: 0, right: 0, top: amountTop, bottom: 0 },
-      },
-    ])
+    expect(handleWheelFeedback).nthCalledWith(2, {
+      id: 1,
+      atBoundary: { left: true, top: true, right: false, bottom: false },
+      amount: { left: 0, right: 0, top: amountTop, bottom: 0 },
+    })
   })
 
   test('feedback on hitting bottom boundary', () => {
@@ -78,14 +65,11 @@ describe('wheel feedback container', () => {
       delta: { bottom: amountBottom },
     })
 
-    expect(handleWheelFeedback).toBeCalledTimes(2)
-    expect(getArgsOfLastCall(handleWheelFeedback)).toEqual([
-      {
-        id: 1,
-        atBoundary: { left: true, top: false, right: false, bottom: true },
-        amount: { left: 0, right: 0, top: 0, bottom: amountBottom },
-      },
-    ])
+    expect(handleWheelFeedback).nthCalledWith(2, {
+      id: 1,
+      atBoundary: { left: true, top: false, right: false, bottom: true },
+      amount: { left: 0, right: 0, top: 0, bottom: amountBottom },
+    })
   })
 
   test('feedback on hitting nothing', () => {
@@ -97,14 +81,11 @@ describe('wheel feedback container', () => {
       scroll: { xPercentage: 55, yPercentage: 45 },
     })
 
-    expect(handleWheelFeedback).toBeCalledTimes(2)
-    expect(getArgsOfLastCall(handleWheelFeedback)).toEqual([
-      {
-        id: 1,
-        atBoundary: { left: false, right: false, top: false, bottom: false },
-        amount: { left: delta.left, right: 0, top: delta.top, bottom: 0 },
-      },
-    ])
+    expect(handleWheelFeedback).nthCalledWith(2, {
+      id: 1,
+      atBoundary: { left: false, right: false, top: false, bottom: false },
+      amount: { left: delta.left, right: 0, top: delta.top, bottom: 0 },
+    })
   })
 
   function renderWithChildHandlingFeedback() {

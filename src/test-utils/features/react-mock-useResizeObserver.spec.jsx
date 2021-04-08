@@ -1,9 +1,6 @@
-import React from 'react'
 import { renderHook, act } from '@testing-library/react-hooks'
-import * as TLR from '@testing-library/react'
-import { useRef, useState } from 'react'
-import { getArgsOfLastCall } from '../../utils/jestUtils'
-import createMockResizeObserverHook from './createMockResizeObserverHook'
+import { getArgsOfLastCall } from 'test-utils/jest'
+import { createMockResizeObserverHook } from 'test-utils/react-mocks'
 
 describe('mock useResizeObserver', () => {
   const sample = {
@@ -25,12 +22,20 @@ describe('mock useResizeObserver', () => {
     },
   }
 
-  test('fireResizeEvent is trigged when made', () => {
+  test('fireResizeEvent is triggered when made', () => {
     const { callback } = renderMockResizeSituation()
 
     expect(callback).toBeCalled()
-    const { getBoundingClientRect } = getArgsOfLastCall(callback)[0].target
+    const { getBoundingClientRect } = getLastEvent(callback).target
     expect(getBoundingClientRect()).toEqual(sample.boundingClientRect)
+  })
+
+  test('not triggered when hook is re-rendered', () => {
+    const { callback, rerender } = renderMockResizeSituation()
+
+    expect(callback).toBeCalledTimes(1)
+    rerender()
+    expect(callback).toBeCalledTimes(1)
   })
 
   test('specified initial target properties', () => {
@@ -40,9 +45,9 @@ describe('mock useResizeObserver', () => {
       offsetWidth: 40,
       offsetHeight: 50,
     }
-
     const { callback } = renderMockResizeSituation(initialTargetProperties)
-    const [{ target }] = getArgsOfLastCall(callback)
+
+    const { target } = getLastEvent(callback)
     expect(target).toEqual(initialTargetProperties)
   })
 
@@ -72,40 +77,14 @@ describe('mock useResizeObserver', () => {
       current: { note: 'this is supposed to be an HTML object or a fiber' },
     }
     const callback = jest.fn()
-    renderHook(() => useMockResizeObserver(testRef, callback))
-
-    return { fireResizeEvent, callback, testRef }
-  }
-})
-
-describe('found bugs', () => {
-  test('render loop', () => {
-    const { useMockResizeObserver } = createMockResizeObserverHook()
-    const resizeCallback = jest.fn(() => {})
-    TLR.render(
-      <Trigger
-        useMockResizeObserver={useMockResizeObserver}
-        onResize={resizeCallback}
-      />
+    const { rerender } = renderHook(() =>
+      useMockResizeObserver(testRef, callback)
     )
 
-    expect(resizeCallback).toBeCalledTimes(1)
+    return { fireResizeEvent, callback, testRef, rerender }
+  }
 
-    const TriggerButton = TLR.screen.getByText('Trigger')
-    TLR.fireEvent.click(TriggerButton)
-
-    expect(resizeCallback).toBeCalledTimes(1)
-
-    function Trigger({ useMockResizeObserver, onResize }) {
-      const ref = useRef()
-      const [count, setCount] = useState(0)
-      useMockResizeObserver(ref, onResize)
-
-      return (
-        <button ref={ref} onClick={() => setCount(count + 1)}>
-          Trigger
-        </button>
-      )
-    }
-  })
+  function getLastEvent(callback) {
+    return getArgsOfLastCall(callback)[0]
+  }
 })

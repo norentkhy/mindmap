@@ -1,7 +1,7 @@
 import React from 'react'
 import { renderHook, act } from '@testing-library/react-hooks'
 import { ProjectProvider } from '../Contexts/ProjectContext'
-import { createMockContextProvider } from '../../utils/createMockContextProvider'
+import { createMockContextProvider } from 'test-utils/react-mocks'
 import { useActions } from './useActions'
 
 test('intended use', () => {

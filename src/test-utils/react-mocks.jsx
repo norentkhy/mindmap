@@ -1,8 +1,24 @@
-import { useCallback, useLayoutEffect } from 'react'
+import React, { createContext, useCallback, useLayoutEffect } from 'react'
 
-export default function createMockResizeObserverHook(
+export function createMockContextProvider(
+  { initialState = {}, modifications = {} } = {
+    initialState: {},
+    modifications: {},
+  }
+) {
+  const Context = createContext()
+
+  return [Context, Provider]
+
+  function Provider({ children }) {
+    const model = { state: initialState, ...modifications }
+    return <Context.Provider value={model}>{children}</Context.Provider>
+  }
+}
+
+export function createMockResizeObserverHook(
   initialTargetProperties = {
-    getBoundingClientRect: () => sample.boundingClientRect,
+    getBoundingClientRect: () => sizeExample.boundingClientRect,
     offsetLeft: 0,
     offsetTop: 0,
     offsetWidth: 10,
@@ -36,8 +52,8 @@ export default function createMockResizeObserverHook(
   function fireResizeEvent(
     Element,
     {
-      boundingClientRect = sample.boundingClientRect,
-      offsetRect = sample.offsetRect,
+      boundingClientRect = sizeExample.boundingClientRect,
+      offsetRect = sizeExample.offsetRect,
     }
   ) {
     const { offsetLeft, offsetTop, offsetWidth, offsetHeight } = offsetRect
@@ -52,16 +68,16 @@ export default function createMockResizeObserverHook(
       },
     })
   }
-}
 
-function mockInitialResize({ Element, callback }) {
-  if (!Element.firstResizeCallback) {
-    Element.firstResizeCallback = callback
-    callback()
+  function mockInitialResize({ Element, callback }) {
+    if (!Element.firstResizeCallback) {
+      Element.firstResizeCallback = callback
+      callback()
+    }
   }
 }
 
-const sample = {
+const sizeExample = {
   boundingClientRect: {
     left: 101,
     top: 102,

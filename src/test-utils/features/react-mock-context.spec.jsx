@@ -1,16 +1,13 @@
 import { renderHook, act } from '@testing-library/react-hooks'
 import React, { useContext } from 'react'
-import { createMockContextProvider } from './createMockContextProvider'
+import { createMockContextProvider } from '../react-mocks'
+import { getActions } from '../testing-library-react-hooks'
 
 describe('mock context and provider', () => {
   test('argumentless usage', () => {
     const [MockContext, MockProvider] = createMockContextProvider()
-
-    const { result } = renderHook(() => useContext(MockContext), {
-      wrapper: ({ children }) => <MockProvider>{children}</MockProvider>,
-    })
-
-    expect(result.current).toEqual({ state: {} })
+    const { result } = renderTest({ MockContext, MockProvider })
+    expect(result.current.state).toEqual({})
   })
 
   test('with initial state', () => {
@@ -19,11 +16,8 @@ describe('mock context and provider', () => {
       initialState,
     })
 
-    const { result } = renderHook(() => useContext(MockContext), {
-      wrapper: ({ children }) => <MockProvider>{children}</MockProvider>,
-    })
-
-    expect(result.current).toEqual({ state: initialState })
+    const { result } = renderTest({ MockContext, MockProvider })
+    expect(result.current.state).toEqual(initialState)
   })
 
   test('with modified view model', () => {
@@ -32,11 +26,14 @@ describe('mock context and provider', () => {
       modifications: { trigger },
     })
 
-    const { result } = renderHook(() => useContext(MockContext), {
-      wrapper: ({ children }) => <MockProvider>{children}</MockProvider>,
-    })
-
+    const { result } = renderTest({ MockContext, MockProvider })
     act(() => result.current.trigger())
     expect(trigger).toHaveBeenCalled()
   })
 })
+
+function renderTest({ MockContext, MockProvider }) {
+  return renderHook(() => useContext(MockContext), {
+    wrapper: ({ children }) => <MockProvider>{children}</MockProvider>,
+  })
+}

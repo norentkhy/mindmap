@@ -3,10 +3,9 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import { Tabs } from './Tabs'
 import { v4 as uuidv4 } from 'uuid'
 import userEvent from '@testing-library/user-event'
-import { getInputSelection } from '../../utils/getInputSelection'
+import { getInputSelection } from 'test-utils/dom'
 import { TabsProvider } from './TabsContext'
-import { createMockContextProvider } from '../../utils/createMockContextProvider'
-import { getArgsOfLastCall } from '../../utils/jestUtils'
+import { createMockContextProvider } from 'test-utils/react-mocks'
 
 describe('rendered as intended', () => {
   test('overlap with MindMap.spec', () => {
@@ -101,13 +100,10 @@ describe('rendered with mocks', () => {
       const someNewTitle = 'some new title'
       ui.typeAndPressEnter(someNewTitle)
 
-      expect(finishRenameTab).toBeCalledTimes(1)
-      expect(getArgsOfLastCall(finishRenameTab)).toEqual([
-        {
-          id: tabTarget.id,
-          newTitle: someNewTitle,
-        },
-      ])
+      expect(finishRenameTab).nthCalledWith(1, {
+        id: tabTarget.id,
+        newTitle: someNewTitle,
+      })
 
       function renderWithTabInRenameMode() {
         const {

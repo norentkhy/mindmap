@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 import { act, renderHook } from '@testing-library/react-hooks'
-import createMockResizeObserverHook from './createMockResizeObserverHook'
+import { createMockResizeObserverHook } from 'test-utils/react-mocks'
 import { ProjectContext, ProjectProvider } from './ProjectContext'
 
 export function captureNewNodes({ result, change }) {

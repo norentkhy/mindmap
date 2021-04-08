@@ -2,7 +2,7 @@ import React from 'react'
 import { render, screen, act } from '@testing-library/react'
 import { MainView } from './MainView'
 import { v4 as uuidv4 } from 'uuid'
-import { getInputSelection } from '../../utils/getInputSelection'
+import { getInputSelection } from 'test-utils/dom'
 import {
   createDataStructure,
   queryNode,
@@ -10,8 +10,8 @@ import {
   ui,
   getFocus,
 } from './testUtilities'
-import { createMockContextProvider } from '../../utils/createMockContextProvider'
-import createMockResizeObserverHook from '../Contexts/createMockResizeObserverHook'
+import { createMockContextProvider } from 'test-utils/react-mocks'
+import { createMockResizeObserverHook } from 'test-utils/react-mocks'
 import 'jest-styled-components'
 
 describe('inherited from MindMap.spec', () => {
