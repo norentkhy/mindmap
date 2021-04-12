@@ -1,19 +1,19 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import styled from 'styled-components'
-import { useActions } from './useActions'
+import { ProjectContext } from '~mindmap/components/Contexts/ProjectContext'
 
-export function Actions({ useHook = useActions }) {
-  const { undoAction, redoAction, createRootNode } = useHook()
+export function Actions({ theProjectContext = ProjectContext }) {
+  const { undo, redo, createRootNode } = useContext(theProjectContext)
 
   return (
     <FlexRow aria-label="actions">
       <button onClick={createRootNode} aria-label="create root node">
         create root node
       </button>
-      <button onClick={() => undoAction()} aria-label="undo action">
+      <button onClick={() => undo()} aria-label="undo action">
         undo action
       </button>
-      <button onClick={() => redoAction()} aria-label="redo action">
+      <button onClick={() => redo()} aria-label="redo action">
         redo action
       </button>
     </FlexRow>

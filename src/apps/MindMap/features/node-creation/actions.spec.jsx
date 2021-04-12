@@ -1,10 +1,7 @@
-import { fireEvent, render, screen } from '@testing-library/react'
 import { Actions } from '~mindmap/components/Actions/Actions'
-
-import * as TLRH from '@testing-library/react-hooks'
 import { createMockContextProvider } from 'test-utils/react-mocks'
-import { useActions } from '~mindmap/components/Actions/useActions'
 
+import { fireEvent, render, screen } from '@testing-library/react'
 import React from 'react'
 
 describe('with mock providers', () => {
@@ -18,16 +15,20 @@ describe('with mock providers', () => {
   })
 
   function renderWithMockHook(hookModifications) {
-    return render(<Actions useHook={useMock} />)
-
-    function useMock() {
-      return {
+    const [MockContext, MockProvider] = createMockContextProvider({
+      modifications: {
         undoAction() {},
         redoAction() {},
         createRootNode() {},
         ...hookModifications,
-      }
-    }
+      },
+    })
+
+    return render(
+      <MockProvider>
+        <Actions theProjectContext={MockContext} />
+      </MockProvider>
+    )
   }
 })
 
@@ -53,32 +54,3 @@ function getButton(labeltext) {
 function click(Element) {
   fireEvent.click(Element)
 }
-
-describe('with mock provider', () => {
-  describe('undo/redo ', () => {
-    test('createRootNode', () => {
-      const createRootNode = jest.fn()
-
-      const { result } = renderWithMockProvider({ createRootNode })
-
-      TLRH.act(() => result.current.createRootNode())
-
-      expect(createRootNode).toHaveBeenCalled()
-    })
-  })
-
-  function renderWithMockProvider(modifications) {
-    const [ProjectContext, ProjectMockProvider] = createMockContextProvider({
-      modifications,
-    })
-
-    return TLRH.renderHook(
-      () => useActions({ theProjectContext: ProjectContext }),
-      {
-        wrapper: ({ children }) => (
-          <ProjectMockProvider>{children}</ProjectMockProvider>
-        ),
-      }
-    )
-  }
-})

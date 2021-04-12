@@ -2,39 +2,44 @@ import { Actions } from '~mindmap/components/Actions/Actions'
 
 import React from 'react'
 import { fireEvent, render, screen } from '@testing-library/react'
+import { createMockContextProvider } from 'test-utils/react-mocks'
 
 describe('with mock providers', () => {
   test('undo', () => {
-    const undoAction = jest.fn()
-    renderWithMockHook({ undoAction })
+    const undo = jest.fn()
+    renderWithMockHook({ undo })
 
     ui.undo()
 
-    expect(undoAction).toHaveBeenCalled()
-    expect(undoAction.mock.calls[0]).toEqual([])
+    expect(undo).toHaveBeenCalled()
+    expect(undo.mock.calls[0]).toEqual([])
   })
 
   test('redo', () => {
-    const redoAction = jest.fn()
-    renderWithMockHook({ redoAction })
+    const redo = jest.fn()
+    renderWithMockHook({ redo })
 
     ui.redo()
 
-    expect(redoAction).toHaveBeenCalled()
-    expect(redoAction.mock.calls[0]).toEqual([])
+    expect(redo).toHaveBeenCalled()
+    expect(redo.mock.calls[0]).toEqual([])
   })
 
   function renderWithMockHook(hookModifications) {
-    return render(<Actions useHook={useMock} />)
-
-    function useMock() {
-      return {
-        undoAction() {},
-        redoAction() {},
+    const [MockContext, MockProvider] = createMockContextProvider({
+      modifications: {
+        undo() {},
+        redo() {},
         createRootNode() {},
         ...hookModifications,
-      }
-    }
+      },
+    })
+
+    return render(
+      <MockProvider>
+        <Actions theProjectContext={MockContext} />
+      </MockProvider>
+    )
   }
 })
 
