@@ -1,6 +1,6 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { queryNodeInput } from './components/MainView/testUtilities'
+import { queryNodeInput } from '../components/MainView/testUtilities'
 import { v4 as uuidv4 } from 'uuid'
 
 export function generateUniqueText() {
