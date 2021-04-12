@@ -1,21 +1,21 @@
-import MindMap from '~mindmap/MindMap'
+import MindMapApp from '~mindmap/App'
 
 import React from 'react'
 import { render, screen } from '@testing-library/react'
 
 describe('view elements', () => {
   test('tabs', () => {
-    render(<MindMap />)
+    render(<MindMapApp />)
     screen.getByLabelText(/^tabs$/i)
   })
 
   test('actions', () => {
-    render(<MindMap />)
+    render(<MindMapApp />)
     screen.getByLabelText(/^actions$/i)
   })
 
   test('main view', () => {
-    render(<MindMap />)
+    render(<MindMapApp />)
     screen.getByLabelText(/^main view$/i)
   })
 })

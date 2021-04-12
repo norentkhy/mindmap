@@ -1,13 +1,13 @@
 import React from 'react'
 import { render, screen, waitFor } from '@testing-library/react'
-import MindMap from '~mindmap/MindMap'
+import MindMapApp from '~mindmap/App'
 import { foldNode } from '~mindmap/components/MainView/testUtilities'
 import { createTrees } from '~mindmap/MindMapTestUtilities'
 import 'jest-styled-components'
 
 describe('node folding: integration', () => {
   test('fold a node structure', async () => {
-    render(<MindMap />)
+    render(<MindMapApp />)
     const texts = [
       {
         notFoldedAway: 'unaffected1',

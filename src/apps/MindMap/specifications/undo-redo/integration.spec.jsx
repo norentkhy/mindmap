@@ -1,4 +1,4 @@
-import MindMap from '~mindmap/MindMap'
+import MindMapApp from '~mindmap/App'
 import { queryNodeInput } from '~mindmap/components/MainView/testUtilities'
 import { createRootNodeWithProperties } from '~mindmap/MindMapTestUtilities'
 
@@ -8,7 +8,7 @@ import 'jest-styled-components'
 
 describe('undo/redo', () => {
   test('creation of rootnode', async () => {
-    render(<MindMap />)
+    render(<MindMapApp />)
 
     const rootNode = { text: 'root node' }
 

@@ -1,4 +1,4 @@
-import MindMap from '~mindmap/MindMap'
+import MindMapApp from '~mindmap/App'
 import {
   createRootNode,
   completeNodeNaming,
@@ -16,7 +16,7 @@ import 'jest-styled-components'
 
 describe('node creation: integration', () => {
   test('create a rootnode and edit its content', async () => {
-    render(<MindMap />)
+    render(<MindMapApp />)
 
     createRootNode()
 
@@ -32,7 +32,7 @@ describe('node creation: integration', () => {
   })
 
   test('create multiple rootnodes', async () => {
-    render(<MindMap />)
+    render(<MindMapApp />)
 
     const rootTexts = ['root node 1', 'root node 2']
     for (const text of rootTexts) {
@@ -43,7 +43,7 @@ describe('node creation: integration', () => {
   })
 
   test('create a childnode', async () => {
-    render(<MindMap />)
+    render(<MindMapApp />)
     const rootText = 'root text'
     await createRootNodeWithProperties({ text: rootText })
 
@@ -65,7 +65,7 @@ describe('node creation: integration', () => {
   })
 
   test('editing node text', async () => {
-    render(<MindMap />)
+    render(<MindMapApp />)
     const rootNode = { text: 'root node' }
     const RootNode = await createRootNodeWithProperties(rootNode)
 

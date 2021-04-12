@@ -1,4 +1,4 @@
-export default { title: 'proofs of concept' }
+export default { title: 'Prototypes' }
 export * from './useResizeObserverExample'
 export * from './InfiniteScrollView'
 export * from './LinesBetweenDivs'

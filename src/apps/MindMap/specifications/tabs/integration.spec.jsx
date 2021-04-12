@@ -1,4 +1,4 @@
-import MindMap from '~mindmap/MindMap'
+import MindMapApp from '~mindmap/App'
 
 import userEvent from '@testing-library/user-event'
 import { fireEvent, render, screen } from '@testing-library/react'
@@ -7,7 +7,7 @@ import 'jest-styled-components'
 
 describe('tabs integration', () => {
   test('add a new tab', () => {
-    render(<MindMap />)
+    render(<MindMapApp />)
     expect(screen.queryByText('untitled')).toBeNull()
 
     fireEvent.click(screen.getByLabelText('add new tab'))
@@ -18,7 +18,7 @@ describe('tabs integration', () => {
   })
 
   test('rename a tab', () => {
-    render(<MindMap />)
+    render(<MindMapApp />)
     fireEvent.click(screen.getByLabelText('add new tab'))
     fireEvent.doubleClick(screen.getByText('untitled'))
 

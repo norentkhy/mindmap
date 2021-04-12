@@ -1,11 +1,6 @@
 import React from 'react'
-import {
-  render,
-  screen,
-  waitFor,
-  waitForElementToBeRemoved,
-} from '@testing-library/react'
-import MindMap from './MindMap'
+import { render, screen } from '@testing-library/react'
+import MindMapApp from '~mindmap/App'
 import {
   createRootNodeWithProperties,
   generateUniqueText,
@@ -14,13 +9,7 @@ import {
   expectTreesToBeVisible,
   findNodeDifferences,
   queryNode,
-  createRootNode,
-  findNodeInput,
-  completeNodeNaming,
-  waitForNodeInputToDisappear,
-  createChildNode,
 } from './MindMapTestUtilities'
-import { queryNodeInput } from './components/MainView/testUtilities'
 
 describe('utilities', () => {
   test('unique random text', () => {
@@ -35,7 +24,7 @@ describe('utilities', () => {
 
   describe('create a root node with properties', () => {
     test('basic functionality', async () => {
-      render(<MindMap />)
+      render(<MindMapApp />)
 
       const text = generateUniqueText()
       await createRootNodeWithProperties({ text })
@@ -45,7 +34,7 @@ describe('utilities', () => {
     })
 
     test('returns the created node', async () => {
-      render(<MindMap />)
+      render(<MindMapApp />)
 
       const text = generateUniqueText()
       const CreatedNode = await createRootNodeWithProperties({ text })
@@ -82,14 +71,14 @@ describe('utilities', () => {
     })
 
     async function renderMindMapWithParentNode() {
-      render(<MindMap />)
+      render(<MindMapApp />)
       let parentText = generateUniqueText()
       return await createRootNodeWithProperties({ text: parentText })
     }
   })
 
   test('query a node', async () => {
-    render(<MindMap />)
+    render(<MindMapApp />)
 
     const rootNode = { text: 'root' }
     expect(queryNode(rootNode)).toBeNull()
@@ -105,7 +94,7 @@ describe('utilities', () => {
   })
 
   test('find differences', async () => {
-    render(<MindMap />)
+    render(<MindMapApp />)
     await createRootNodeWithProperties({ text: 'not this one' })
 
     const targettedText = 'this one'
@@ -143,7 +132,7 @@ describe('utilities', () => {
       ],
     ],
   ])('create a mindmap from tree datastructures', async (trees) => {
-    render(<MindMap />)
+    render(<MindMapApp />)
     await createTrees(trees)
     expectTreesToBeVisible(trees)
   })

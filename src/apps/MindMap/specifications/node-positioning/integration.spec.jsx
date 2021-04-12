@@ -1,4 +1,4 @@
-import MindMap from '~mindmap/MindMap'
+import MindMapApp from '~mindmap/App'
 import { createRootNodeWithProperties } from '~mindmap/MindMapTestUtilities'
 import { createMockResizeObserverHook } from 'test-utils/react-mocks'
 
@@ -7,57 +7,6 @@ import { act, render } from '@testing-library/react'
 import 'jest-styled-components'
 
 describe('mocks due to test environment', () => {
-  const sample = {
-    boundingClientRect: {
-      left: 101,
-      top: 102,
-      right: 203,
-      bottom: 204,
-      width: 105,
-      height: 106,
-      x: 101,
-      y: 102,
-    },
-    offsetRect: { left: 5, top: 3, width: 10, height: 4 },
-  }
-
-  test('node resize event gets logged', async () => {
-    const { fireResizeEvent, logResize } = renderMindMapWithMockResizeObserver()
-
-    const Node = await createRootNodeWithProperties({ text: 'test' })
-    expect(logResize).toBeCalledTimes(1)
-
-    const { boundingClientRect, offsetRect } = sample
-    act(() =>
-      fireResizeEvent(Node, {
-        boundingClientRect,
-        offsetRect: mapRectToOffset(offsetRect),
-      })
-    )
-
-    expect(logResize).toBeCalledWith(
-      expect.objectContaining({
-        boundingClientRect,
-        offsetRect,
-      })
-    )
-  })
-
-  test('all elements resize', async () => {
-    const { fireResizeEvent, container } = renderMindMapWithMockResizeObserver()
-    await createRootNodeWithProperties({ text: 'test' })
-    const { boundingClientRect, offsetRect } = sample
-
-    getAllElements(container).forEach((Element) =>
-      act(() =>
-        fireResizeEvent(Element, {
-          boundingClientRect,
-          offsetRect: mapRectToOffset(offsetRect),
-        })
-      )
-    )
-  })
-
   test('resize elements specifically', async () => {
     const { fireResizeEvent, container } = renderMindMapWithMockResizeObserver()
     await createRootNodeWithProperties({ text: 'test' })
@@ -106,6 +55,15 @@ describe('mocks due to test environment', () => {
       )
     }
 
+    function mapRectToOffset({ left, top, width, height }) {
+      return {
+        offsetLeft: left,
+        offsetTop: top,
+        offsetWidth: width,
+        offsetHeight: height,
+      }
+    }
+
     function isSurface(Element) {
       return Element.getAttribute('aria-label') === 'main view'
     }
@@ -132,15 +90,6 @@ describe('mocks due to test environment', () => {
     }
   }
 
-  function mapRectToOffset({ left, top, width, height }) {
-    return {
-      offsetLeft: left,
-      offsetTop: top,
-      offsetWidth: width,
-      offsetHeight: height,
-    }
-  }
-
   function renderMindMapWithMockResizeObserver() {
     const {
       useMockResizeObserver,
@@ -149,7 +98,7 @@ describe('mocks due to test environment', () => {
     const logResize = jest.fn()
 
     const { container } = render(
-      <MindMap
+      <MindMapApp
         useThisResizeObserver={useMockResizeObserver}
         logResize={logResize}
       />
