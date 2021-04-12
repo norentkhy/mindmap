@@ -1,6 +1,6 @@
 import MindMapApp from '~mindmap/App'
-import { queryNodeInput } from '~mindmap/components/MainView/testUtilities'
-import { createRootNodeWithProperties } from '~mindmap/MindMapTestUtilities'
+import { queryNodeInput } from '~mindmap/test-utilities/view'
+import { createRootNodeWithProperties } from '~mindmap/test-utilities/integrated-view'
 
 import React from 'react'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'

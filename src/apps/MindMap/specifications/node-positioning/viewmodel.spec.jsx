@@ -7,7 +7,7 @@ import {
   renderHookTest,
   getNode,
   createChildNodeWithProperties,
-} from '~mindmap/components/Contexts/TestUtilities'
+} from '~mindmap/test-utilities/viewmodel'
 import { disableConsoleErrorWithin } from 'utils/JestTools'
 
 describe('dimensions', () => {

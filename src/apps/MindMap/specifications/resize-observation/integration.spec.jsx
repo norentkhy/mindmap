@@ -1,5 +1,5 @@
 import MindMapApp from '~mindmap/App'
-import { createRootNodeWithProperties } from '~mindmap/MindMapTestUtilities'
+import { createRootNodeWithProperties } from '~mindmap/test-utilities/integrated-view'
 import { createMockResizeObserverHook } from 'test-utils/react-mocks'
 
 import React from 'react'

@@ -6,8 +6,8 @@ import {
   createChildNode,
   queryNode,
   findNodeInput,
-} from '~mindmap/MindMapTestUtilities'
-import { queryNodeInput } from '~mindmap/components/MainView/testUtilities'
+} from '~mindmap/test-utilities/integrated-view'
+import { queryNodeInput } from '~mindmap/test-utilities/view'
 
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'

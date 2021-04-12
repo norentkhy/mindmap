@@ -6,7 +6,7 @@ import {
   captureNewNodes,
   createChildNodeWithProperties,
   renderHookTest,
-} from './TestUtilities'
+} from '~mindmap/test-utilities/viewmodel'
 
 describe('utilities', () => {
   test('createRootNodeWithProperties', () => {

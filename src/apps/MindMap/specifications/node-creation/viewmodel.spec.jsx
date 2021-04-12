@@ -5,7 +5,7 @@ import {
   createRootNodeWithProperties,
   getNewestRootNode,
   renderHookTest,
-} from '~mindmap/components/Contexts/TestUtilities'
+} from '~mindmap/test-utilities/viewmodel'
 
 describe('node creation', () => {
   test('handle root node creation', () => {

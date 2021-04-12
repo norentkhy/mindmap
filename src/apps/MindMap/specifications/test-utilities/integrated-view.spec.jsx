@@ -9,7 +9,7 @@ import {
   expectTreesToBeVisible,
   findNodeDifferences,
   queryNode,
-} from './MindMapTestUtilities'
+} from '~mindmap/test-utilities/integrated-view'
 
 describe('utilities', () => {
   test('unique random text', () => {

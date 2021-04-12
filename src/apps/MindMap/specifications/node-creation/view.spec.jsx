@@ -9,7 +9,7 @@ import {
   queryNodeInput,
   ui,
   getFocus,
-} from '~mindmap/components/MainView/testUtilities'
+} from '~mindmap/test-utilities/view'
 import { createMockContextProvider } from 'test-utils/react-mocks'
 import 'jest-styled-components'
 

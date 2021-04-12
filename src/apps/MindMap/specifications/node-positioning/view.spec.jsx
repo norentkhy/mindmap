@@ -1,10 +1,7 @@
 import React from 'react'
 import { render } from '@testing-library/react'
 import { MainView } from '~mindmap/components/MainView/MainView'
-import {
-  createDataStructure,
-  queryNode,
-} from '~mindmap/components/MainView/testUtilities'
+import { createDataStructure, queryNode } from '~mindmap/test-utilities/view'
 import { createMockContextProvider } from 'test-utils/react-mocks'
 import 'jest-styled-components'
 

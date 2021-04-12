@@ -2,7 +2,7 @@ import {
   createRootNodeWithProperties,
   getNewestRootNode,
   renderHookTest,
-} from '~mindmap/components/Contexts/TestUtilities'
+} from '~mindmap/test-utilities/viewmodel'
 
 import { act } from '@testing-library/react-hooks'
 import { describe, test, expect } from '@jest/globals'
