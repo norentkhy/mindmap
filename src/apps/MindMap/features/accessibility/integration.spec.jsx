@@ -1,11 +1,7 @@
-import MindMap from './MindMap'
+import MindMap from '~mindmap/MindMap'
 
 import React from 'react'
 import { render, screen } from '@testing-library/react'
-import 'jest-styled-components'
-
-const spy = jest.spyOn(global.console, 'error')
-afterEach(() => expect(spy).not.toHaveBeenCalled())
 
 describe('view elements', () => {
   test('tabs', () => {
