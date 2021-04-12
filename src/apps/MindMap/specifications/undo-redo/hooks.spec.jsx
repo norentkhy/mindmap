@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react-hooks'
-import { useTime } from './useTime'
+import { useTime } from '~mindmap/hooks/useTime'
 
 describe('useTime', () => {
   const timeInstances = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
