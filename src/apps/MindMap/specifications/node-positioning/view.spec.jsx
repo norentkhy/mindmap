@@ -2,7 +2,6 @@ import React from 'react'
 import { render } from '@testing-library/react'
 import { MainView } from '~mindmap/components/MainView/MainView'
 import { createDataStructure, queryNode } from '~mindmap/test-utilities/view'
-import { createMockContextProvider } from 'test-utils/react-mocks'
 import 'jest-styled-components'
 
 describe('dimensions of each node', () => {
@@ -43,20 +42,16 @@ function renderTest(
     modifications: {},
   }
 ) {
-  const [MockContext, MockProvider] = createMockContextProvider({
-    initialState,
-    modifications: {
+  return render(<MainView useThisModel={useMock} />)
+
+  function useMock() {
+    return {
+      state: initialState,
       useThisResizeObserver() {},
       registerNodeLayout() {},
       registerTreeLayout() {},
       adjustRootTree() {},
       ...modifications,
-    },
-  })
-
-  return render(
-    <MockProvider>
-      <MainView theProjectContext={MockContext} />
-    </MockProvider>
-  )
+    }
+  }
 }

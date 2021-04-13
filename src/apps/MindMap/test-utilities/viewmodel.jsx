@@ -1,10 +1,7 @@
 import React, { useContext } from 'react'
 import { act, renderHook } from '@testing-library/react-hooks'
 import { createMockResizeObserverHook } from 'test-utils/react-mocks'
-import {
-  ProjectContext,
-  ProjectProvider,
-} from '~mindmap/components/Contexts/ProjectContext'
+import { ModelContext, ModelProvider } from '~mindmap/components/Model'
 
 export function captureNewNodes({ result, change }) {
   const oldNodes = getRootNodes(result)
@@ -98,14 +95,14 @@ export function getNode({ result, id }) {
 export function renderHookTest(log) {
   const { useMockResizeObserver } = createMockResizeObserverHook()
 
-  return renderHook(() => useContext(ProjectContext), {
+  return renderHook(() => useContext(ModelContext), {
     wrapper: ({ children }) => (
-      <ProjectProvider
+      <ModelProvider
         useThisResizeObserver={useMockResizeObserver}
         logResize={log}
       >
         {children}
-      </ProjectProvider>
+      </ModelProvider>
     ),
   })
 }

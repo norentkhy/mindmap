@@ -24,22 +24,20 @@ describe('accessibility: view components', () => {
   })
 
   test('main view', () => {
-    render(
-      <MockProvider>
-        <MainView theProjectContext={MockContext} />
-      </MockProvider>
-    )
+    render(<MainView useThisModel={useMock} />)
     expectLabelToBeVisible('main view')
   })
 
   test('actions', () => {
-    render(
-      <MockProvider>
-        <Actions theProjectContext={MockContext} />
-      </MockProvider>
-    )
+    render(<Actions useThisModel={useMock} />)
     expectLabelToBeVisible('actions')
   })
+
+  function useMock() {
+    return {
+      useThisResizeObserver() {},
+    }
+  }
 })
 
 function expectLabelToBeVisible(stringOrRegExp) {

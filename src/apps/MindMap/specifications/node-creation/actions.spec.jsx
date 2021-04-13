@@ -1,5 +1,4 @@
 import { Actions } from '~mindmap/components/Actions/Actions'
-import { createMockContextProvider } from 'test-utils/react-mocks'
 
 import { fireEvent, render, screen } from '@testing-library/react'
 import React from 'react'
@@ -15,20 +14,16 @@ describe('with mock providers', () => {
   })
 
   function renderWithMockHook(hookModifications) {
-    const [MockContext, MockProvider] = createMockContextProvider({
-      modifications: {
+    return render(<Actions useThisModel={useMock} />)
+
+    function useMock() {
+      return {
         undoAction() {},
         redoAction() {},
         createRootNode() {},
         ...hookModifications,
-      },
-    })
-
-    return render(
-      <MockProvider>
-        <Actions theProjectContext={MockContext} />
-      </MockProvider>
-    )
+      }
+    }
   }
 })
 

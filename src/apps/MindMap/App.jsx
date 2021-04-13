@@ -1,7 +1,7 @@
 import React from 'react'
 import { Actions } from './components/Actions/Actions'
 import { MainView } from './components/MainView/MainView'
-import { ProjectProvider } from './components/Contexts/ProjectContext'
+import { ModelProvider } from './components/Model'
 import { Tabs } from './components/Tabs/Tabs'
 import { TabsProvider } from './components/Tabs/TabsContext'
 
@@ -20,11 +20,11 @@ export default function MindMap({ logResize, useThisResizeObserver }) {
 
 function Providers({ children, logResize, useThisResizeObserver }) {
   return (
-    <ProjectProvider
+    <ModelProvider
       logResize={logResize}
       useThisResizeObserver={useThisResizeObserver}
     >
       <TabsProvider>{children}</TabsProvider>
-    </ProjectProvider>
+    </ModelProvider>
   )
 }

@@ -3,22 +3,18 @@ import styled from 'styled-components'
 import determineNodesToRender from './determineNodesToRender'
 import Node from './Node'
 
-export default function NodeFamily({ headNode, theProjectContext }) {
+export default function NodeFamily({ headNode, useThisModel }) {
   const nodesToRender = determineNodesToRender(headNode)
 
   return (
     <FlexRowCentered>
-      <Node
-        node={headNode}
-        key={headNode.id}
-        theProjectContext={theProjectContext}
-      />
+      <Node node={headNode} key={headNode.id} useThisModel={useThisModel} />
       <ChildContainer>
         {nodesToRender?.map((node) => (
           <NodeFamily
             headNode={node}
             key={node.id}
-            theProjectContext={theProjectContext}
+            useThisModel={useThisModel}
           />
         ))}
       </ChildContainer>

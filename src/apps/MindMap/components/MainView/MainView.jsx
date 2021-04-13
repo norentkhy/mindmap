@@ -1,12 +1,12 @@
-import React, { useContext, useRef } from 'react'
+import React, { useRef } from 'react'
 import styled from 'styled-components'
-import { ProjectContext } from '../Contexts/ProjectContext'
+import useModel from '~mindmap/hooks/useModel'
 import determineNodesToRender from './determineNodesToRender'
 import NodeFamily from './NodeFamily'
 
-export function MainView({ theProjectContext = ProjectContext }) {
+export function MainView({ useThisModel = useModel }) {
   const { createRootNode, nodesToRender, surfaceRef } = useMainView(
-    theProjectContext
+    useThisModel
   )
 
   return (
@@ -15,12 +15,12 @@ export function MainView({ theProjectContext = ProjectContext }) {
         <RootContainer
           node={node}
           key={`container ${node.id}`}
-          theProjectContext={theProjectContext}
+          useThisModel={useThisModel}
         >
           <NodeFamily
             headNode={node}
             key={node.id}
-            theProjectContext={theProjectContext}
+            useThisModel={useThisModel}
           />
         </RootContainer>
       ))}
@@ -28,13 +28,13 @@ export function MainView({ theProjectContext = ProjectContext }) {
   )
 }
 
-function useMainView(theProjectContext) {
+function useMainView(useThisModel) {
   const {
     state,
     createRootNode,
     registerSurfaceLayout,
     useThisResizeObserver,
-  } = useContext(theProjectContext)
+  } = useThisModel()
   const nodesToRender = determineNodesToRender(state)
   const surfaceRef = useRef()
   useThisResizeObserver(surfaceRef, handleResizeEvent)
@@ -55,11 +55,9 @@ function useMainView(theProjectContext) {
   }
 }
 
-function RootContainer({ theProjectContext, children, node }) {
+function RootContainer({ useThisModel, children, node }) {
   const ref = useRef()
-  const { registerTreeLayout, useThisResizeObserver } = useContext(
-    theProjectContext
-  )
+  const { registerTreeLayout, useThisResizeObserver } = useThisModel()
   useThisResizeObserver(ref, registerThisTreeLayout)
 
   return (

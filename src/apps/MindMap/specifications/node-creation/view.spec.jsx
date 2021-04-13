@@ -10,7 +10,6 @@ import {
   ui,
   getFocus,
 } from '~mindmap/test-utilities/view'
-import { createMockContextProvider } from 'test-utils/react-mocks'
 import 'jest-styled-components'
 
 describe('node creation view', () => {
@@ -245,20 +244,16 @@ function renderTest(
     modifications: {},
   }
 ) {
-  const [MockContext, MockProvider] = createMockContextProvider({
-    initialState,
-    modifications: {
+  return render(<MainView useThisModel={useMock} />)
+
+  function useMock() {
+    return {
+      state: initialState,
       useThisResizeObserver() {},
       registerNodeLayout() {},
       registerTreeLayout() {},
       adjustRootTree() {},
       ...modifications,
-    },
-  })
-
-  return render(
-    <MockProvider>
-      <MainView theProjectContext={MockContext} />
-    </MockProvider>
-  )
+    }
+  }
 }

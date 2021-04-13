@@ -1,6 +1,6 @@
-import { useContext, useRef } from 'react'
+import { useRef } from 'react'
 
-export default function useNode({ node, theProjectContext }) {
+export default function useNode({ node, useThisModel }) {
   const { editing, id, text } = node
 
   const {
@@ -9,7 +9,7 @@ export default function useNode({ node, theProjectContext }) {
     initiateEditNode,
     useThisResizeObserver,
     registerNodeLayout,
-  } = useContext(theProjectContext)
+  } = useThisModel()
 
   const nodeRef = useRef()
 

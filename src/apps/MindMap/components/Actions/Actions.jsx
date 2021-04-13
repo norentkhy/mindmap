@@ -1,9 +1,9 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import styled from 'styled-components'
-import { ProjectContext } from '~mindmap/components/Contexts/ProjectContext'
+import useModel from '~mindmap/hooks/useModel'
 
-export function Actions({ theProjectContext = ProjectContext }) {
-  const { undo, redo, createRootNode } = useContext(theProjectContext)
+export function Actions({ useThisModel = useModel }) {
+  const { undo, redo, createRootNode } = useThisModel()
 
   return (
     <FlexRow aria-label="actions">

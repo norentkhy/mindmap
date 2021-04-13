@@ -1,13 +1,13 @@
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 export default function NodeInput({
   node: { id, text, editing },
-  theProjectContext,
+  useThisModel,
 }) {
   const [newText, setNewText] = useState(text)
   const inputRef = useRef()
 
-  const { finalizeEditNode } = useContext(theProjectContext)
+  const { finalizeEditNode } = useThisModel()
 
   useEffect(() => {
     editing && inputRef.current?.focus()

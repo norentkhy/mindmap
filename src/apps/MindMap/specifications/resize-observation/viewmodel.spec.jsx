@@ -2,10 +2,7 @@ import React, { useContext } from 'react'
 import { describe, test, expect } from '@jest/globals'
 import { act, renderHook } from '@testing-library/react-hooks'
 import { createMockResizeObserverHook } from 'test-utils/react-mocks'
-import {
-  ProjectContext,
-  ProjectProvider,
-} from '~mindmap/components/Contexts/ProjectContext'
+import { ModelContext, ModelProvider } from '~mindmap/components/Model'
 
 describe('dimensions', () => {
   test('update of node layout dimensions', () => {
@@ -120,14 +117,15 @@ function getState(result) {
 function renderHookTest(log) {
   const { useMockResizeObserver } = createMockResizeObserverHook()
 
-  return renderHook(() => useContext(ProjectContext), {
+  return renderHook(() => useContext(ModelContext), {
     wrapper: ({ children }) => (
-      <ProjectProvider
+      <ModelProvider
         useThisResizeObserver={useMockResizeObserver}
         logResize={log}
       >
+        {' '}
         {children}
-      </ProjectProvider>
+      </ModelProvider>
     ),
   })
 }

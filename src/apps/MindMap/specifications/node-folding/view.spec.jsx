@@ -1,6 +1,5 @@
 import { MainView } from '~mindmap/components/MainView/MainView'
 import { createDataStructure, ui } from '~mindmap/test-utilities/view'
-import { createMockContextProvider } from 'test-utils/react-mocks'
 
 import React from 'react'
 import { render, screen } from '@testing-library/react'
@@ -77,20 +76,16 @@ function renderTest(
     modifications: {},
   }
 ) {
-  const [MockContext, MockProvider] = createMockContextProvider({
-    initialState,
-    modifications: {
+  return render(<MainView useThisModel={useMock} />)
+
+  function useMock() {
+    return {
+      state: initialState,
       useThisResizeObserver() {},
       registerNodeLayout() {},
       registerTreeLayout() {},
       adjustRootTree() {},
       ...modifications,
-    },
-  })
-
-  return render(
-    <MockProvider>
-      <MainView theProjectContext={MockContext} />
-    </MockProvider>
-  )
+    }
+  }
 }

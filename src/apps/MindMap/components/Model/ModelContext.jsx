@@ -1,12 +1,12 @@
 import React, { createContext, useEffect, useReducer } from 'react'
 import produce from 'immer'
 import { v4 as uuidv4 } from 'uuid'
-import { useTime } from '../../hooks/useTime'
+import { useTime } from '~mindmap/hooks/useTime'
 import useResizeObserver from '@react-hook/resize-observer'
 
-export const ProjectContext = createContext()
+export const ModelContext = createContext()
 
-export function ProjectProvider({
+export function ModelProvider({
   children,
   initialState = { trees: [], origin: { left: 100, top: 100 } },
   useThisResizeObserver = useResizeObserver,
@@ -19,9 +19,9 @@ export function ProjectProvider({
   })
 
   return (
-    <ProjectContext.Provider value={newViewModel}>
+    <ModelContext.Provider value={newViewModel}>
       {children}
-    </ProjectContext.Provider>
+    </ModelContext.Provider>
   )
 }
 
