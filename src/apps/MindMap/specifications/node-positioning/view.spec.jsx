@@ -1,6 +1,6 @@
 import React from 'react'
 import { render } from '@testing-library/react'
-import { MainView } from '~mindmap/components/MainView/MainView'
+import { MainView } from '~mindmap/components'
 import { createDataStructure, queryNode } from '~mindmap/test-utilities/view'
 import 'jest-styled-components'
 

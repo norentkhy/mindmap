@@ -1,5 +1,5 @@
 import { useContext } from 'react'
-import { ModelContext } from '~mindmap/components/Model'
+import { ModelContext } from '~mindmap/components'
 
 function useModel() {
   return useContext(ModelContext)

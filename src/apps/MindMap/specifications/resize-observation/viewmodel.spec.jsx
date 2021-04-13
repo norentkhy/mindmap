@@ -2,7 +2,7 @@ import React, { useContext } from 'react'
 import { describe, test, expect } from '@jest/globals'
 import { act, renderHook } from '@testing-library/react-hooks'
 import { createMockResizeObserverHook } from 'test-utils/react-mocks'
-import { ModelContext, ModelProvider } from '~mindmap/components/Model'
+import { ModelContext, ModelProvider } from '~mindmap/components'
 
 describe('dimensions', () => {
   test('update of node layout dimensions', () => {

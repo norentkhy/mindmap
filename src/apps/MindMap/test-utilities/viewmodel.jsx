@@ -1,7 +1,7 @@
-import React, { useContext } from 'react'
-import { act, renderHook } from '@testing-library/react-hooks'
+import { ModelContext, ModelProvider } from '~mindmap/components'
 import { createMockResizeObserverHook } from 'test-utils/react-mocks'
-import { ModelContext, ModelProvider } from '~mindmap/components/Model'
+import { act, renderHook } from '@testing-library/react-hooks'
+import React, { useContext } from 'react'
 
 export function captureNewNodes({ result, change }) {
   const oldNodes = getRootNodes(result)

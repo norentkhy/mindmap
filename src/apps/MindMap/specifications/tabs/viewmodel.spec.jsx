@@ -1,7 +1,7 @@
 import React, { useContext } from 'react'
 import { act, renderHook } from '@testing-library/react-hooks'
 import { v4 as uuidv4 } from 'uuid'
-import { TabsProvider, TabsContext } from '~mindmap/components/Tabs/TabsContext'
+import { TabsProvider, TabsContext } from '~mindmap/components'
 import produce from 'immer'
 
 const tabs = [

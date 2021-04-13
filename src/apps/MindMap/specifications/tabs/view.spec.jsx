@@ -1,4 +1,4 @@
-import { Tabs } from '~mindmap/components/Tabs/Tabs'
+import { Tabs } from '~mindmap/components'
 import { createMockContextProvider } from 'test-utils/react-mocks'
 import { getInputSelection } from 'test-utils/dom'
 import { v4 as uuidv4 } from 'uuid'

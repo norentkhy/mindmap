@@ -1,4 +1,4 @@
-import { MainView } from '~mindmap/components/MainView/MainView'
+import { MainView } from '~mindmap/components'
 import { createDataStructure, ui } from '~mindmap/test-utilities/view'
 
 import React from 'react'

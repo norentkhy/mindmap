@@ -1,6 +1,6 @@
 import React from 'react'
 import { render } from '@testing-library/react'
-import { MainView } from '~mindmap/components/MainView/MainView'
+import { MainView } from '~mindmap/components'
 import { v4 as uuidv4 } from 'uuid'
 import { getInputSelection } from 'test-utils/dom'
 import {

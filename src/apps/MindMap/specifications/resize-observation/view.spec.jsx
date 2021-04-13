@@ -1,6 +1,6 @@
 import React from 'react'
 import { render, screen, act } from '@testing-library/react'
-import { MainView } from '~mindmap/components/MainView/MainView'
+import { MainView } from '~mindmap/components'
 import { createDataStructure, queryNode } from '~mindmap/test-utilities/view'
 import { createMockResizeObserverHook } from 'test-utils/react-mocks'
 import 'jest-styled-components'

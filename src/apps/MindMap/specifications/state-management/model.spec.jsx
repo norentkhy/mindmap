@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react-hooks'
 import React from 'react'
 import useModel from '~mindmap/hooks/useModel'
-import { ModelProvider } from '~mindmap/components/Model'
+import { ModelProvider } from '~mindmap/components'
 
 test('hook', () => {
   const { result } = renderHook(() => useModel(), {

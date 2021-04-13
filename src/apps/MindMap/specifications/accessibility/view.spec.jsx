@@ -1,6 +1,4 @@
-import { Actions } from '~mindmap/components/Actions/Actions'
-import { MainView } from '~mindmap/components/MainView/MainView'
-import { Tabs } from '~mindmap/components/Tabs/Tabs'
+import { Actions, MainView, Tabs } from '~mindmap/components'
 import { createMockContextProvider } from 'test-utils/react-mocks'
 
 import React from 'react'
