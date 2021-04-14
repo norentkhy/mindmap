@@ -3,7 +3,7 @@
     "baseUrl": ".",
     "jsx": "react",
     "paths": {
-      "~mindmap/*": ["./src/apps/mindmap-renamed/*"],
+      "~mindmap/*": ["./src/apps/mindmap/*"],
       "hooks/*": ["./src/hooks/*"],
       "utils/*": ["./src/utils/*"],
       "components/*": ["./src/apps/website/components/*"],
