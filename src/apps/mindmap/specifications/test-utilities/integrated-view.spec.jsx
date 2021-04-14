@@ -10,6 +10,7 @@ import {
   findNodeDifferences,
   queryNode,
 } from '~mindmap/test-utilities/integrated-view'
+import { ui } from '~mindmap/test-utilities/view'
 
 describe('utilities', () => {
   test('unique random text', () => {
@@ -81,16 +82,17 @@ describe('utilities', () => {
     render(<MindMapApp />)
 
     const rootNode = { text: 'root' }
-    expect(queryNode(rootNode)).toBeNull()
+    ui.expect.node(rootNode).not.toBeVisible()
 
     await createRootNodeWithProperties(rootNode)
-    expect(queryNode(rootNode)).toBeVisible()
+
+    ui.expect.node(rootNode).toBeVisible()
 
     const childNode = { text: 'child' }
-    expect(queryNode(childNode)).toBeNull()
+    ui.expect.node(childNode).not.toBeVisible()
 
     await createRootNodeWithProperties(childNode)
-    expect(queryNode(childNode)).toBeVisible()
+    ui.expect.node(childNode).toBeVisible()
   })
 
   test('find differences', async () => {

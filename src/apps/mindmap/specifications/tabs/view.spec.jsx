@@ -1,17 +1,15 @@
 import { Tabs } from '~mindmap/components'
+import { ui } from '~mindmap/test-utilities/view'
 import { createMockContextProvider } from 'test-utils/react-mocks'
-import { getInputSelection } from 'test-utils/dom'
 import { v4 as uuidv4 } from 'uuid'
 
 import React from 'react'
-import userEvent from '@testing-library/user-event'
-import { render, screen, fireEvent } from '@testing-library/react'
 
 describe('rendered with mocks', () => {
   const tabs = [
     { id: createUuid(), title: 'untitled', selected: true },
-    { id: createUuid(), title: 'untitled-2', selected: false },
-    { id: createUuid(), title: 'untitled-3', selected: false },
+    { id: createUuid(), title: 'untitled', selected: false },
+    { id: createUuid(), title: 'untitled', selected: false },
   ]
 
   describe('views', () => {
@@ -19,15 +17,15 @@ describe('rendered with mocks', () => {
       const addNewTab = createMockFn()
       renderWithMock({ addNewTab })
 
-      ui.createNewTab()
+      ui.createNew.tab()
       expect(addNewTab).toHaveBeenCalled()
     })
 
     test('render of tabs in state', () => {
       renderWithMock({ state: { tabs } })
 
-      tabs.forEach((tab) => {
-        expect(queryTab(tab)).toBeVisible()
+      tabs.forEach((_, index) => {
+        ui.expect.tab({ index }).toBeVisible()
       })
     })
   })
@@ -37,22 +35,21 @@ describe('rendered with mocks', () => {
       const selectTab = createMockFn()
       renderWithMock({ state: { tabs }, selectTab })
 
-      tabs.forEach(({ title, id }, i) => {
-        fireEvent.click(queryTab({ title }))
-        expect(selectTab).toHaveBeenCalledTimes(i + 1)
-        expect(selectTab.mock.calls[i]).toEqual([id])
+      tabs.forEach(({ id }, index) => {
+        ui.mouseAction.clickOn.tab({ index })
+        const nthCall = index + 1
+        expect(selectTab).nthCalledWith(nthCall, id)
       })
     })
 
     test('state result from view model', () => {
       renderWithMock({ state: { tabs } })
 
-      tabs.forEach((tab) => {
-        const Tab = queryTab(tab)
-        expect(Tab).toHaveStyle(
-          `font-weight: ${tab.selected ? 'bold' : 'normal'}`
-        )
-      })
+      tabs.forEach((tab, index) =>
+        ui.expect
+          .tab({ index })
+          .toHaveStyle({ 'font-weight': tab.selected ? 'bold' : 'normal' })
+      )
     })
   })
 
@@ -61,10 +58,10 @@ describe('rendered with mocks', () => {
       const initiateRenameTab = createMockFn()
       renderWithMock({ state: { tabs }, initiateRenameTab })
 
-      tabs.forEach((tab, i) => {
-        fireEvent.dblClick(queryTab(tab))
-        expect(initiateRenameTab).toHaveBeenCalledTimes(i + 1)
-        expect(initiateRenameTab.mock.calls[i]).toEqual([tab.id])
+      tabs.forEach((tab, index) => {
+        ui.rename.tab({ index })
+        const nthCall = index + 1
+        expect(initiateRenameTab).nthCalledWith(nthCall, tab.id)
       })
     })
 
@@ -74,16 +71,14 @@ describe('rendered with mocks', () => {
         nonTargetTabs,
         finishRenameTab,
       } = renderWithTabInRenameMode()
+      ui.expect.tab(tabTarget).not.toBeVisible()
 
-      expect(queryTab(tabTarget)).toBeNull()
+      nonTargetTabs.forEach((tabInfo) => ui.expect.tab(tabInfo).toBeVisible())
 
-      nonTargetTabs.forEach((tab) => expect(queryTab(tab)).toBeVisible())
-
-      const Focus = getFocus()
-      expect(getInputSelection(Focus)).toBe(tabTarget.title)
+      ui.expect.focus().toHaveTextSelection(tabTarget.title)
 
       const someNewTitle = 'some new title'
-      ui.typeAndPressEnter(someNewTitle)
+      ui.keyboardAction.typeAndPressEnter(someNewTitle)
 
       expect(finishRenameTab).nthCalledWith(1, {
         id: tabTarget.id,
@@ -129,7 +124,7 @@ describe('rendered with mocks', () => {
       modifications,
     })
 
-    render(
+    ui.render(
       <MockProvider viewModelModifications={modifications}>
         <Tabs theTabsContext={MockContext} />
       </MockProvider>
@@ -139,48 +134,6 @@ describe('rendered with mocks', () => {
 
 function createUuid() {
   return uuidv4()
-}
-
-function queryTab({ title }) {
-  return screen.queryByText(title)
-}
-
-const ui = {
-  selectNode({ text }) {
-    const Target = queryNode({ text })
-    userEvent.click(Target)
-  },
-  foldSelectedNode() {
-    const Target = getFocus()
-    userEvent.type(Target, 'f')
-  },
-  createChildNodeOfSelectedNode() {
-    const Target = getFocus()
-    userEvent.type(Target, 'c')
-  },
-  createRootNode() {
-    fireEvent.doubleClick(screen.getByLabelText('main view'))
-  },
-  typeAndPressEnter(text) {
-    const Target = getFocus()
-    userEvent.type(Target, `${text}{enter}`)
-  },
-  editSelectedNode() {
-    const Target = getFocus()
-    userEvent.type(Target, '{enter}')
-  },
-  createNewTab() {
-    const NewTabButton = queryByLabelText(/^add new tab$/i)
-    fireEvent.click(NewTabButton)
-  },
-}
-
-function queryByLabelText(stringOrRegExp) {
-  return screen.queryByLabelText(stringOrRegExp)
-}
-
-function getFocus() {
-  return document.activeElement || document.body
 }
 
 function createMockFn(...args) {

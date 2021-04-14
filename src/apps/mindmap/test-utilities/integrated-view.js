@@ -1,7 +1,7 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { queryNodeInput } from './view'
 import { v4 as uuidv4 } from 'uuid'
+import { ui } from './view'
 
 export function generateUniqueText() {
   return uuidv4()
@@ -65,11 +65,10 @@ export async function createRootNodeWithProperties({ text, ...rest }) {
 }
 
 export async function completeNodeNaming(text) {
-  const InputNode = await findNodeInput()
-  userEvent.type(InputNode, text)
-  userEvent.type(InputNode, '{enter}')
+  await ui.waitFor.nodeInput().toBeVisible()
+  ui.keyboardAction.typeAndPressEnter(text)
 
-  await waitForNodeInputToDisappear()
+  await ui.waitFor.nodeInput().not.toBeVisible()
 }
 
 export async function findNodeDifferences(callback) {
@@ -107,10 +106,6 @@ export async function findNodeDifferences(callback) {
 
 export function findNodeInput() {
   return screen.findByLabelText(nodeInputLabel)
-}
-
-export async function waitForNodeInputToDisappear() {
-  await waitFor(() => expect(queryNodeInput()).toBeNull())
 }
 
 export function queryNode(args) {

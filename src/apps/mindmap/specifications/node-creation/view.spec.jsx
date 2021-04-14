@@ -1,22 +1,13 @@
-import React from 'react'
-import { render } from '@testing-library/react'
 import { MainView } from '~mindmap/components'
-import { v4 as uuidv4 } from 'uuid'
-import { getInputSelection } from 'test-utils/dom'
-import {
-  createDataStructure,
-  queryNode,
-  queryNodeInput,
-  ui,
-  getFocus,
-} from '~mindmap/test-utilities/view'
-import 'jest-styled-components'
+import { createDataStructure, ui } from '~mindmap/test-utilities/view'
+import React from 'react'
 
 describe('node creation view', () => {
   describe('display of node data', () => {
     test('single root node', () => {
       const node = renderWithOneRootNode()
-      expect(queryNode({ text: node.text })).toBeVisible()
+
+      ui.expect.node(node).toBeVisible()
 
       function renderWithOneRootNode() {
         const node = createDataStructure.node({ text: 'original text' })
@@ -30,7 +21,7 @@ describe('node creation view', () => {
     test('multiple root nodes', () => {
       const rootNodes = renderWithMultipleRootNodes()
 
-      rootNodes.forEach(({ text }) => expect(queryNode({ text })).toBeVisible())
+      rootNodes.forEach((nodeInfo) => ui.expect.node(nodeInfo).toBeVisible())
 
       function renderWithMultipleRootNodes() {
         const {
@@ -59,9 +50,9 @@ describe('node creation view', () => {
     describe('create root node and give it text', () => {
       test('create', () => {
         const createRootNode = renderTestForRootNodeCreation()
-        expect(queryNodeInput()).toBeNull()
+        ui.expect.nodeInput().not.toBeVisible()
 
-        ui.createRootNode()
+        ui.mouseAction.createRootNode()
         expect(createRootNode).toHaveBeenCalled()
 
         function renderTestForRootNodeCreation() {
@@ -75,16 +66,16 @@ describe('node creation view', () => {
       test('edit', () => {
         const { node, finalizeEditNode } = renderNodeInEditMode()
 
-        const Focus = getFocus()
-        expect(getInputSelection(Focus)).toBe(node.text)
-
+        ui.expect.nodeInput().toHaveFocus()
+        ui.expect.nodeInput().toHaveTextSelection(node.text)
         const someNewText = 'some new text'
-        ui.typeAndPressEnter(someNewText)
+        ui.keyboardAction.typeAndPressEnter(someNewText)
 
         expect(finalizeEditNode).toHaveBeenCalled()
-        expect(finalizeEditNode.mock.calls[0]).toEqual([
-          { id: node.id, text: someNewText },
-        ])
+        expect(finalizeEditNode).toBeCalledWith({
+          id: node.id,
+          text: someNewText,
+        })
 
         function renderNodeInEditMode() {
           const { node, initialState } = createInitialStateWithNodeInEditMode()
@@ -117,11 +108,11 @@ describe('node creation view', () => {
           createChildNode,
         } = renderWithOneRootNodeForChildNodeCreation()
 
-        ui.selectNode({ text: rootNode.text })
-        ui.createChildNodeOfSelectedNode()
+        ui.mouseAction.clickOn.node(rootNode)
+        ui.keyboardAction.createChildNodeOfSelectedNode()
 
         expect(createChildNode).toHaveBeenCalled()
-        expect(createChildNode.mock.calls[0]).toEqual([rootNode.id])
+        expect(createChildNode).toBeCalledWith(rootNode.id)
 
         function renderWithOneRootNodeForChildNodeCreation() {
           const { rootNode, initialState } = createInitialStateWithOneRootNode()
@@ -149,16 +140,16 @@ describe('node creation view', () => {
           finalizeEditNode,
         } = renderTestWithChildNodeInEditMode()
 
-        const Focus = getFocus()
-        expect(getInputSelection(Focus)).toBe(childNode.text)
-
+        ui.expect.nodeInput().toHaveFocus()
+        ui.expect.nodeInput().toHaveTextSelection(childNode.text)
         const someNewText = 'some new text'
-        ui.typeAndPressEnter(someNewText)
+        ui.keyboardAction.typeAndPressEnter(someNewText)
 
         expect(finalizeEditNode).toHaveBeenCalled()
-        expect(finalizeEditNode.mock.calls[0]).toEqual([
-          { id: childNode.id, text: someNewText },
-        ])
+        expect(finalizeEditNode).toBeCalledWith({
+          id: childNode.id,
+          text: someNewText,
+        })
 
         function renderTestWithChildNodeInEditMode() {
           const {
@@ -199,11 +190,11 @@ describe('node creation view', () => {
           initiateEditNode,
         } = renderTestWithParentAndChildNode()
 
-        ui.selectNode({ text: parentNode.text })
-        ui.editSelectedNode()
+        ui.mouseAction.clickOn.node({ text: parentNode.text })
+        ui.mouseAction.editSelectedNode()
 
         expect(initiateEditNode).toHaveBeenCalled()
-        expect(initiateEditNode.mock.calls[0]).toEqual([parentNode.id])
+        expect(initiateEditNode).toBeCalledWith(parentNode.id)
 
         function renderTestWithParentAndChildNode() {
           const {
@@ -220,15 +211,14 @@ describe('node creation view', () => {
           return { parentNode, initiateEditNode }
 
           function createInitialStateWithParentAndChildNode() {
-            const childNode = { id: uuidv4(), text: 'child' }
-            const parentNode = {
-              id: uuidv4(),
+            const childNode = createDataStructure.node({ text: 'child' })
+            const parentNode = createDataStructure.node({
               text: 'parent',
               children: [childNode],
-            }
-            const initialState = {
-              trees: [parentNode],
-            }
+            })
+            const initialState = createDataStructure.state({
+              rootNodes: [parentNode],
+            })
 
             return { initialState, parentNode }
           }
@@ -244,7 +234,7 @@ function renderTest(
     modifications: {},
   }
 ) {
-  return render(<MainView useThisModel={useMock} />)
+  return ui.render(<MainView useThisModel={useMock} />)
 
   function useMock() {
     return {

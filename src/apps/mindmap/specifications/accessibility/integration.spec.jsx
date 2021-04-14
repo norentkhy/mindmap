@@ -1,21 +1,19 @@
 import MindMapApp from '~mindmap/App'
-
+import { ui } from '~mindmap/test-utilities/view'
 import React from 'react'
-import { render, screen } from '@testing-library/react'
 
 describe('view elements', () => {
   test('tabs', () => {
-    render(<MindMapApp />)
-    screen.getByLabelText(/^tabs$/i)
+    ui.render(<MindMapApp />)
+    ui.query.byLabel('tabs')
   })
-
   test('actions', () => {
-    render(<MindMapApp />)
-    screen.getByLabelText(/^actions$/i)
+    ui.render(<MindMapApp />)
+    ui.query.byLabel('actions')
   })
 
   test('main view', () => {
-    render(<MindMapApp />)
-    screen.getByLabelText(/^main view$/i)
+    ui.render(<MindMapApp />)
+    ui.query.byLabel('main view')
   })
 })

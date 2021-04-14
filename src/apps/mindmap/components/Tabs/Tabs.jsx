@@ -9,7 +9,12 @@ export function Tabs({ theTabsContext = TabsContext }) {
   return (
     <TabsBar aria-label="tabs">
       {tabsToRender.map((tab) => (
-        <Tab key={tab.id} tab={tab} theTabsContext={theTabsContext} />
+        <Tab
+          key={tab.id}
+          data-id={tab.id}
+          tab={tab}
+          theTabsContext={theTabsContext}
+        />
       ))}
       <button aria-label="add new tab" onClick={addNewTab}>
         +
@@ -55,6 +60,7 @@ function TabButton({ tab: { id, title, selected }, theTabsContext }) {
 
   return (
     <Button
+      data-id={id}
       onClick={() => selectTab(id)}
       onDoubleClick={() => initiateRenameTab(id)}
       selected={selected}

@@ -1,7 +1,7 @@
-import React from 'react'
-import { render, screen, act } from '@testing-library/react'
 import { MainView } from '~mindmap/components'
-import { createDataStructure, queryNode } from '~mindmap/test-utilities/view'
+import { createDataStructure, ui } from '~mindmap/test-utilities/view'
+import React from 'react'
+import { act } from '@testing-library/react'
 import { createMockResizeObserverHook } from 'test-utils/react-mocks'
 import 'jest-styled-components'
 
@@ -31,7 +31,7 @@ describe('Observation of dimensions', () => {
       registerNodeLayout,
     })
 
-    const Node = queryNode(node)
+    const Node = ui.query.node(node)
     const { boundingClientRect, offsetRect } = sample
     act(() => fireResizeEvent(Node, { boundingClientRect, offsetRect }))
 
@@ -48,7 +48,7 @@ describe('Observation of dimensions', () => {
       registerTreeLayout,
     })
 
-    const TreeContainer = getRootContainer(queryNode(node))
+    const TreeContainer = ui.query.rootTree(node)
     const { boundingClientRect, offsetRect } = sample
 
     act(() =>
@@ -68,7 +68,7 @@ describe('Observation of dimensions', () => {
       registerSurfaceLayout,
     })
 
-    const Surface = screen.getByLabelText(/^main view$/i)
+    const Surface = ui.query.mindSpace()
     const { boundingClientRect, offsetRect } = sample
 
     act(() => fireResizeEvent(Surface, { boundingClientRect, offsetRect }))
@@ -78,14 +78,6 @@ describe('Observation of dimensions', () => {
       offsetRect: convertOffsetRect(offsetRect),
     })
   })
-
-  function getRootContainer(Node) {
-    const ParentElement = Node.parentElement
-    if (!ParentElement) throw new Error('no root container')
-    if (ParentElement.getAttribute('aria-label') === 'container of rootnode')
-      return ParentElement
-    else return getRootContainer(ParentElement)
-  }
 
   function renderTestWithMockResizeObserver(mockFunctions) {
     const {
@@ -123,7 +115,7 @@ function renderTest(
     modifications: {},
   }
 ) {
-  return render(<MainView useThisModel={useMock} />)
+  return ui.render(<MainView useThisModel={useMock} />)
 
   function useMock() {
     return {

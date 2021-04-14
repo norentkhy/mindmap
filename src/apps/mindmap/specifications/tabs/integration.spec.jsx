@@ -1,31 +1,30 @@
 import MindMapApp from '~mindmap/App'
-
-import userEvent from '@testing-library/user-event'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { ui } from '~mindmap/test-utilities/view'
 import React from 'react'
-import 'jest-styled-components'
 
 describe('tabs integration', () => {
   test('add a new tab', () => {
-    render(<MindMapApp />)
-    expect(screen.queryByText('untitled')).toBeNull()
+    ui.render(<MindMapApp />)
+    ui.expect.untitledTab().not.toBeVisible()
 
-    fireEvent.click(screen.getByLabelText('add new tab'))
-    expect(screen.getByText('untitled')).toBeVisible()
+    ui.createNew.tab()
+    ui.expect.untitledTab().toBeVisible()
 
-    fireEvent.click(screen.getByLabelText('add new tab'))
-    expect(screen.getAllByText('untitled').length).toBe(2)
+    ui.createNew.tab()
+    ui.expect.numberOf.untitledTabs().toBe(2)
   })
 
-  test('rename a tab', () => {
-    render(<MindMapApp />)
-    fireEvent.click(screen.getByLabelText('add new tab'))
-    fireEvent.doubleClick(screen.getByText('untitled'))
+  test('rename a tab', async () => {
+    ui.render(<MindMapApp />)
+
+    ui.createNew.tab()
+    ui.rename.tab({ title: 'untitled' })
 
     const someNewTitle = 'some new title'
-    userEvent.type(document.activeElement, someNewTitle)
-    userEvent.type(document.activeElement, '{enter}')
 
-    expect(screen.getByText(someNewTitle)).toBeVisible()
+    await ui.waitFor.tabInput().toHaveFocus()
+    ui.keyboardAction.typeAndPressEnter(someNewTitle)
+
+    ui.expect.tab({ title: someNewTitle }).toBeVisible()
   })
 })

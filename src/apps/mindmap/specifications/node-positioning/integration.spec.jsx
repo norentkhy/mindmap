@@ -1,29 +1,29 @@
 import MindMapApp from '~mindmap/App'
-import { createRootNodeWithProperties } from '~mindmap/test-utilities/integrated-view'
+import { ui } from '~mindmap/test-utilities/view'
 import { createMockResizeObserverHook } from 'test-utils/react-mocks'
-
 import React from 'react'
 import { act, render } from '@testing-library/react'
-import 'jest-styled-components'
 
 describe('mocks due to test environment', () => {
   test('resize elements specifically', async () => {
-    const { fireResizeEvent, container } = renderMindMapWithMockResizeObserver()
-    await createRootNodeWithProperties({ text: 'test' })
+    const { fireResizeEvent } = renderMindMapWithMockResizeObserver()
+    ui.mouseAction.createRootNode()
+    ui.keyboardAction.typeAndPressEnter('test')
 
-    getAllElements(container).forEach((Element) => {
-      if (isSurface(Element)) resizeSurface(Element)
-      if (isRootContainer(Element)) resizeRootContainer(Element)
-      if (isNode(Element)) resizeNode(Element)
+    simulateResizeOfRelevantElements()
+
+    ui.expect.rootTree({ text: 'test' }).toHaveStyle({
+      position: 'absolute',
+      left: '280px',
+      top: '225px',
     })
 
-    getAllElements(container).forEach((Element) => {
-      if (isRootContainer(Element)) {
-        expect(Element).toHaveStyleRule('position', 'absolute')
-        expect(Element).toHaveStyleRule('left', '280px')
-        expect(Element).toHaveStyleRule('top', '225px')
-      }
-    })
+    function simulateResizeOfRelevantElements() {
+      const { MindSpace, RootTrees, Nodes } = ui.query.relevantResizeElements()
+      resizeSurface(MindSpace)
+      RootTrees.forEach(resizeRootContainer)
+      Nodes.forEach(resizeNode)
+    }
 
     function resizeSurface(Element) {
       const Rect = { left: 0, top: 0, width: 640, height: 480 }
@@ -63,32 +63,7 @@ describe('mocks due to test environment', () => {
         offsetHeight: height,
       }
     }
-
-    function isSurface(Element) {
-      return Element.getAttribute('aria-label') === 'main view'
-    }
-
-    function isRootContainer(Element) {
-      return Element.getAttribute('aria-label') === 'container of rootnode'
-    }
-
-    function isNode(Element) {
-      return Element.getAttribute('aria-label') === 'node'
-    }
   })
-
-  function getAllElements(container) {
-    return getAllChildElements(container)
-
-    function getAllChildElements(Element) {
-      const ChildElements = Array.from(Element.children)
-      if (!ChildElements) return []
-      return [
-        Element,
-        ...ChildElements.flatMap((Element) => getAllChildElements(Element)),
-      ]
-    }
-  }
 
   function renderMindMapWithMockResizeObserver() {
     const {

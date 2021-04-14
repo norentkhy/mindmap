@@ -1,9 +1,9 @@
 export function mapObject(obj, map) {
   const entries = Object.entries(obj)
-  const mappedObj = {}
-  for (const [key, value] of entries) mappedObj[key] = map(value)
-
-  return mappedObj
+  return entries.reduce(
+    (draft, [key, value]) => ({ ...draft, [key]: map(value) }),
+    {}
+  )
 }
 export function mapMultipleArrays(arrayOfArrays, map) {
   const minimumLength = arrayOfArrays.reduce(

@@ -1,8 +1,8 @@
 import { Actions, MainView, Tabs } from '~mindmap/components'
+import { ui } from '~mindmap/test-utilities/view'
 import { createMockContextProvider } from 'test-utils/react-mocks'
 
 import React from 'react'
-import { render, screen } from '@testing-library/react'
 import 'jest-styled-components'
 
 describe('accessibility: view components', () => {
@@ -13,22 +13,22 @@ describe('accessibility: view components', () => {
   })
 
   test('tabs', () => {
-    render(
+    ui.render(
       <MockProvider>
         <Tabs theTabsContext={MockContext} />
       </MockProvider>
     )
-    expectLabelToBeVisible('tabs')
+    ui.expect.byLabel('tabs').toBeVisible()
   })
 
   test('main view', () => {
-    render(<MainView useThisModel={useMock} />)
-    expectLabelToBeVisible('main view')
+    ui.render(<MainView useThisModel={useMock} />)
+    ui.expect.byLabel('main view').toBeVisible()
   })
 
   test('actions', () => {
-    render(<Actions useThisModel={useMock} />)
-    expectLabelToBeVisible('actions')
+    ui.render(<Actions useThisModel={useMock} />)
+    ui.expect.byLabel('actions').toBeVisible()
   })
 
   function useMock() {
@@ -37,7 +37,3 @@ describe('accessibility: view components', () => {
     }
   }
 })
-
-function expectLabelToBeVisible(stringOrRegExp) {
-  expect(screen.getByLabelText(stringOrRegExp)).toBeVisible()
-}

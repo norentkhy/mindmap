@@ -1,47 +1,42 @@
-import React from 'react'
-import { render, screen, waitFor } from '@testing-library/react'
 import MindMapApp from '~mindmap/App'
-import { foldNode } from '~mindmap/test-utilities/view'
+import { ui } from '~mindmap/test-utilities/view'
 import { createTrees } from '~mindmap/test-utilities/integrated-view'
-import 'jest-styled-components'
+import React from 'react'
 
 describe('node folding: integration', () => {
   test('fold a node structure', async () => {
-    render(<MindMapApp />)
+    ui.render(<MindMapApp />)
     const texts = [
       {
-        notFoldedAway: 'unaffected1',
-        toFold: 'fold this1',
-        foldedAway: 'folded away1',
+        parent: 'unaffected1',
+        child: 'fold this1',
+        grandchild: 'folded away1',
       },
       {
-        notFoldedAway: 'unaffected2',
-        toFold: 'fold this2',
-        foldedAway: 'folded away2',
+        parent: 'unaffected2',
+        child: 'fold this2',
+        grandchild: 'folded away2',
       },
     ]
     const trees = texts.map(generateFoldTree)
     await createTrees(trees)
 
     for (const text of texts) {
-      expect(screen.getByText(text.foldedAway)).toBeVisible()
+      ui.expect.node({ text: text.grandchild }).toBeVisible()
 
-      const NodeToFold = screen.getByText(text.toFold)
-      foldNode(NodeToFold)
-      await waitFor(() =>
-        expect(screen.queryByText(text.foldedAway)).toBeNull()
-      )
+      ui.mouseAction.clickOn.node({ text: text.child })
+      ui.keyboardAction.foldSelectedNode()
+      await ui.waitFor.node({ text: text.grandchild }).not.toBeVisible()
 
-      foldNode(NodeToFold)
-      await waitFor(() =>
-        expect(screen.getByText(text.foldedAway)).toBeVisible()
-      )
+      ui.mouseAction.clickOn.node({ text: text.child })
+      ui.keyboardAction.foldSelectedNode()
+      await ui.waitFor.node({ text: text.grandchild }).toBeVisible()
     }
 
-    function generateFoldTree({ notFoldedAway, toFold, foldedAway }) {
+    function generateFoldTree({ parent, child, grandchild }) {
       return {
-        text: notFoldedAway,
-        children: [{ text: toFold, children: [{ text: foldedAway }] }],
+        text: parent,
+        children: [{ text: child, children: [{ text: grandchild }] }],
       }
     }
   })

@@ -1,42 +1,38 @@
 import MindMapApp from '~mindmap/App'
-import { queryNodeInput } from '~mindmap/test-utilities/view'
+import { ui } from '~mindmap/test-utilities/view'
 import { createRootNodeWithProperties } from '~mindmap/test-utilities/integrated-view'
 
 import React from 'react'
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import 'jest-styled-components'
+import { screen } from '@testing-library/react'
 
 describe('undo/redo', () => {
   test('creation of rootnode', async () => {
-    render(<MindMapApp />)
+    ui.render(<MindMapApp />)
 
     const rootNode = { text: 'root node' }
 
-    const RootNode = await createRootNodeWithProperties(rootNode)
-    expect(RootNode).toBeVisible()
+    await createRootNodeWithProperties(rootNode)
+    ui.expect.node(rootNode).toBeVisible()
 
-    const UndoActionButton = screen.getByLabelText('undo action')
-    fireEvent.click(UndoActionButton)
-    await waitFor(() => expect(screen.queryByText(rootNode.text)).toBeNull())
-    expect(queryNodeInput()).toBeVisible()
-    expect(queryNodeInput()).toHaveFocus()
+    ui.mouseAction.clickOn.menu.undoAction()
+    await ui.waitFor.nodeInput().toHaveFocus()
 
     const EmptyScreen = screen
-    fireEvent.click(UndoActionButton)
+    ui.mouseAction.clickOn.menu.undoAction()
     expect(screen).toEqual(EmptyScreen)
 
-    fireEvent.click(UndoActionButton)
-    await waitFor(() => expect(screen.queryByText(rootNode.text)).toBeNull())
+    ui.mouseAction.clickOn.menu.undoAction()
+    await ui.waitFor.node(rootNode).not.toBeVisible()
 
-    const RedoActionButton = screen.getByLabelText('redo action')
-    fireEvent.click(RedoActionButton)
-    await waitFor(() => expect(queryNodeInput()).toBeVisible)
+    ui.mouseAction.clickOn.menu.redoAction()
+    await ui.waitFor.nodeInput().toBeVisible()
 
-    fireEvent.click(RedoActionButton)
-    await waitFor(() => expect(screen.getByText(rootNode.text)).toBeVisible)
+    ui.mouseAction.clickOn.menu.redoAction()
+    await ui.waitFor.node(rootNode).toBeVisible()
 
     const NonEmptyScreen = screen
-    fireEvent.click(RedoActionButton)
+    ui.mouseAction.clickOn.menu.redoAction()
     expect(screen).toEqual(NonEmptyScreen)
+    expect(screen).toEqual(EmptyScreen)
   })
 })

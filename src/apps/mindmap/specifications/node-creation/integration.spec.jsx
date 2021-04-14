@@ -1,84 +1,65 @@
 import MindMapApp from '~mindmap/App'
-import {
-  createRootNode,
-  completeNodeNaming,
-  createRootNodeWithProperties,
-  createChildNode,
-  queryNode,
-  findNodeInput,
-} from '~mindmap/test-utilities/integrated-view'
-import { queryNodeInput } from '~mindmap/test-utilities/view'
-
-import { render, screen, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import { ui } from '~mindmap/test-utilities/view'
 import React from 'react'
 import 'jest-styled-components'
 
 describe('node creation: integration', () => {
   test('create a rootnode and edit its content', async () => {
-    render(<MindMapApp />)
-
-    createRootNode()
-
-    const InputNode = queryNodeInput()
-    expect(InputNode).toBeVisible()
-    expect(InputNode).toHaveFocus()
+    ui.render(<MindMapApp />)
 
     const someNewText = 'some new text'
-    await completeNodeNaming(someNewText)
+    ui.mouseAction.createRootNode()
+    ui.keyboardAction.typeAndPressEnter(someNewText)
 
-    await waitFor(() => expect(queryNodeInput()).toBeNull())
-    expect(screen.getByText(someNewText)).toBeVisible()
+    await ui.waitFor.node({ text: someNewText }).toBeVisible()
   })
 
   test('create multiple rootnodes', async () => {
-    render(<MindMapApp />)
+    ui.render(<MindMapApp />)
 
     const rootTexts = ['root node 1', 'root node 2']
     for (const text of rootTexts) {
-      await createRootNodeWithProperties({ text })
-      const CreatedNode = await screen.findByText(text)
-      expect(CreatedNode).toBeVisible()
+      ui.mouseAction.createRootNode()
+      ui.keyboardAction.typeAndPressEnter(text)
+
+      await ui.waitFor.node({ text }).toBeVisible()
     }
   })
 
   test('create a childnode', async () => {
-    render(<MindMapApp />)
+    ui.render(<MindMapApp />)
     const rootText = 'root text'
-    await createRootNodeWithProperties({ text: rootText })
 
-    const ParentNode = screen.getByText(rootText)
-    createChildNode(ParentNode)
-    const ChildInput = await findNodeInput()
-    expect(ChildInput).toBeVisible()
-    await waitFor(() => {
-      expect(ChildInput).toHaveFocus()
-    })
+    ui.mouseAction.createRootNode()
+    ui.keyboardAction.typeAndPressEnter(rootText)
+
+    await ui.waitFor.node({ text: rootText }).toBeVisible()
+    ui.mouseAction.clickOn.node({ text: rootText })
+    ui.keyboardAction.createChildNodeOfSelectedNode()
 
     const childText = 'child text'
-    await completeNodeNaming(childText)
+    await ui.waitFor.nodeInput().toHaveFocus()
+    ui.keyboardAction.typeAndPressEnter(childText)
 
-    expect(queryNodeInput()).toBeNull()
-    ;[rootText, childText].forEach((text) => {
-      expect(screen.getByText(text)).toBeVisible()
-    })
+    await ui.waitFor.nodeInput().not.toBeVisible()
+    await ui.waitFor.node({ text: rootText }).toBeVisible()
+    await ui.waitFor.node({ text: childText }).toBeVisible()
   })
 
   test('editing node text', async () => {
-    render(<MindMapApp />)
-    const rootNode = { text: 'root node' }
-    const RootNode = await createRootNodeWithProperties(rootNode)
+    ui.render(<MindMapApp />)
 
-    userEvent.type(RootNode, '{enter}')
-    const NodeInput = await findNodeInput()
-    expect(NodeInput).toBeVisible()
-    await waitFor(() => {
-      expect(NodeInput).toHaveFocus()
-    })
+    const rootNode = { text: 'root node' }
+    ui.mouseAction.createRootNode()
+    ui.keyboardAction.typeAndPressEnter(rootNode.text)
+
+    await ui.waitFor.nodeInput().not.toBeVisible()
+    ui.mouseAction.clickOn.node(rootNode)
+    ui.mouseAction.editSelectedNode()
 
     const newText = 'some new text'
-    userEvent.type(NodeInput, newText)
-    userEvent.type(NodeInput, '{enter}')
-    expect(queryNode({ text: newText }))
+    await ui.waitFor.nodeInput().toHaveFocus()
+    ui.keyboardAction.typeAndPressEnter(newText)
+    await ui.waitFor.node({ text: newText }).toBeVisible()
   })
 })

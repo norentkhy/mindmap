@@ -1,39 +1,27 @@
-import React from 'react'
-import { render } from '@testing-library/react'
 import { MainView } from '~mindmap/components'
-import { createDataStructure, queryNode } from '~mindmap/test-utilities/view'
-import 'jest-styled-components'
+import { ui, createDataStructure } from '~mindmap/test-utilities/view'
+import React from 'react'
 
 describe('dimensions of each node', () => {
   test('offsets given to each roottree', () => {
     const offsetLeft = 10
     const offsetTop = 11
+    const node = createDataStructure.node({
+      text: 'offset test',
+      desiredTreeCss: { offsetLeft, offsetTop },
+    })
     renderTest({
       initialState: createDataStructure.state({
-        rootNodes: [
-          createDataStructure.node({
-            text: 'offset test',
-            desiredTreeCss: { offsetLeft, offsetTop },
-          }),
-        ],
+        rootNodes: [node],
       }),
     })
 
-    const Node = queryNode({ text: 'offset test' })
-    const RootContainer = getRootContainer(Node)
-
-    expect(RootContainer).toHaveStyleRule('position', 'absolute')
-    expect(RootContainer).toHaveStyleRule('left', `${offsetLeft}px`)
-    expect(RootContainer).toHaveStyleRule('top', `${offsetTop}px`)
+    ui.expect.rootTree(node).toHaveStyle({
+      position: 'absolute',
+      left: `${offsetLeft}px`,
+      top: `${offsetTop}px`,
+    })
   })
-
-  function getRootContainer(Node) {
-    const ParentElement = Node.parentElement
-    if (!ParentElement) throw new Error('no root container')
-    if (ParentElement.getAttribute('aria-label') === 'container of rootnode')
-      return ParentElement
-    else return getRootContainer(ParentElement)
-  }
 })
 
 function renderTest(
@@ -42,7 +30,7 @@ function renderTest(
     modifications: {},
   }
 ) {
-  return render(<MainView useThisModel={useMock} />)
+  return ui.render(<MainView useThisModel={useMock} />)
 
   function useMock() {
     return {

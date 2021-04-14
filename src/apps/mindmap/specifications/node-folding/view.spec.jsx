@@ -1,16 +1,13 @@
 import { MainView } from '~mindmap/components'
 import { createDataStructure, ui } from '~mindmap/test-utilities/view'
-
 import React from 'react'
-import { render, screen } from '@testing-library/react'
-import 'jest-styled-components'
 
 describe('node folding: view', () => {
   test('display a folded node', () => {
     const { invisibleNode, foldedNode } = renderFoldedNodeWithInvisibleNode()
 
-    expect(screen.getByText(foldedNode.text)).toBeVisible()
-    expect(screen.queryByText(invisibleNode.text)).toBeNull()
+    ui.expect.node(foldedNode).toBeVisible()
+    ui.expect.node(invisibleNode).not.toBeVisible()
 
     function renderFoldedNodeWithInvisibleNode() {
       const {
@@ -41,11 +38,11 @@ describe('node folding: view', () => {
   test('fold call to view model', () => {
     const { nodeToFold, foldNode } = renderNodeToFold()
 
-    ui.selectNode({ text: nodeToFold.text })
-    ui.foldSelectedNode()
+    ui.mouseAction.clickOn.node({ text: nodeToFold.text })
+    ui.keyboardAction.foldSelectedNode()
 
     expect(foldNode).toHaveBeenCalled()
-    expect(foldNode.mock.calls[0]).toEqual([nodeToFold.id])
+    expect(foldNode).toBeCalledWith(nodeToFold.id)
 
     function renderNodeToFold() {
       const { rootNode, initialState } = createInitialStateWithRootNode()
@@ -76,7 +73,7 @@ function renderTest(
     modifications: {},
   }
 ) {
-  return render(<MainView useThisModel={useMock} />)
+  return ui.render(<MainView useThisModel={useMock} />)
 
   function useMock() {
     return {
