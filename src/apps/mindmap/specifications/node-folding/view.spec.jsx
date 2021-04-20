@@ -1,5 +1,5 @@
 import { MainView } from '~mindmap/components'
-import { createDataStructure, ui } from '~mindmap/test-utilities/view'
+import { ui, model } from '~mindmap/test-utilities'
 import React from 'react'
 
 describe('node folding: view', () => {
@@ -20,13 +20,13 @@ describe('node folding: view', () => {
       return { invisibleNode, foldedNode }
 
       function createInitialStateWithRootAndChildNode() {
-        const childNode = createDataStructure.node({ text: 'folded away' })
-        const rootNode = createDataStructure.node({
+        const childNode = model.create.node({ text: 'folded away' })
+        const rootNode = model.create.node({
           text: 'fold this',
           folded: true,
           children: [childNode],
         })
-        const initialState = createDataStructure.state({
+        const initialState = model.create.state({
           rootNodes: [rootNode],
         })
 
@@ -56,8 +56,8 @@ describe('node folding: view', () => {
       return { nodeToFold: rootNode, foldNode }
 
       function createInitialStateWithRootNode() {
-        const rootNode = createDataStructure.node({ text: 'fold this' })
-        const initialState = createDataStructure.state({
+        const rootNode = model.create.node({ text: 'fold this' })
+        const initialState = model.create.state({
           rootNodes: [rootNode],
         })
 

@@ -1,17 +1,17 @@
 import { MainView } from '~mindmap/components'
-import { ui, createDataStructure } from '~mindmap/test-utilities/view'
+import { ui, model } from '~mindmap/test-utilities'
 import React from 'react'
 
 describe('dimensions of each node', () => {
   test('offsets given to each roottree', () => {
     const offsetLeft = 10
     const offsetTop = 11
-    const node = createDataStructure.node({
+    const node = model.create.node({
       text: 'offset test',
       desiredTreeCss: { offsetLeft, offsetTop },
     })
     renderTest({
-      initialState: createDataStructure.state({
+      initialState: model.create.state({
         rootNodes: [node],
       }),
     })

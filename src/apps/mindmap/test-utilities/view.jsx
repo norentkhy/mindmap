@@ -1,6 +1,3 @@
-import { createRef } from 'react'
-import { getInputSelection } from 'test-utils/dom'
-import { v4 as uuidv4 } from 'uuid'
 import {
   clickElement,
   doubleClickElement,
@@ -12,6 +9,7 @@ import {
   typeWithKeyboard,
   typeAndPressEnter,
   getFocus,
+  getInputSelection,
 } from './dependencies'
 import 'jest-styled-components'
 import { mapObject } from 'utils/FunctionalProgramming'
@@ -151,46 +149,6 @@ function getRootTree(Node) {
   if (ParentElement.getAttribute('aria-label') === 'container of rootnode')
     return ParentElement
   else return getRootTree(ParentElement)
-}
-
-export const createDataStructure = {
-  node({
-    text,
-    editing = false,
-    folded = false,
-    children = [],
-    desiredTreeCss,
-    ...unknownProperties
-  }) {
-    const unknownPropertyKeys = Object.keys(unknownProperties)
-    if (unknownPropertyKeys.length)
-      throw new Error(`unknown properties: ${unknownPropertyKeys}`)
-
-    return {
-      id: createUuid(),
-      ref: createRef(),
-      text,
-      editing,
-      folded,
-      children,
-      desiredTreeCss,
-    }
-  },
-
-  childNode({ parentNode, text }) {
-    return produce(parentNode, (node) => {
-      if (!node?.children?.length) node.children = []
-      node.children.push({ id: createUuid(), text })
-    })
-  },
-
-  state({ rootNodes }) {
-    return { trees: rootNodes }
-  },
-}
-
-function createUuid() {
-  return uuidv4()
 }
 
 function queryNode({ text }) {

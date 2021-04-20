@@ -3,6 +3,7 @@ import '@testing-library/jest-dom'
 import { render, fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { v4 as uuidv4 } from 'uuid'
+import { getInputSelection } from 'test-utils/dom'
 
 const queryElementByLabelText = screen.queryByLabelText
 const queryElementByText = screen.queryByText
@@ -20,6 +21,8 @@ export {
   typeWithKeyboard,
   typeAndPressEnter,
   getFocus,
+  getInputSelection,
+  generateUUID,
 }
 
 function typeWithKeyboard(keys) {
@@ -33,4 +36,8 @@ function typeAndPressEnter(text) {
 
 function getFocus() {
   return document.activeElement || document.body
+}
+
+function generateUUID() {
+  return uuidv4()
 }

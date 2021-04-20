@@ -1,5 +1,5 @@
 import { MainView } from '~mindmap/components'
-import { createDataStructure, ui } from '~mindmap/test-utilities/view'
+import { model, ui } from '~mindmap/test-utilities'
 import React from 'react'
 import { act } from '@testing-library/react'
 import { createMockResizeObserverHook } from 'test-utils/react-mocks'
@@ -98,9 +98,9 @@ describe('Observation of dimensions', () => {
     return { rendered, fireResizeEvent, node }
 
     function createInitialStateWithNodeForResizing() {
-      const node = createDataStructure.node({ text: 'this will resize' })
+      const node = model.create.node({ text: 'this will resize' })
 
-      const initialState = createDataStructure.state({
+      const initialState = model.create.state({
         rootNodes: [node],
       })
 

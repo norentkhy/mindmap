@@ -1,5 +1,6 @@
 import { MainView } from '~mindmap/components'
-import { createDataStructure, ui } from '~mindmap/test-utilities/view'
+import { ui } from '~mindmap/test-utilities/view'
+import { model } from '~mindmap/test-utilities/model'
 import React from 'react'
 
 describe('node creation view', () => {
@@ -10,8 +11,8 @@ describe('node creation view', () => {
       ui.expect.node(node).toBeVisible()
 
       function renderWithOneRootNode() {
-        const node = createDataStructure.node({ text: 'original text' })
-        const initialState = createDataStructure.state({ rootNodes: [node] })
+        const node = model.create.node({ text: 'original text' })
+        const initialState = model.create.state({ rootNodes: [node] })
         renderTest({ initialState })
 
         return node
@@ -34,10 +35,8 @@ describe('node creation view', () => {
 
         function createInitialStateWithMultipleRootNodes() {
           const nodeTexts = ['a', 'b', 'c', 'd']
-          const rootNodes = nodeTexts.map((text) =>
-            createDataStructure.node({ text })
-          )
-          const initialState = createDataStructure.state({
+          const rootNodes = nodeTexts.map((text) => model.create.node({ text }))
+          const initialState = model.create.state({
             rootNodes,
           })
           return { rootNodes, initialState }
@@ -88,11 +87,11 @@ describe('node creation view', () => {
           return { node, finalizeEditNode }
 
           function createInitialStateWithNodeInEditMode() {
-            const node = createDataStructure.node({
+            const node = model.create.node({
               text: 'original text',
               editing: true,
             })
-            const initialState = createDataStructure.state({
+            const initialState = model.create.state({
               rootNodes: [node],
             })
             return { node, initialState }
@@ -125,8 +124,8 @@ describe('node creation view', () => {
           return { rootNode, createChildNode }
 
           function createInitialStateWithOneRootNode() {
-            const rootNode = createDataStructure.node({ text: 'root node' })
-            const initialState = createDataStructure.state({
+            const rootNode = model.create.node({ text: 'root node' })
+            const initialState = model.create.state({
               rootNodes: [rootNode],
             })
             return { rootNode, initialState }
@@ -165,15 +164,15 @@ describe('node creation view', () => {
           return { childNode, finalizeEditNode }
 
           function createInitialStateWithChildNodeInEditMode() {
-            const childNode = createDataStructure.node({
+            const childNode = model.create.node({
               text: 'child',
               editing: true,
             })
-            const rootNode = createDataStructure.node({
+            const rootNode = model.create.node({
               text: 'parent',
               children: [childNode],
             })
-            const initialState = createDataStructure.state({
+            const initialState = model.create.state({
               rootNodes: [rootNode],
             })
 
@@ -211,12 +210,12 @@ describe('node creation view', () => {
           return { parentNode, initiateEditNode }
 
           function createInitialStateWithParentAndChildNode() {
-            const childNode = createDataStructure.node({ text: 'child' })
-            const parentNode = createDataStructure.node({
+            const childNode = model.create.node({ text: 'child' })
+            const parentNode = model.create.node({
               text: 'parent',
               children: [childNode],
             })
-            const initialState = createDataStructure.state({
+            const initialState = model.create.state({
               rootNodes: [parentNode],
             })
 

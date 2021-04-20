@@ -1,13 +1,13 @@
 import React, { useContext } from 'react'
 import { act, renderHook } from '@testing-library/react-hooks'
-import { v4 as uuidv4 } from 'uuid'
 import { TabsProvider, TabsContext } from '~mindmap/components'
+import { model } from '~mindmap/test-utilities'
 import produce from 'immer'
 
 const tabs = [
-  { id: uuidv4(), title: 'untitled' },
-  { id: uuidv4(), title: 'untitled-2' },
-  { id: uuidv4(), title: 'untitled-3' },
+  model.create.tab({ title: 'untitled' }),
+  model.create.tab({ title: 'untitled' }),
+  model.create.tab({ title: 'untitled' }),
 ]
 
 describe('overlap with Tabs.spec', () => {
