@@ -1,7 +1,7 @@
 import MindMapApp from '~mindmap/App'
 import { ui } from '~mindmap/test-utilities/view'
 import React from 'react'
-import { act, render } from '@testing-library/react'
+import { render } from '@testing-library/react'
 
 describe('mocks due to test environment', () => {
   test('resize elements specifically', async () => {
@@ -26,32 +26,26 @@ describe('mocks due to test environment', () => {
 
     function resizeSurface(Element) {
       const Rect = { left: 0, top: 0, width: 640, height: 480 }
-      act(() =>
-        fireResizeEvent(Element, {
-          boundingClientRect: Rect,
-          offsetRect: mapRectToOffset(Rect),
-        })
-      )
+      fireResizeEvent(Element, {
+        boundingClientRect: Rect,
+        offsetRect: mapRectToOffset(Rect),
+      })
     }
 
     function resizeRootContainer(Element) {
       const Rect = { left: 0, top: 0, width: 100, height: 30 }
-      act(() =>
-        fireResizeEvent(Element, {
-          boundingClientRect: Rect,
-          offsetRect: mapRectToOffset(Rect),
-        })
-      )
+      fireResizeEvent(Element, {
+        boundingClientRect: Rect,
+        offsetRect: mapRectToOffset(Rect),
+      })
     }
 
     function resizeNode(Element) {
       const Rect = { left: 0, top: 5, width: 80, height: 20 }
-      act(() =>
-        fireResizeEvent(Element, {
-          boundingClientRect: Rect,
-          offsetRect: mapRectToOffset(Rect),
-        })
-      )
+      fireResizeEvent(Element, {
+        boundingClientRect: Rect,
+        offsetRect: mapRectToOffset(Rect),
+      })
     }
 
     function mapRectToOffset({ left, top, width, height }) {

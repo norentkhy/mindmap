@@ -1,7 +1,6 @@
 import MindMapApp from '~mindmap/App'
 import { ui } from '~mindmap/test-utilities/view'
 import React from 'react'
-import 'jest-styled-components'
 
 describe('node creation: integration', () => {
   test('create a rootnode and edit its content', async () => {

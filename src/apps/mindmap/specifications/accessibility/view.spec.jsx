@@ -1,9 +1,7 @@
 import { Actions, MainView, Tabs } from '~mindmap/components'
 import { ui } from '~mindmap/test-utilities/view'
 import { createMockContextProvider } from 'test-utils/react-mocks'
-
 import React from 'react'
-import 'jest-styled-components'
 
 describe('accessibility: view components', () => {
   const [MockContext, MockProvider] = createMockContextProvider({

@@ -1,11 +1,6 @@
 import MindMapApp from '~mindmap/App'
 import { ui } from '~mindmap/test-utilities/view'
-import { createMockResizeObserverHook } from 'test-utils/react-mocks'
-
 import React from 'react'
-import { act } from '@testing-library/react'
-import 'jest-styled-components'
-import { renderIntoDocument } from 'react-dom/test-utils'
 
 describe('mocks due to test environment', () => {
   const sample = {
@@ -34,12 +29,10 @@ describe('mocks due to test environment', () => {
 
     const { boundingClientRect, offsetRect } = sample
     const Node = ui.query.node({ text: 'test' })
-    act(() =>
-      fireResizeEvent(Node, {
-        boundingClientRect,
-        offsetRect: mapRectToOffset(offsetRect),
-      })
-    )
+    fireResizeEvent(Node, {
+      boundingClientRect,
+      offsetRect: mapRectToOffset(offsetRect),
+    })
 
     expect(logResize).toBeCalledWith(
       expect.objectContaining({
@@ -60,12 +53,10 @@ describe('mocks due to test environment', () => {
     const AllElements = ui.query.allElements()
     const { boundingClientRect, offsetRect } = sample
     AllElements.forEach((Element) =>
-      act(() =>
-        fireResizeEvent(Element, {
-          boundingClientRect,
-          offsetRect: mapRectToOffset(offsetRect),
-        })
-      )
+      fireResizeEvent(Element, {
+        boundingClientRect,
+        offsetRect: mapRectToOffset(offsetRect),
+      })
     )
   })
 
@@ -95,32 +86,26 @@ describe('mocks due to test environment', () => {
 
     function resizeSurface(Element) {
       const Rect = { left: 0, top: 0, width: 640, height: 480 }
-      act(() =>
-        fireResizeEvent(Element, {
-          boundingClientRect: Rect,
-          offsetRect: mapRectToOffset(Rect),
-        })
-      )
+      fireResizeEvent(Element, {
+        boundingClientRect: Rect,
+        offsetRect: mapRectToOffset(Rect),
+      })
     }
 
     function resizeRootContainer(Element) {
       const Rect = { left: 0, top: 0, width: 100, height: 30 }
-      act(() =>
-        fireResizeEvent(Element, {
-          boundingClientRect: Rect,
-          offsetRect: mapRectToOffset(Rect),
-        })
-      )
+      fireResizeEvent(Element, {
+        boundingClientRect: Rect,
+        offsetRect: mapRectToOffset(Rect),
+      })
     }
 
     function resizeNode(Element) {
       const Rect = { left: 0, top: 5, width: 80, height: 20 }
-      act(() =>
-        fireResizeEvent(Element, {
-          boundingClientRect: Rect,
-          offsetRect: mapRectToOffset(Rect),
-        })
-      )
+      fireResizeEvent(Element, {
+        boundingClientRect: Rect,
+        offsetRect: mapRectToOffset(Rect),
+      })
     }
   })
 

@@ -1,4 +1,5 @@
 import React, { createContext, useCallback, useLayoutEffect } from 'react'
+import { act } from '@testing-library/react'
 
 export function createMockContextProvider(
   { initialState = {}, modifications = {}, useModel } = {
@@ -58,16 +59,18 @@ export function createMockResizeObserverHook(
       offsetRect = sizeExample.offsetRect,
     }
   ) {
-    const { offsetLeft, offsetTop, offsetWidth, offsetHeight } = offsetRect
-    const callback = callbacks.get(Element)
-    callback?.({
-      target: {
-        offsetLeft,
-        offsetTop,
-        offsetWidth,
-        offsetHeight,
-        getBoundingClientRect: () => boundingClientRect,
-      },
+    act(() => {
+      const { offsetLeft, offsetTop, offsetWidth, offsetHeight } = offsetRect
+      const callback = callbacks.get(Element)
+      callback?.({
+        target: {
+          offsetLeft,
+          offsetTop,
+          offsetWidth,
+          offsetHeight,
+          getBoundingClientRect: () => boundingClientRect,
+        },
+      })
     })
   }
 

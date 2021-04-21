@@ -1,7 +1,6 @@
 import { MainView } from '~mindmap/components'
 import { model, ui } from '~mindmap/test-utilities'
 import React from 'react'
-import { act } from '@testing-library/react'
 
 describe('Observation of dimensions', () => {
   const sample = {
@@ -31,7 +30,7 @@ describe('Observation of dimensions', () => {
 
     const Node = ui.query.node(node)
     const { boundingClientRect, offsetRect } = sample
-    act(() => fireResizeEvent(Node, { boundingClientRect, offsetRect }))
+    fireResizeEvent(Node, { boundingClientRect, offsetRect })
 
     expect(registerNodeLayout).toBeCalledWith({
       id: node.id,
@@ -49,9 +48,7 @@ describe('Observation of dimensions', () => {
     const TreeContainer = ui.query.rootTree(node)
     const { boundingClientRect, offsetRect } = sample
 
-    act(() =>
-      fireResizeEvent(TreeContainer, { boundingClientRect, offsetRect })
-    )
+    fireResizeEvent(TreeContainer, { boundingClientRect, offsetRect })
 
     expect(registerTreeLayout).toBeCalledWith({
       id: node.id,
@@ -69,7 +66,7 @@ describe('Observation of dimensions', () => {
     const Surface = ui.query.mindSpace()
     const { boundingClientRect, offsetRect } = sample
 
-    act(() => fireResizeEvent(Surface, { boundingClientRect, offsetRect }))
+    fireResizeEvent(Surface, { boundingClientRect, offsetRect })
 
     expect(registerSurfaceLayout).toBeCalledWith({
       boundingClientRect,

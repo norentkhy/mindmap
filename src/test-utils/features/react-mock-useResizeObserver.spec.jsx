@@ -1,4 +1,4 @@
-import { renderHook, act } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react-hooks'
 import { getArgsOfLastCall } from 'test-utils/jest'
 import { createMockResizeObserverHook } from 'test-utils/react-mocks'
 
@@ -54,12 +54,10 @@ describe('mock useResizeObserver', () => {
   test('fireResizeEvent triggers callback', () => {
     const { fireResizeEvent, callback, testRef } = renderMockResizeSituation()
 
-    act(() =>
-      fireResizeEvent(testRef.current, {
-        boundingClientRect: sample.boundingClientRect,
-        offsetRect: sample.offsetRect,
-      })
-    )
+    fireResizeEvent(testRef.current, {
+      boundingClientRect: sample.boundingClientRect,
+      offsetRect: sample.offsetRect,
+    })
 
     expect(callback).toBeCalledTimes(2)
     expect(callback).nthCalledWith(2, {
