@@ -1,5 +1,5 @@
 import MindMapApp from '~mindmap/App'
-import { ui } from '~mindmap/test-utilities/view'
+import { ui, model } from '~mindmap/test-utilities'
 import React from 'react'
 
 describe('mocks due to test environment', () => {
@@ -25,7 +25,7 @@ describe('mocks due to test environment', () => {
     ui.keyboardAction.typeAndPressEnter('test')
     await ui.waitFor.nodeInput().not.toBeVisible()
 
-    expect(logResize).toBeCalledTimes(1)
+    model.expect.mockFunction(logResize).toBeCalledTimes(1)
 
     const { boundingClientRect, offsetRect } = sample
     const Node = ui.query.node({ text: 'test' })
@@ -34,7 +34,7 @@ describe('mocks due to test environment', () => {
       offsetRect: mapRectToOffset(offsetRect),
     })
 
-    expect(logResize).toBeCalledWith(
+    model.expect.mockFunction(logResize).toBeCalledWith(
       expect.objectContaining({
         boundingClientRect,
         offsetRect,
@@ -119,7 +119,7 @@ describe('mocks due to test environment', () => {
   }
 
   function renderMindMapWithMockResizeObserver() {
-    const logResize = jest.fn()
+    const logResize = model.create.mockFunction()
 
     const { fireResizeEvent } = ui.renderView({
       injectMockModelIntoJSX: ({ useMockResizeObserver }) => (

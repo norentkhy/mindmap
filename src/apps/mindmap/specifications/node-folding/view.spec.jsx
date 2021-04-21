@@ -41,12 +41,11 @@ describe('node folding: view', () => {
     ui.mouseAction.clickOn.node({ text: nodeToFold.text })
     ui.keyboardAction.foldSelectedNode()
 
-    expect(foldNode).toHaveBeenCalled()
-    expect(foldNode).toBeCalledWith(nodeToFold.id)
+    model.expect.mockFunction(foldNode).toBeCalledWith(nodeToFold.id)
 
     function renderNodeToFold() {
       const { rootNode, initialState } = createInitialStateWithRootNode()
-      const foldNode = jest.fn()
+      const foldNode = model.create.mockFunction()
 
       renderTest({
         initialState,

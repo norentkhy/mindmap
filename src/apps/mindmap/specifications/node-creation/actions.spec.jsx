@@ -1,15 +1,13 @@
 import { Actions } from '~mindmap/components'
-import { ui } from '~mindmap/test-utilities/view'
+import { ui, model } from '~mindmap/test-utilities'
 import React from 'react'
 
 describe('with mock providers', () => {
   test('node creation', () => {
-    const createRootNode = jest.fn()
+    const createRootNode = model.create.mockFunction()
     renderWithMockHook({ createRootNode })
-
     ui.mouseAction.clickOn.menu.createRootNode()
-
-    expect(createRootNode).toHaveBeenCalled()
+    model.expect.mockFunction(createRootNode).toBeCalled()
   })
 
   function renderWithMockHook(mockHookModifications) {

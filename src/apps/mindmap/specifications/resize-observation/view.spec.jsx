@@ -23,7 +23,7 @@ describe('Observation of dimensions', () => {
   }
 
   test('Rootnode', () => {
-    const registerNodeLayout = jest.fn()
+    const registerNodeLayout = model.create.mockFunction()
     const { fireResizeEvent, node } = renderTest({
       registerNodeLayout,
     })
@@ -32,7 +32,7 @@ describe('Observation of dimensions', () => {
     const { boundingClientRect, offsetRect } = sample
     fireResizeEvent(Node, { boundingClientRect, offsetRect })
 
-    expect(registerNodeLayout).toBeCalledWith({
+    model.expect.mockFunction(registerNodeLayout).toBeCalledWith({
       id: node.id,
       boundingClientRect,
       offsetRect: convertOffsetRect(offsetRect),
@@ -40,7 +40,7 @@ describe('Observation of dimensions', () => {
   })
 
   test('Rootnode container', () => {
-    const registerTreeLayout = jest.fn()
+    const registerTreeLayout = model.create.mockFunction()
     const { fireResizeEvent, node } = renderTest({
       registerTreeLayout,
     })
@@ -50,7 +50,7 @@ describe('Observation of dimensions', () => {
 
     fireResizeEvent(TreeContainer, { boundingClientRect, offsetRect })
 
-    expect(registerTreeLayout).toBeCalledWith({
+    model.expect.mockFunction(registerTreeLayout).toBeCalledWith({
       id: node.id,
       boundingClientRect,
       offsetRect: convertOffsetRect(offsetRect),
@@ -58,7 +58,7 @@ describe('Observation of dimensions', () => {
   })
 
   test('Node space', () => {
-    const registerSurfaceLayout = jest.fn()
+    const registerSurfaceLayout = model.create.mockFunction()
     const { fireResizeEvent } = renderTest({
       registerSurfaceLayout,
     })
@@ -68,7 +68,7 @@ describe('Observation of dimensions', () => {
 
     fireResizeEvent(Surface, { boundingClientRect, offsetRect })
 
-    expect(registerSurfaceLayout).toBeCalledWith({
+    model.expect.mockFunction(registerSurfaceLayout).toBeCalledWith({
       boundingClientRect,
       offsetRect: convertOffsetRect(offsetRect),
     })

@@ -1,4 +1,5 @@
 import React, { useContext } from 'react'
+import { model } from '~mindmap/test-utilities'
 import { describe, test, expect } from '@jest/globals'
 import { act, renderHook } from '@testing-library/react-hooks'
 import { createMockResizeObserverHook } from 'test-utils/react-mocks'
@@ -87,11 +88,12 @@ describe('logging of changes', () => {
       })
     )
 
-    expect(log).toBeCalled()
-    expect(log).toBeCalledWith({ id, boundingClientRect, offsetRect })
+    model.expect
+      .mockFunction(log)
+      .toBeCalledWith({ id, boundingClientRect, offsetRect })
 
     function renderHookTestWithNodeForLogging() {
-      const log = jest.fn()
+      const log = model.create.mockFunction()
       const { result } = renderHookTest(log)
       act(() => result.current.createRootNode())
 

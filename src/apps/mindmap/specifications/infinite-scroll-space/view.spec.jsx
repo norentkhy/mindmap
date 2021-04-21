@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { ui } from '~mindmap/test-utilities'
+import { ui, model } from '~mindmap/test-utilities'
 import { fireEvent, screen } from '@testing-library/react'
 import WheelFeedbackContainer from '../../components/WheelFeedbackContainer/WheelFeedbackContainer'
 
@@ -7,7 +7,7 @@ describe('wheel feedback container', () => {
   test('initial feedback', () => {
     const handleWheelFeedback = renderWithChildHandlingFeedback()
 
-    expect(handleWheelFeedback).nthCalledWith(1, {
+    model.expect.mockFunction(handleWheelFeedback).nthCalledWith(1, {
       id: 0,
       atBoundary: { left: true, top: true, right: false, bottom: false },
     })
@@ -21,7 +21,7 @@ describe('wheel feedback container', () => {
       delta: { left: amountLeft },
     })
 
-    expect(handleWheelFeedback).nthCalledWith(2, {
+    model.expect.mockFunction(handleWheelFeedback).nthCalledWith(2, {
       id: 1,
       atBoundary: { left: true, top: true, right: false, bottom: false },
       amount: { left: amountLeft, right: 0, top: 0, bottom: 0 },
@@ -36,7 +36,7 @@ describe('wheel feedback container', () => {
       delta: { right: amountRight },
     })
 
-    expect(handleWheelFeedback).nthCalledWith(2, {
+    model.expect.mockFunction(handleWheelFeedback).nthCalledWith(2, {
       id: 1,
       atBoundary: { left: false, top: true, right: true, bottom: false },
       amount: { left: 0, right: amountRight, top: 0, bottom: 0 },
@@ -51,7 +51,7 @@ describe('wheel feedback container', () => {
       delta: { top: amountTop },
     })
 
-    expect(handleWheelFeedback).nthCalledWith(2, {
+    model.expect.mockFunction(handleWheelFeedback).nthCalledWith(2, {
       id: 1,
       atBoundary: { left: true, top: true, right: false, bottom: false },
       amount: { left: 0, right: 0, top: amountTop, bottom: 0 },
@@ -66,7 +66,7 @@ describe('wheel feedback container', () => {
       delta: { bottom: amountBottom },
     })
 
-    expect(handleWheelFeedback).nthCalledWith(2, {
+    model.expect.mockFunction(handleWheelFeedback).nthCalledWith(2, {
       id: 1,
       atBoundary: { left: true, top: false, right: false, bottom: true },
       amount: { left: 0, right: 0, top: 0, bottom: amountBottom },
@@ -82,7 +82,7 @@ describe('wheel feedback container', () => {
       scroll: { xPercentage: 55, yPercentage: 45 },
     })
 
-    expect(handleWheelFeedback).nthCalledWith(2, {
+    model.expect.mockFunction(handleWheelFeedback).nthCalledWith(2, {
       id: 1,
       atBoundary: { left: false, right: false, top: false, bottom: false },
       amount: { left: delta.left, right: 0, top: delta.top, bottom: 0 },
@@ -90,7 +90,7 @@ describe('wheel feedback container', () => {
   })
 
   function renderWithChildHandlingFeedback() {
-    const handleWheelFeedback = jest.fn()
+    const handleWheelFeedback = model.create.mockFunction()
     ui.renderView({
       JSX: (
         <WheelFeedbackContainer>

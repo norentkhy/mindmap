@@ -1,6 +1,5 @@
 import { MainView } from '~mindmap/components'
-import { ui } from '~mindmap/test-utilities/view'
-import { model } from '~mindmap/test-utilities/model'
+import { ui, model } from '~mindmap/test-utilities'
 import React from 'react'
 
 describe('node creation view', () => {
@@ -52,10 +51,10 @@ describe('node creation view', () => {
         ui.expect.nodeInput().not.toBeVisible()
 
         ui.mouseAction.createRootNode()
-        expect(createRootNode).toHaveBeenCalled()
+        model.expect.mockFunction(createRootNode).toBeCalled()
 
         function renderTestForRootNodeCreation() {
-          const createRootNode = jest.fn()
+          const createRootNode = model.create.mockFunction()
           renderTest({ modifications: { createRootNode } })
 
           return createRootNode
@@ -70,15 +69,15 @@ describe('node creation view', () => {
         const someNewText = 'some new text'
         ui.keyboardAction.typeAndPressEnter(someNewText)
 
-        expect(finalizeEditNode).toHaveBeenCalled()
-        expect(finalizeEditNode).toBeCalledWith({
+        model.expect.mockFunction(finalizeEditNode).toBeCalled()
+        model.expect.mockFunction(finalizeEditNode).toBeCalledWith({
           id: node.id,
           text: someNewText,
         })
 
         function renderNodeInEditMode() {
           const { node, initialState } = createInitialStateWithNodeInEditMode()
-          const finalizeEditNode = jest.fn()
+          const finalizeEditNode = model.create.mockFunction()
           renderTest({
             initialState,
             modifications: { finalizeEditNode },
@@ -110,12 +109,12 @@ describe('node creation view', () => {
         ui.mouseAction.clickOn.node(rootNode)
         ui.keyboardAction.createChildNodeOfSelectedNode()
 
-        expect(createChildNode).toHaveBeenCalled()
-        expect(createChildNode).toBeCalledWith(rootNode.id)
+        model.expect.mockFunction(createChildNode).toBeCalled()
+        model.expect.mockFunction(createChildNode).toBeCalledWith(rootNode.id)
 
         function renderWithOneRootNodeForChildNodeCreation() {
           const { rootNode, initialState } = createInitialStateWithOneRootNode()
-          const createChildNode = jest.fn()
+          const createChildNode = model.create.mockFunction()
           renderTest({
             initialState,
             modifications: { createChildNode },
@@ -144,8 +143,8 @@ describe('node creation view', () => {
         const someNewText = 'some new text'
         ui.keyboardAction.typeAndPressEnter(someNewText)
 
-        expect(finalizeEditNode).toHaveBeenCalled()
-        expect(finalizeEditNode).toBeCalledWith({
+        model.expect.mockFunction(finalizeEditNode).toBeCalled()
+        model.expect.mockFunction(finalizeEditNode).toBeCalledWith({
           id: childNode.id,
           text: someNewText,
         })
@@ -155,7 +154,7 @@ describe('node creation view', () => {
             childNode,
             initialState,
           } = createInitialStateWithChildNodeInEditMode()
-          const finalizeEditNode = jest.fn()
+          const finalizeEditNode = model.create.mockFunction()
           renderTest({
             initialState,
             modifications: { finalizeEditNode },
@@ -192,15 +191,17 @@ describe('node creation view', () => {
         ui.mouseAction.clickOn.node({ text: parentNode.text })
         ui.mouseAction.editSelectedNode()
 
-        expect(initiateEditNode).toHaveBeenCalled()
-        expect(initiateEditNode).toBeCalledWith(parentNode.id)
+        model.expect.mockFunction(initiateEditNode).toBeCalled()
+        model.expect
+          .mockFunction(initiateEditNode)
+          .toBeCalledWith(parentNode.id)
 
         function renderTestWithParentAndChildNode() {
           const {
             initialState,
             parentNode,
           } = createInitialStateWithParentAndChildNode()
-          const initiateEditNode = jest.fn()
+          const initiateEditNode = model.create.mockFunction()
 
           renderTest({
             initialState,

@@ -1,24 +1,21 @@
 import { Tabs } from '~mindmap/components'
-import { ui } from '~mindmap/test-utilities/view'
-import { createMockContextProvider } from 'test-utils/react-mocks'
-import { v4 as uuidv4 } from 'uuid'
-
+import { ui, model } from '~mindmap/test-utilities'
 import React from 'react'
 
 describe('rendered with mocks', () => {
   const tabs = [
-    { id: createUuid(), title: 'untitled', selected: true },
-    { id: createUuid(), title: 'untitled', selected: false },
-    { id: createUuid(), title: 'untitled', selected: false },
+    model.create.tab({ selected: true }),
+    model.create.tab({ selected: false }),
+    model.create.tab({ selected: false }),
   ]
 
   describe('views', () => {
     test('add new tab', () => {
-      const addNewTab = createMockFn()
+      const addNewTab = model.create.mockFunction()
       renderWithMock({ addNewTab })
 
       ui.createNew.tab()
-      expect(addNewTab).toHaveBeenCalled()
+      model.expect.mockFunction(addNewTab).toBeCalled()
     })
 
     test('render of tabs in state', () => {
@@ -32,13 +29,13 @@ describe('rendered with mocks', () => {
 
   describe('tab selection', () => {
     test('function call to view model', () => {
-      const selectTab = createMockFn()
+      const selectTab = model.create.mockFunction()
       renderWithMock({ state: { tabs }, selectTab })
 
       tabs.forEach(({ id }, index) => {
         ui.mouseAction.clickOn.tab({ index })
         const nthCall = index + 1
-        expect(selectTab).nthCalledWith(nthCall, id)
+        model.expect.mockFunction(selectTab).nthCalledWith(nthCall, id)
       })
     })
 
@@ -55,13 +52,15 @@ describe('rendered with mocks', () => {
 
   describe('tab renaming', () => {
     test('function call to view model', () => {
-      const initiateRenameTab = createMockFn()
+      const initiateRenameTab = model.create.mockFunction()
       renderWithMock({ state: { tabs }, initiateRenameTab })
 
       tabs.forEach((tab, index) => {
         ui.rename.tab({ index })
         const nthCall = index + 1
-        expect(initiateRenameTab).nthCalledWith(nthCall, tab.id)
+        model.expect
+          .mockFunction(initiateRenameTab)
+          .nthCalledWith(nthCall, tab.id)
       })
     })
 
@@ -80,7 +79,7 @@ describe('rendered with mocks', () => {
       const someNewTitle = 'some new title'
       ui.keyboardAction.typeAndPressEnter(someNewTitle)
 
-      expect(finishRenameTab).nthCalledWith(1, {
+      model.expect.mockFunction(finishRenameTab).nthCalledWith(1, {
         id: tabTarget.id,
         newTitle: someNewTitle,
       })
@@ -92,7 +91,7 @@ describe('rendered with mocks', () => {
           state,
         } = createSituationWithOneRenaming()
 
-        const finishRenameTab = createMockFn()
+        const finishRenameTab = model.create.mockFunction()
         renderWithMock({ state, finishRenameTab })
 
         return {
@@ -128,11 +127,3 @@ describe('rendered with mocks', () => {
     })
   }
 })
-
-function createUuid() {
-  return uuidv4()
-}
-
-function createMockFn(...args) {
-  return jest.fn(...args)
-}

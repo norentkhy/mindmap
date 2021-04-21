@@ -1,26 +1,25 @@
 import { Actions } from '~mindmap/components'
-import React from 'react'
+import { model } from '~mindmap/test-utilities'
 import { fireEvent, render, screen } from '@testing-library/react'
+import React from 'react'
 
 describe('with mock providers', () => {
   test('undo', () => {
-    const undo = jest.fn()
+    const undo = model.create.mockFunction()
     renderWithMockHook({ undo })
 
     ui.undo()
 
-    expect(undo).toHaveBeenCalled()
-    expect(undo.mock.calls[0]).toEqual([])
+    model.expect.mockFunction(undo).toBeCalledWith()
   })
 
   test('redo', () => {
-    const redo = jest.fn()
+    const redo = model.create.mockFunction()
     renderWithMockHook({ redo })
 
     ui.redo()
 
-    expect(redo).toHaveBeenCalled()
-    expect(redo.mock.calls[0]).toEqual([])
+    model.expect.mockFunction(redo).toBeCalledWith()
   })
 
   function renderWithMockHook(hookModifications) {
