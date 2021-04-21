@@ -120,15 +120,12 @@ describe('rendered with mocks', () => {
   })
 
   function renderWithMock(modifications) {
-    const [MockContext, MockProvider] = createMockContextProvider({
-      modifications,
-    })
-
-    ui.render(
-      <MockProvider viewModelModifications={modifications}>
+    ui.renderView({
+      injectMockModelIntoJSX: ({ MockContext }) => (
         <Tabs theTabsContext={MockContext} />
-      </MockProvider>
-    )
+      ),
+      mockHookModifications: modifications,
+    })
   }
 })
 

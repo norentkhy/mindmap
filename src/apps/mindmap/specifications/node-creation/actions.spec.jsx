@@ -12,16 +12,12 @@ describe('with mock providers', () => {
     expect(createRootNode).toHaveBeenCalled()
   })
 
-  function renderWithMockHook(hookModifications) {
-    return ui.render(<Actions useThisModel={useMock} />)
-
-    function useMock() {
-      return {
-        undoAction() {},
-        redoAction() {},
-        createRootNode() {},
-        ...hookModifications,
-      }
-    }
+  function renderWithMockHook(mockHookModifications) {
+    return ui.renderView({
+      injectMockModelIntoJSX: ({ useMock }) => (
+        <Actions useThisModel={useMock} />
+      ),
+      mockHookModifications,
+    })
   }
 })

@@ -5,7 +5,7 @@ import {
   queryElementByText,
   expect,
   waitFor,
-  render,
+  renderView,
   typeWithKeyboard,
   typeAndPressEnter,
   getFocus,
@@ -43,7 +43,7 @@ const waitForDefinedElement = mapObject(
 )
 
 export const ui = {
-  render,
+  renderView,
   query: {
     ...queryDefinedElement,
     allElements: queryAllElements,

@@ -5,7 +5,7 @@ import 'jest-styled-components'
 
 describe('node creation: integration', () => {
   test('create a rootnode and edit its content', async () => {
-    ui.render(<MindMapApp />)
+    ui.renderView({ JSX: <MindMapApp /> })
 
     const someNewText = 'some new text'
     ui.mouseAction.createRootNode()
@@ -15,7 +15,7 @@ describe('node creation: integration', () => {
   })
 
   test('create multiple rootnodes', async () => {
-    ui.render(<MindMapApp />)
+    ui.renderView({ JSX: <MindMapApp /> })
 
     const rootTexts = ['root node 1', 'root node 2']
     for (const text of rootTexts) {
@@ -27,7 +27,7 @@ describe('node creation: integration', () => {
   })
 
   test('create a childnode', async () => {
-    ui.render(<MindMapApp />)
+    ui.renderView({ JSX: <MindMapApp /> })
     const rootText = 'root text'
 
     ui.mouseAction.createRootNode()
@@ -47,7 +47,7 @@ describe('node creation: integration', () => {
   })
 
   test('editing node text', async () => {
-    ui.render(<MindMapApp />)
+    ui.renderView({ JSX: <MindMapApp /> })
 
     const rootNode = { text: 'root node' }
     ui.mouseAction.createRootNode()

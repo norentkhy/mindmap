@@ -30,16 +30,13 @@ function renderTest(
     modifications: {},
   }
 ) {
-  return ui.render(<MainView useThisModel={useMock} />)
+  const { rendered } = ui.renderView({
+    injectMockModelIntoJSX: ({ useMock }) => (
+      <MainView useThisModel={useMock} />
+    ),
+    initialState,
+    mockHookModifications: modifications,
+  })
 
-  function useMock() {
-    return {
-      state: initialState,
-      useThisResizeObserver() {},
-      registerNodeLayout() {},
-      registerTreeLayout() {},
-      adjustRootTree() {},
-      ...modifications,
-    }
-  }
+  return rendered
 }

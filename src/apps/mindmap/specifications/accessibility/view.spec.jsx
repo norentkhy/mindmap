@@ -13,27 +13,31 @@ describe('accessibility: view components', () => {
   })
 
   test('tabs', () => {
-    ui.render(
-      <MockProvider>
-        <Tabs theTabsContext={MockContext} />
-      </MockProvider>
-    )
+    ui.renderView({
+      JSX: (
+        <MockProvider>
+          <Tabs theTabsContext={MockContext} />
+        </MockProvider>
+      ),
+    })
     ui.expect.byLabel('tabs').toBeVisible()
   })
 
   test('main view', () => {
-    ui.render(<MainView useThisModel={useMock} />)
+    ui.renderView({
+      injectMockModelIntoJSX: ({ useMock }) => (
+        <MainView useThisModel={useMock} />
+      ),
+    })
     ui.expect.byLabel('main view').toBeVisible()
   })
 
   test('actions', () => {
-    ui.render(<Actions useThisModel={useMock} />)
+    ui.renderView({
+      injectMockModelIntoJSX: ({ useMock }) => (
+        <Actions useThisModel={useMock} />
+      ),
+    })
     ui.expect.byLabel('actions').toBeVisible()
   })
-
-  function useMock() {
-    return {
-      useThisResizeObserver() {},
-    }
-  }
 })

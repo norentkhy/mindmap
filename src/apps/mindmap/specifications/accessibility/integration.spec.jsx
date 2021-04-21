@@ -4,16 +4,16 @@ import React from 'react'
 
 describe('view elements', () => {
   test('tabs', () => {
-    ui.render(<MindMapApp />)
+    ui.renderView({ JSX: <MindMapApp /> })
     ui.query.byLabel('tabs')
   })
   test('actions', () => {
-    ui.render(<MindMapApp />)
+    ui.renderView({ JSX: <MindMapApp /> })
     ui.query.byLabel('actions')
   })
 
   test('main view', () => {
-    ui.render(<MindMapApp />)
+    ui.renderView({ JSX: <MindMapApp /> })
     ui.query.byLabel('main view')
   })
 })

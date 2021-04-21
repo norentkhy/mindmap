@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { ui } from '~mindmap/test-utilities'
+import { fireEvent, screen } from '@testing-library/react'
 import WheelFeedbackContainer from '../../components/WheelFeedbackContainer/WheelFeedbackContainer'
 
 describe('wheel feedback container', () => {
@@ -90,11 +91,13 @@ describe('wheel feedback container', () => {
 
   function renderWithChildHandlingFeedback() {
     const handleWheelFeedback = jest.fn()
-    render(
-      <WheelFeedbackContainer>
-        <MindCanvasMock onWheelFeedback={handleWheelFeedback} />
-      </WheelFeedbackContainer>
-    )
+    ui.renderView({
+      JSX: (
+        <WheelFeedbackContainer>
+          <MindCanvasMock onWheelFeedback={handleWheelFeedback} />
+        </WheelFeedbackContainer>
+      ),
+    })
 
     return handleWheelFeedback
   }

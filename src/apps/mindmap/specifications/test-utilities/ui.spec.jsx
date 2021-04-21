@@ -7,7 +7,7 @@ import { mapObject } from 'utils/FunctionalProgramming'
 describe('query', () => {
   test('elements with text', () => {
     const text = 'this will be queried'
-    ui.render(<button>{text}</button>)
+    ui.renderView({ JSX: <button>{text}</button> })
 
     const Element = ui.query.byText(text)
 
@@ -19,7 +19,7 @@ describe('query', () => {
 describe('expect', () => {
   test('element visibility', () => {
     const text = 'this is visible'
-    ui.render(<button>{text}</button>)
+    ui.renderView({ JSX: <button>{text}</button> })
 
     const queryElement = () => ui.query.byText(text)
     expect(queryElement()).toBeVisible()

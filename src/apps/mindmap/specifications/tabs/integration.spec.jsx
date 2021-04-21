@@ -4,7 +4,7 @@ import React from 'react'
 
 describe('tabs integration', () => {
   test('add a new tab', () => {
-    ui.render(<MindMapApp />)
+    ui.renderView({ JSX: <MindMapApp /> })
     ui.expect.untitledTab().not.toBeVisible()
 
     ui.createNew.tab()
@@ -15,7 +15,7 @@ describe('tabs integration', () => {
   })
 
   test('rename a tab', async () => {
-    ui.render(<MindMapApp />)
+    ui.renderView({ JSX: <MindMapApp /> })
 
     ui.createNew.tab()
     ui.rename.tab({ title: 'untitled' })

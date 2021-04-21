@@ -2,8 +2,6 @@ import { MainView } from '~mindmap/components'
 import { model, ui } from '~mindmap/test-utilities'
 import React from 'react'
 import { act } from '@testing-library/react'
-import { createMockResizeObserverHook } from 'test-utils/react-mocks'
-import 'jest-styled-components'
 
 describe('Observation of dimensions', () => {
   const sample = {
@@ -27,7 +25,7 @@ describe('Observation of dimensions', () => {
 
   test('Rootnode', () => {
     const registerNodeLayout = jest.fn()
-    const { fireResizeEvent, node } = renderTestWithMockResizeObserver({
+    const { fireResizeEvent, node } = renderTest({
       registerNodeLayout,
     })
 
@@ -44,7 +42,7 @@ describe('Observation of dimensions', () => {
 
   test('Rootnode container', () => {
     const registerTreeLayout = jest.fn()
-    const { fireResizeEvent, node } = renderTestWithMockResizeObserver({
+    const { fireResizeEvent, node } = renderTest({
       registerTreeLayout,
     })
 
@@ -64,7 +62,7 @@ describe('Observation of dimensions', () => {
 
   test('Node space', () => {
     const registerSurfaceLayout = jest.fn()
-    const { fireResizeEvent } = renderTestWithMockResizeObserver({
+    const { fireResizeEvent } = renderTest({
       registerSurfaceLayout,
     })
 
@@ -79,56 +77,20 @@ describe('Observation of dimensions', () => {
     })
   })
 
-  function renderTestWithMockResizeObserver(mockFunctions) {
-    const {
-      useMockResizeObserver,
-      fireResizeEvent,
-    } = createMockResizeObserverHook()
+  function renderTest(mockFunctions) {
+    const node = model.create.node({ text: 'this will resize' })
 
-    const { initialState, node } = createInitialStateWithNodeForResizing()
-
-    const rendered = renderTest({
-      initialState,
-      modifications: {
-        useThisResizeObserver: useMockResizeObserver,
-        ...mockFunctions,
-      },
+    const { rendered, fireResizeEvent } = ui.renderView({
+      injectMockModelIntoJSX: ({ useMock }) => (
+        <MainView useThisModel={useMock} />
+      ),
+      initialState: model.create.state({ rootNodes: [node] }),
+      mockHookModifications: mockFunctions,
     })
 
     return { rendered, fireResizeEvent, node }
-
-    function createInitialStateWithNodeForResizing() {
-      const node = model.create.node({ text: 'this will resize' })
-
-      const initialState = model.create.state({
-        rootNodes: [node],
-      })
-
-      return { initialState, node }
-    }
   }
 })
-
-function renderTest(
-  { initialState = {}, modifications = {} } = {
-    initialState: {},
-    modifications: {},
-  }
-) {
-  return ui.render(<MainView useThisModel={useMock} />)
-
-  function useMock() {
-    return {
-      state: initialState,
-      useThisResizeObserver() {},
-      registerNodeLayout() {},
-      registerTreeLayout() {},
-      registerSurfaceLayout() {},
-      adjustRootTree() {},
-      ...modifications,
-    }
-  }
-}
 
 function convertOffsetRect({
   offsetLeft,

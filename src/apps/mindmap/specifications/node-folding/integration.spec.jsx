@@ -5,7 +5,7 @@ import React from 'react'
 
 describe('node folding: integration', () => {
   test('fold a node structure', async () => {
-    ui.render(<MindMapApp />)
+    ui.renderView({ JSX: <MindMapApp /> })
     const texts = [
       {
         parent: 'unaffected1',

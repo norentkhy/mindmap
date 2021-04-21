@@ -7,7 +7,7 @@ import { screen } from '@testing-library/react'
 
 describe('undo/redo', () => {
   test('creation of rootnode', async () => {
-    ui.render(<MindMapApp />)
+    ui.renderView({ JSX: <MindMapApp /> })
 
     const rootNode = { text: 'root node' }
 

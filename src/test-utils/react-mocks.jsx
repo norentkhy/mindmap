@@ -1,7 +1,7 @@
 import React, { createContext, useCallback, useLayoutEffect } from 'react'
 
 export function createMockContextProvider(
-  { initialState = {}, modifications = {} } = {
+  { initialState = {}, modifications = {}, useModel } = {
     initialState: {},
     modifications: {},
   }
@@ -11,7 +11,9 @@ export function createMockContextProvider(
   return [Context, Provider]
 
   function Provider({ children }) {
-    const model = { state: initialState, ...modifications }
+    const model = useModel
+      ? useModel()
+      : { state: initialState, ...modifications }
     return <Context.Provider value={model}>{children}</Context.Provider>
   }
 }

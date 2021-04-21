@@ -4,16 +4,21 @@ import { ui } from '~mindmap/test-utilities/view'
 import React from 'react'
 
 test('normal use case', () => {
-  ui.render(
-    <ModelProvider>
-      <ExpectHookToGiveState />
-    </ModelProvider>
-  )
+  ui.renderView({
+    JSX: (
+      <ModelProvider>
+        <ExpectHookToGiveState />
+      </ModelProvider>
+    ),
+  })
 })
 
 test('test use case', () => {
-  const useMock = () => ({ state: 'mock' })
-  ui.render(<ExpectHookToGiveState useThisModel={useMock} />)
+  ui.renderView({
+    injectMockModelIntoJSX: ({ useMock }) => (
+      <ExpectHookToGiveState useThisModel={useMock} />
+    ),
+  })
 })
 
 function ExpectHookToGiveState({ useThisModel = useModel }) {
