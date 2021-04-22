@@ -1,5 +1,5 @@
 import { MainView } from '~mindmap/components'
-import { ui, viewmodel } from '~mindmap/test-utilities'
+import { view, viewmodel } from '~mindmap/test-utilities'
 import React from 'react'
 
 describe('node creation view', () => {
@@ -7,7 +7,7 @@ describe('node creation view', () => {
     test('single root node', () => {
       const node = renderWithOneRootNode()
 
-      ui.expect.node(node).toBeVisible()
+      view.expect.node(node).toBeVisible()
 
       function renderWithOneRootNode() {
         const node = viewmodel.create.node({ text: 'original text' })
@@ -21,7 +21,7 @@ describe('node creation view', () => {
     test('multiple root nodes', () => {
       const rootNodes = renderWithMultipleRootNodes()
 
-      rootNodes.forEach((nodeInfo) => ui.expect.node(nodeInfo).toBeVisible())
+      rootNodes.forEach((nodeInfo) => view.expect.node(nodeInfo).toBeVisible())
 
       function renderWithMultipleRootNodes() {
         const {
@@ -50,9 +50,9 @@ describe('node creation view', () => {
     describe('create root node and give it text', () => {
       test('create', () => {
         const createRootNode = renderTestForRootNodeCreation()
-        ui.expect.nodeInput().not.toBeVisible()
+        view.expect.nodeInput().not.toBeVisible()
 
-        ui.mouseAction.createRootNode()
+        view.mouseAction.createRootNode()
         viewmodel.expect.mockFunction(createRootNode).toBeCalled()
 
         function renderTestForRootNodeCreation() {
@@ -66,10 +66,10 @@ describe('node creation view', () => {
       test('edit', () => {
         const { node, finalizeEditNode } = renderNodeInEditMode()
 
-        ui.expect.nodeInput().toHaveFocus()
-        ui.expect.nodeInput().toHaveTextSelection(node.text)
+        view.expect.nodeInput().toHaveFocus()
+        view.expect.nodeInput().toHaveTextSelection(node.text)
         const someNewText = 'some new text'
-        ui.keyboardAction.typeAndPressEnter(someNewText)
+        view.keyboardAction.typeAndPressEnter(someNewText)
 
         viewmodel.expect.mockFunction(finalizeEditNode).toBeCalled()
         viewmodel.expect.mockFunction(finalizeEditNode).toBeCalledWith({
@@ -108,8 +108,8 @@ describe('node creation view', () => {
           createChildNode,
         } = renderWithOneRootNodeForChildNodeCreation()
 
-        ui.mouseAction.clickOn.node(rootNode)
-        ui.keyboardAction.createChildNodeOfSelectedNode()
+        view.mouseAction.clickOn.node(rootNode)
+        view.keyboardAction.createChildNodeOfSelectedNode()
 
         viewmodel.expect.mockFunction(createChildNode).toBeCalled()
         viewmodel.expect
@@ -142,10 +142,10 @@ describe('node creation view', () => {
           finalizeEditNode,
         } = renderTestWithChildNodeInEditMode()
 
-        ui.expect.nodeInput().toHaveFocus()
-        ui.expect.nodeInput().toHaveTextSelection(childNode.text)
+        view.expect.nodeInput().toHaveFocus()
+        view.expect.nodeInput().toHaveTextSelection(childNode.text)
         const someNewText = 'some new text'
-        ui.keyboardAction.typeAndPressEnter(someNewText)
+        view.keyboardAction.typeAndPressEnter(someNewText)
 
         viewmodel.expect.mockFunction(finalizeEditNode).toBeCalled()
         viewmodel.expect.mockFunction(finalizeEditNode).toBeCalledWith({
@@ -192,8 +192,8 @@ describe('node creation view', () => {
           initiateEditNode,
         } = renderTestWithParentAndChildNode()
 
-        ui.mouseAction.clickOn.node({ text: parentNode.text })
-        ui.mouseAction.editSelectedNode()
+        view.mouseAction.clickOn.node({ text: parentNode.text })
+        view.mouseAction.editSelectedNode()
 
         viewmodel.expect.mockFunction(initiateEditNode).toBeCalled()
         viewmodel.expect
@@ -238,7 +238,7 @@ function renderTest(
     modifications: {},
   }
 ) {
-  const { rendered } = ui.renderView({
+  const { rendered } = view.render({
     injectMockModelIntoJSX: ({ useMock }) => (
       <MainView useThisModel={useMock} />
     ),

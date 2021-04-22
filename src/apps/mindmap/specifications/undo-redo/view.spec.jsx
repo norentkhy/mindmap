@@ -36,6 +36,7 @@ describe('with mock providers', () => {
   }
 })
 
+//TODO: use encapsulated test-utility view/ui
 const ui = {
   undo() {
     const Button = getButton('undo action')

@@ -1,5 +1,5 @@
 import { Tabs } from '~mindmap/components'
-import { ui, viewmodel } from '~mindmap/test-utilities'
+import { view, viewmodel } from '~mindmap/test-utilities'
 import React from 'react'
 
 describe('rendered with mocks', () => {
@@ -14,7 +14,7 @@ describe('rendered with mocks', () => {
       const addNewTab = viewmodel.create.mockFunction()
       renderWithMock({ addNewTab })
 
-      ui.createNew.tab()
+      view.createNew.tab()
       viewmodel.expect.mockFunction(addNewTab).toBeCalled()
     })
 
@@ -22,7 +22,7 @@ describe('rendered with mocks', () => {
       renderWithMock({ state: { tabs } })
 
       tabs.forEach((_, index) => {
-        ui.expect.tab({ index }).toBeVisible()
+        view.expect.tab({ index }).toBeVisible()
       })
     })
   })
@@ -33,7 +33,7 @@ describe('rendered with mocks', () => {
       renderWithMock({ state: { tabs }, selectTab })
 
       tabs.forEach(({ id }, index) => {
-        ui.mouseAction.clickOn.tab({ index })
+        view.mouseAction.clickOn.tab({ index })
         const nthCall = index + 1
         viewmodel.expect.mockFunction(selectTab).nthCalledWith(nthCall, id)
       })
@@ -43,7 +43,7 @@ describe('rendered with mocks', () => {
       renderWithMock({ state: { tabs } })
 
       tabs.forEach((tab, index) =>
-        ui.expect
+        view.expect
           .tab({ index })
           .toHaveStyle({ 'font-weight': tab.selected ? 'bold' : 'normal' })
       )
@@ -56,7 +56,7 @@ describe('rendered with mocks', () => {
       renderWithMock({ state: { tabs }, initiateRenameTab })
 
       tabs.forEach((tab, index) => {
-        ui.rename.tab({ index })
+        view.rename.tab({ index })
         const nthCall = index + 1
         viewmodel.expect
           .mockFunction(initiateRenameTab)
@@ -70,14 +70,14 @@ describe('rendered with mocks', () => {
         nonTargetTabs,
         finishRenameTab,
       } = renderWithTabInRenameMode()
-      ui.expect.tab(tabTarget).not.toBeVisible()
+      view.expect.tab(tabTarget).not.toBeVisible()
 
-      nonTargetTabs.forEach((tabInfo) => ui.expect.tab(tabInfo).toBeVisible())
+      nonTargetTabs.forEach((tabInfo) => view.expect.tab(tabInfo).toBeVisible())
 
-      ui.expect.focus().toHaveTextSelection(tabTarget.title)
+      view.expect.focus().toHaveTextSelection(tabTarget.title)
 
       const someNewTitle = 'some new title'
-      ui.keyboardAction.typeAndPressEnter(someNewTitle)
+      view.keyboardAction.typeAndPressEnter(someNewTitle)
 
       viewmodel.expect.mockFunction(finishRenameTab).nthCalledWith(1, {
         id: tabTarget.id,
@@ -119,7 +119,7 @@ describe('rendered with mocks', () => {
   })
 
   function renderWithMock(modifications) {
-    ui.renderView({
+    view.render({
       injectMockModelIntoJSX: ({ MockContext }) => (
         <Tabs theTabsContext={MockContext} />
       ),

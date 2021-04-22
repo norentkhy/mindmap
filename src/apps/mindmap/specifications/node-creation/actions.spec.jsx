@@ -1,17 +1,17 @@
 import { Actions } from '~mindmap/components'
-import { ui, viewmodel } from '~mindmap/test-utilities'
+import { view, viewmodel } from '~mindmap/test-utilities'
 import React from 'react'
 
 describe('with mock providers', () => {
   test('node creation', () => {
     const createRootNode = viewmodel.create.mockFunction()
     renderWithMockHook({ createRootNode })
-    ui.mouseAction.clickOn.menu.createRootNode()
+    view.mouseAction.clickOn.menu.createRootNode()
     viewmodel.expect.mockFunction(createRootNode).toBeCalled()
   })
 
   function renderWithMockHook(mockHookModifications) {
-    return ui.renderView({
+    return view.render({
       injectMockModelIntoJSX: ({ useMock }) => (
         <Actions useThisModel={useMock} />
       ),

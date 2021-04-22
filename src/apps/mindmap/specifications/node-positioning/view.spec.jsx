@@ -1,5 +1,5 @@
 import { MainView } from '~mindmap/components'
-import { ui, viewmodel } from '~mindmap/test-utilities'
+import { view, viewmodel } from '~mindmap/test-utilities'
 import React from 'react'
 
 describe('dimensions of each node', () => {
@@ -16,7 +16,7 @@ describe('dimensions of each node', () => {
       }),
     })
 
-    ui.expect.rootTree(node).toHaveStyle({
+    view.expect.rootTree(node).toHaveStyle({
       position: 'absolute',
       left: `${offsetLeft}px`,
       top: `${offsetTop}px`,
@@ -30,7 +30,7 @@ function renderTest(
     modifications: {},
   }
 ) {
-  const { rendered } = ui.renderView({
+  const { rendered } = view.render({
     injectMockModelIntoJSX: ({ useMock }) => (
       <MainView useThisModel={useMock} />
     ),

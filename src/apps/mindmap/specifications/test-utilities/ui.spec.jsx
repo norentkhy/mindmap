@@ -1,5 +1,5 @@
 import { expect, describe, test } from '@jest/globals'
-import { ui, getWaitForOptions } from '~mindmap/test-utilities/view'
+import { view, getWaitForOptions } from '~mindmap/test-utilities/view'
 import React from 'react'
 import { screen, waitFor } from '@testing-library/react'
 import { mapObject } from 'utils/FunctionalProgramming'
@@ -7,9 +7,9 @@ import { mapObject } from 'utils/FunctionalProgramming'
 describe('query', () => {
   test('elements with text', () => {
     const text = 'this will be queried'
-    ui.renderView({ JSX: <button>{text}</button> })
+    view.render({ JSX: <button>{text}</button> })
 
-    const Element = ui.query.byText(text)
+    const Element = view.query.byText(text)
 
     expect(Element).not.toBeNull()
     expect(Element).toBe(screen.queryByText(text))
@@ -19,12 +19,12 @@ describe('query', () => {
 describe('expect', () => {
   test('element visibility', () => {
     const text = 'this is visible'
-    ui.renderView({ JSX: <button>{text}</button> })
+    view.render({ JSX: <button>{text}</button> })
 
-    const queryElement = () => ui.query.byText(text)
+    const queryElement = () => view.query.byText(text)
     expect(queryElement()).toBeVisible()
 
-    ui.expect.element(queryElement).toBeVisible()
+    view.expect.element(queryElement).toBeVisible()
   })
 })
 

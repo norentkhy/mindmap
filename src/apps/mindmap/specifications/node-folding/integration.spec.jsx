@@ -1,11 +1,11 @@
 import MindMapApp from '~mindmap/App'
-import { ui } from '~mindmap/test-utilities/view'
+import { view } from '~mindmap/test-utilities/view'
 import { createTrees } from '~mindmap/test-utilities/integrated-view'
 import React from 'react'
 
 describe('node folding: integration', () => {
   test('fold a node structure', async () => {
-    ui.renderView({ JSX: <MindMapApp /> })
+    view.render({ JSX: <MindMapApp /> })
     const texts = [
       {
         parent: 'unaffected1',
@@ -22,15 +22,15 @@ describe('node folding: integration', () => {
     await createTrees(trees)
 
     for (const text of texts) {
-      ui.expect.node({ text: text.grandchild }).toBeVisible()
+      view.expect.node({ text: text.grandchild }).toBeVisible()
 
-      ui.mouseAction.clickOn.node({ text: text.child })
-      ui.keyboardAction.foldSelectedNode()
-      await ui.waitFor.node({ text: text.grandchild }).not.toBeVisible()
+      view.mouseAction.clickOn.node({ text: text.child })
+      view.keyboardAction.foldSelectedNode()
+      await view.waitFor.node({ text: text.grandchild }).not.toBeVisible()
 
-      ui.mouseAction.clickOn.node({ text: text.child })
-      ui.keyboardAction.foldSelectedNode()
-      await ui.waitFor.node({ text: text.grandchild }).toBeVisible()
+      view.mouseAction.clickOn.node({ text: text.child })
+      view.keyboardAction.foldSelectedNode()
+      await view.waitFor.node({ text: text.grandchild }).toBeVisible()
     }
 
     function generateFoldTree({ parent, child, grandchild }) {

@@ -1,64 +1,64 @@
 import MindMapApp from '~mindmap/App'
-import { ui } from '~mindmap/test-utilities/view'
+import { view } from '~mindmap/test-utilities/view'
 import React from 'react'
 
 describe('node creation: integration', () => {
   test('create a rootnode and edit its content', async () => {
-    ui.renderView({ JSX: <MindMapApp /> })
+    view.render({ JSX: <MindMapApp /> })
 
     const someNewText = 'some new text'
-    ui.mouseAction.createRootNode()
-    ui.keyboardAction.typeAndPressEnter(someNewText)
+    view.mouseAction.createRootNode()
+    view.keyboardAction.typeAndPressEnter(someNewText)
 
-    await ui.waitFor.node({ text: someNewText }).toBeVisible()
+    await view.waitFor.node({ text: someNewText }).toBeVisible()
   })
 
   test('create multiple rootnodes', async () => {
-    ui.renderView({ JSX: <MindMapApp /> })
+    view.render({ JSX: <MindMapApp /> })
 
     const rootTexts = ['root node 1', 'root node 2']
     for (const text of rootTexts) {
-      ui.mouseAction.createRootNode()
-      ui.keyboardAction.typeAndPressEnter(text)
+      view.mouseAction.createRootNode()
+      view.keyboardAction.typeAndPressEnter(text)
 
-      await ui.waitFor.node({ text }).toBeVisible()
+      await view.waitFor.node({ text }).toBeVisible()
     }
   })
 
   test('create a childnode', async () => {
-    ui.renderView({ JSX: <MindMapApp /> })
+    view.render({ JSX: <MindMapApp /> })
     const rootText = 'root text'
 
-    ui.mouseAction.createRootNode()
-    ui.keyboardAction.typeAndPressEnter(rootText)
+    view.mouseAction.createRootNode()
+    view.keyboardAction.typeAndPressEnter(rootText)
 
-    await ui.waitFor.node({ text: rootText }).toBeVisible()
-    ui.mouseAction.clickOn.node({ text: rootText })
-    ui.keyboardAction.createChildNodeOfSelectedNode()
+    await view.waitFor.node({ text: rootText }).toBeVisible()
+    view.mouseAction.clickOn.node({ text: rootText })
+    view.keyboardAction.createChildNodeOfSelectedNode()
 
     const childText = 'child text'
-    await ui.waitFor.nodeInput().toHaveFocus()
-    ui.keyboardAction.typeAndPressEnter(childText)
+    await view.waitFor.nodeInput().toHaveFocus()
+    view.keyboardAction.typeAndPressEnter(childText)
 
-    await ui.waitFor.nodeInput().not.toBeVisible()
-    await ui.waitFor.node({ text: rootText }).toBeVisible()
-    await ui.waitFor.node({ text: childText }).toBeVisible()
+    await view.waitFor.nodeInput().not.toBeVisible()
+    await view.waitFor.node({ text: rootText }).toBeVisible()
+    await view.waitFor.node({ text: childText }).toBeVisible()
   })
 
   test('editing node text', async () => {
-    ui.renderView({ JSX: <MindMapApp /> })
+    view.render({ JSX: <MindMapApp /> })
 
     const rootNode = { text: 'root node' }
-    ui.mouseAction.createRootNode()
-    ui.keyboardAction.typeAndPressEnter(rootNode.text)
+    view.mouseAction.createRootNode()
+    view.keyboardAction.typeAndPressEnter(rootNode.text)
 
-    await ui.waitFor.nodeInput().not.toBeVisible()
-    ui.mouseAction.clickOn.node(rootNode)
-    ui.mouseAction.editSelectedNode()
+    await view.waitFor.nodeInput().not.toBeVisible()
+    view.mouseAction.clickOn.node(rootNode)
+    view.mouseAction.editSelectedNode()
 
     const newText = 'some new text'
-    await ui.waitFor.nodeInput().toHaveFocus()
-    ui.keyboardAction.typeAndPressEnter(newText)
-    await ui.waitFor.node({ text: newText }).toBeVisible()
+    await view.waitFor.nodeInput().toHaveFocus()
+    view.keyboardAction.typeAndPressEnter(newText)
+    await view.waitFor.node({ text: newText }).toBeVisible()
   })
 })

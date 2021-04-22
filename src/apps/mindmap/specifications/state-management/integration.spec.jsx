@@ -1,10 +1,10 @@
 import useModel from '~mindmap/hooks/useModel'
 import { ModelProvider } from '~mindmap/components'
-import { ui } from '~mindmap/test-utilities/view'
+import { view } from '~mindmap/test-utilities/view'
 import React from 'react'
 
 test('normal use case', () => {
-  ui.renderView({
+  view.render({
     JSX: (
       <ModelProvider>
         <ExpectHookToGiveState />
@@ -14,7 +14,7 @@ test('normal use case', () => {
 })
 
 test('test use case', () => {
-  ui.renderView({
+  view.render({
     injectMockModelIntoJSX: ({ useMock }) => (
       <ExpectHookToGiveState useThisModel={useMock} />
     ),

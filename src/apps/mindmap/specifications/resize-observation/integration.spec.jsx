@@ -1,5 +1,5 @@
 import MindMapApp from '~mindmap/App'
-import { ui, viewmodel } from '~mindmap/test-utilities'
+import { view, viewmodel } from '~mindmap/test-utilities'
 import React from 'react'
 
 describe('mocks due to test environment', () => {
@@ -20,15 +20,15 @@ describe('mocks due to test environment', () => {
   test('node resize event gets logged', async () => {
     const { fireResizeEvent, logResize } = renderMindMapWithMockResizeObserver()
 
-    ui.mouseAction.createRootNode()
-    await ui.waitFor.nodeInput().toHaveFocus()
-    ui.keyboardAction.typeAndPressEnter('test')
-    await ui.waitFor.nodeInput().not.toBeVisible()
+    view.mouseAction.createRootNode()
+    await view.waitFor.nodeInput().toHaveFocus()
+    view.keyboardAction.typeAndPressEnter('test')
+    await view.waitFor.nodeInput().not.toBeVisible()
 
     viewmodel.expect.mockFunction(logResize).toBeCalledTimes(1)
 
     const { boundingClientRect, offsetRect } = sample
-    const Node = ui.query.node({ text: 'test' })
+    const Node = view.query.node({ text: 'test' })
     fireResizeEvent(Node, {
       boundingClientRect,
       offsetRect: mapRectToOffset(offsetRect),
@@ -45,12 +45,12 @@ describe('mocks due to test environment', () => {
   test('resize all elements: no error', async () => {
     const { fireResizeEvent } = renderMindMapWithMockResizeObserver()
 
-    ui.mouseAction.createRootNode()
-    await ui.waitFor.nodeInput().toHaveFocus()
-    ui.keyboardAction.typeAndPressEnter('test')
-    await ui.waitFor.nodeInput().not.toBeVisible()
+    view.mouseAction.createRootNode()
+    await view.waitFor.nodeInput().toHaveFocus()
+    view.keyboardAction.typeAndPressEnter('test')
+    await view.waitFor.nodeInput().not.toBeVisible()
 
-    const AllElements = ui.query.allElements()
+    const AllElements = view.query.allElements()
     const { boundingClientRect, offsetRect } = sample
     AllElements.forEach((Element) =>
       fireResizeEvent(Element, {
@@ -63,21 +63,25 @@ describe('mocks due to test environment', () => {
   test('resize elements specifically', async () => {
     const { fireResizeEvent } = renderMindMapWithMockResizeObserver()
 
-    ui.mouseAction.createRootNode()
-    await ui.waitFor.nodeInput().toHaveFocus()
-    ui.keyboardAction.typeAndPressEnter('test')
-    await ui.waitFor.nodeInput().not.toBeVisible()
+    view.mouseAction.createRootNode()
+    await view.waitFor.nodeInput().toHaveFocus()
+    view.keyboardAction.typeAndPressEnter('test')
+    await view.waitFor.nodeInput().not.toBeVisible()
 
     simulateRelevantResizes()
 
-    ui.expect.rootTree({ text: 'test' }).toHaveStyle({
+    view.expect.rootTree({ text: 'test' }).toHaveStyle({
       position: 'absolute',
       left: '280px',
       top: '225px',
     })
 
     function simulateRelevantResizes() {
-      const { MindSpace, RootTrees, Nodes } = ui.query.relevantResizeElements()
+      const {
+        MindSpace,
+        RootTrees,
+        Nodes,
+      } = view.query.relevantResizeElements()
 
       resizeSurface(MindSpace)
       RootTrees.forEach(resizeRootContainer)
@@ -121,7 +125,7 @@ describe('mocks due to test environment', () => {
   function renderMindMapWithMockResizeObserver() {
     const logResize = viewmodel.create.mockFunction()
 
-    const { fireResizeEvent } = ui.renderView({
+    const { fireResizeEvent } = view.render({
       injectMockModelIntoJSX: ({ useMockResizeObserver }) => (
         <MindMapApp
           useThisResizeObserver={useMockResizeObserver}

@@ -1,23 +1,27 @@
 import MindMapApp from '~mindmap/App'
-import { ui, viewmodel } from '~mindmap/test-utilities'
+import { view, viewmodel } from '~mindmap/test-utilities'
 import React from 'react'
 
 describe('mocks due to test environment', () => {
   test('resize elements specifically', async () => {
     const { fireResizeEvent } = renderMindMapWithMockResizeObserver()
-    ui.mouseAction.createRootNode()
-    ui.keyboardAction.typeAndPressEnter('test')
+    view.mouseAction.createRootNode()
+    view.keyboardAction.typeAndPressEnter('test')
 
     simulateResizeOfRelevantElements()
 
-    ui.expect.rootTree({ text: 'test' }).toHaveStyle({
+    view.expect.rootTree({ text: 'test' }).toHaveStyle({
       position: 'absolute',
       left: '280px',
       top: '225px',
     })
 
     function simulateResizeOfRelevantElements() {
-      const { MindSpace, RootTrees, Nodes } = ui.query.relevantResizeElements()
+      const {
+        MindSpace,
+        RootTrees,
+        Nodes,
+      } = view.query.relevantResizeElements()
       resizeSurface(MindSpace)
       RootTrees.forEach(resizeRootContainer)
       Nodes.forEach(resizeNode)
@@ -60,7 +64,7 @@ describe('mocks due to test environment', () => {
   function renderMindMapWithMockResizeObserver() {
     const logResize = viewmodel.create.mockFunction()
 
-    const { fireResizeEvent } = ui.renderView({
+    const { fireResizeEvent } = view.render({
       injectMockModelIntoJSX: ({ useMockResizeObserver }) => (
         <MindMapApp
           useThisResizeObserver={useMockResizeObserver}

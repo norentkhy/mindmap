@@ -1,5 +1,5 @@
 import MindMapApp from '~mindmap/App'
-import { ui } from '~mindmap/test-utilities/view'
+import { view } from '~mindmap/test-utilities/view'
 import { createRootNodeWithProperties } from '~mindmap/test-utilities/integrated-view'
 
 import React from 'react'
@@ -7,31 +7,31 @@ import { screen } from '@testing-library/react'
 
 describe('undo/redo', () => {
   test('creation of rootnode', async () => {
-    ui.renderView({ JSX: <MindMapApp /> })
+    view.render({ JSX: <MindMapApp /> })
 
     const rootNode = { text: 'root node' }
 
     await createRootNodeWithProperties(rootNode)
-    ui.expect.node(rootNode).toBeVisible()
+    view.expect.node(rootNode).toBeVisible()
 
-    ui.mouseAction.clickOn.menu.undoAction()
-    await ui.waitFor.nodeInput().toHaveFocus()
+    view.mouseAction.clickOn.menu.undoAction()
+    await view.waitFor.nodeInput().toHaveFocus()
 
     const EmptyScreen = screen
-    ui.mouseAction.clickOn.menu.undoAction()
+    view.mouseAction.clickOn.menu.undoAction()
     expect(screen).toEqual(EmptyScreen)
 
-    ui.mouseAction.clickOn.menu.undoAction()
-    await ui.waitFor.node(rootNode).not.toBeVisible()
+    view.mouseAction.clickOn.menu.undoAction()
+    await view.waitFor.node(rootNode).not.toBeVisible()
 
-    ui.mouseAction.clickOn.menu.redoAction()
-    await ui.waitFor.nodeInput().toBeVisible()
+    view.mouseAction.clickOn.menu.redoAction()
+    await view.waitFor.nodeInput().toBeVisible()
 
-    ui.mouseAction.clickOn.menu.redoAction()
-    await ui.waitFor.node(rootNode).toBeVisible()
+    view.mouseAction.clickOn.menu.redoAction()
+    await view.waitFor.node(rootNode).toBeVisible()
 
     const NonEmptyScreen = screen
-    ui.mouseAction.clickOn.menu.redoAction()
+    view.mouseAction.clickOn.menu.redoAction()
     expect(screen).toEqual(NonEmptyScreen)
     expect(screen).toEqual(EmptyScreen)
   })

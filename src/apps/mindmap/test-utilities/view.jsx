@@ -42,8 +42,8 @@ const waitForDefinedElement = mapObject(
   (getExpectOptions) => getWaitForOptions({ getExpectOptions })
 )
 
-export const ui = {
-  renderView,
+export const view = {
+  render: renderView,
   query: {
     ...queryDefinedElement,
     allElements: queryAllElements,

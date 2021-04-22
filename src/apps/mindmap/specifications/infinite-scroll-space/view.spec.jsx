@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { ui, viewmodel } from '~mindmap/test-utilities'
+import { view, viewmodel } from '~mindmap/test-utilities'
 import { fireEvent, screen } from '@testing-library/react'
 import WheelFeedbackContainer from '../../components/WheelFeedbackContainer/WheelFeedbackContainer'
 
@@ -91,7 +91,7 @@ describe('wheel feedback container', () => {
 
   function renderWithChildHandlingFeedback() {
     const handleWheelFeedback = viewmodel.create.mockFunction()
-    ui.renderView({
+    view.render({
       JSX: (
         <WheelFeedbackContainer>
           <MindCanvasMock onWheelFeedback={handleWheelFeedback} />

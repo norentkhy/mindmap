@@ -1,13 +1,13 @@
 import { MainView } from '~mindmap/components'
-import { ui, viewmodel } from '~mindmap/test-utilities'
+import { view, viewmodel } from '~mindmap/test-utilities'
 import React from 'react'
 
 describe('node folding: view', () => {
   test('display a folded node', () => {
     const { invisibleNode, foldedNode } = renderFoldedNodeWithInvisibleNode()
 
-    ui.expect.node(foldedNode).toBeVisible()
-    ui.expect.node(invisibleNode).not.toBeVisible()
+    view.expect.node(foldedNode).toBeVisible()
+    view.expect.node(invisibleNode).not.toBeVisible()
 
     function renderFoldedNodeWithInvisibleNode() {
       const {
@@ -38,8 +38,8 @@ describe('node folding: view', () => {
   test('fold call to view model', () => {
     const { nodeToFold, foldNode } = renderNodeToFold()
 
-    ui.mouseAction.clickOn.node({ text: nodeToFold.text })
-    ui.keyboardAction.foldSelectedNode()
+    view.mouseAction.clickOn.node({ text: nodeToFold.text })
+    view.keyboardAction.foldSelectedNode()
 
     viewmodel.expect.mockFunction(foldNode).toBeCalledWith(nodeToFold.id)
 
@@ -72,7 +72,7 @@ function renderTest(
     modifications: {},
   }
 ) {
-  const { rendered } = ui.renderView({
+  const { rendered } = view.render({
     injectMockModelIntoJSX: ({ useMock }) => (
       <MainView useThisModel={useMock} />
     ),

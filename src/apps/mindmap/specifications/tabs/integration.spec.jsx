@@ -1,30 +1,30 @@
 import MindMapApp from '~mindmap/App'
-import { ui } from '~mindmap/test-utilities/view'
+import { view } from '~mindmap/test-utilities/view'
 import React from 'react'
 
 describe('tabs integration', () => {
   test('add a new tab', () => {
-    ui.renderView({ JSX: <MindMapApp /> })
-    ui.expect.untitledTab().not.toBeVisible()
+    view.render({ JSX: <MindMapApp /> })
+    view.expect.untitledTab().not.toBeVisible()
 
-    ui.createNew.tab()
-    ui.expect.untitledTab().toBeVisible()
+    view.createNew.tab()
+    view.expect.untitledTab().toBeVisible()
 
-    ui.createNew.tab()
-    ui.expect.numberOf.untitledTabs().toBe(2)
+    view.createNew.tab()
+    view.expect.numberOf.untitledTabs().toBe(2)
   })
 
   test('rename a tab', async () => {
-    ui.renderView({ JSX: <MindMapApp /> })
+    view.render({ JSX: <MindMapApp /> })
 
-    ui.createNew.tab()
-    ui.rename.tab({ title: 'untitled' })
+    view.createNew.tab()
+    view.rename.tab({ title: 'untitled' })
 
     const someNewTitle = 'some new title'
 
-    await ui.waitFor.tabInput().toHaveFocus()
-    ui.keyboardAction.typeAndPressEnter(someNewTitle)
+    await view.waitFor.tabInput().toHaveFocus()
+    view.keyboardAction.typeAndPressEnter(someNewTitle)
 
-    ui.expect.tab({ title: someNewTitle }).toBeVisible()
+    view.expect.tab({ title: someNewTitle }).toBeVisible()
   })
 })

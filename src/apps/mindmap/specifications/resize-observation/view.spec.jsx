@@ -1,5 +1,5 @@
 import { MainView } from '~mindmap/components'
-import { viewmodel, ui } from '~mindmap/test-utilities'
+import { viewmodel, view } from '~mindmap/test-utilities'
 import React from 'react'
 
 describe('Observation of dimensions', () => {
@@ -28,7 +28,7 @@ describe('Observation of dimensions', () => {
       registerNodeLayout,
     })
 
-    const Node = ui.query.node(node)
+    const Node = view.query.node(node)
     const { boundingClientRect, offsetRect } = sample
     fireResizeEvent(Node, { boundingClientRect, offsetRect })
 
@@ -45,7 +45,7 @@ describe('Observation of dimensions', () => {
       registerTreeLayout,
     })
 
-    const TreeContainer = ui.query.rootTree(node)
+    const TreeContainer = view.query.rootTree(node)
     const { boundingClientRect, offsetRect } = sample
 
     fireResizeEvent(TreeContainer, { boundingClientRect, offsetRect })
@@ -63,7 +63,7 @@ describe('Observation of dimensions', () => {
       registerSurfaceLayout,
     })
 
-    const Surface = ui.query.mindSpace()
+    const Surface = view.query.mindSpace()
     const { boundingClientRect, offsetRect } = sample
 
     fireResizeEvent(Surface, { boundingClientRect, offsetRect })
@@ -77,7 +77,7 @@ describe('Observation of dimensions', () => {
   function renderTest(mockFunctions) {
     const node = viewmodel.create.node({ text: 'this will resize' })
 
-    const { rendered, fireResizeEvent } = ui.renderView({
+    const { rendered, fireResizeEvent } = view.render({
       injectMockModelIntoJSX: ({ useMock }) => (
         <MainView useThisModel={useMock} />
       ),
