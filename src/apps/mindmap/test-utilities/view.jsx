@@ -10,6 +10,7 @@ import {
   typeAndPressEnter,
   getFocus,
   getInputSelection,
+  queryAllElementsByRole,
 } from './dependencies'
 import 'jest-styled-components'
 import { mapObject } from 'utils/FunctionalProgramming'
@@ -48,6 +49,11 @@ export const view = {
     ...queryDefinedElement,
     allElements: queryAllElements,
     relevantResizeElements: queryRelevantResizeElements,
+  },
+  actionSequence: {
+    createRootNodeWithProperties,
+    createChildNodeWithProperties,
+    createTrees,
   },
   keyboardAction: {
     foldSelectedNode,
@@ -153,6 +159,10 @@ function getRootTree(Node) {
 
 function queryNode({ text }) {
   return queryElementByText(text)
+}
+
+function queryAllNodes() {
+  return queryAllElementsByRole('button')
 }
 
 function queryNodeInput() {
@@ -316,4 +326,78 @@ function undoAction() {
 function redoAction() {
   const RedoActionButton = queryElementByLabelText('redo action')
   clickElement(RedoActionButton)
+}
+
+async function createChildNodeWithProperties({ text, ...rest }) {
+  const NodesDifference = await findNodeDifferences(async () => {
+    createChildNodeOfSelectedNode()
+    await completeNodeNaming(text)
+  })
+
+  return NodesDifference[0]
+}
+
+async function createRootNodeWithProperties({ text, ...rest }) {
+  const NodesDifference = await findNodeDifferences(async () => {
+    createRootNode()
+    await completeNodeNaming(text)
+  })
+
+  return NodesDifference[0]
+}
+
+async function completeNodeNaming(text) {
+  await view.waitFor.nodeInput().toHaveFocus()
+  view.keyboardAction.typeAndPressEnter(text)
+  await view.waitFor.nodeInput().not.toBeVisible()
+}
+
+async function findNodeDifferences(callback) {
+  const NodesBefore = queryAllNodes()
+  await callback()
+  const NodesAfter = queryAllNodes()
+
+  return findDifferencesOnKey({ NodesBefore, NodesAfter })
+
+  function findDifferencesOnKey({ NodesBefore, NodesAfter }) {
+    const keysElementsBefore = NodesBefore.map((element) => getKey(element))
+
+    return NodesAfter.filter((elementAfter) => {
+      const keyElementAfter = getKey(elementAfter)
+      return !keysElementsBefore.includes(keyElementAfter)
+    })
+  }
+
+  function getKey(Element) {
+    const objectKeys = Object.keys(Element)
+    const fiberSomething = Element[objectKeys[0]]
+    return getMeaningfulKey(fiberSomething)
+
+    function getMeaningfulKey(obj) {
+      if (obj?.key) return obj.key
+      if (obj.return) return getMeaningfulKey(obj.return)
+      return null
+    }
+  }
+}
+
+async function createTrees(trees) {
+  if (trees?.length) {
+    for (const tree of trees) {
+      const RootNode = await createRootNodeWithProperties({ text: tree.text })
+      await createChildTrees(RootNode, tree?.children)
+    }
+  }
+}
+
+async function createChildTrees(ParentNode, trees) {
+  if (trees?.length) {
+    for (const tree of trees) {
+      clickElement(ParentNode)
+      const RootNode = await createChildNodeWithProperties({
+        text: tree.text,
+      })
+      await createChildTrees(RootNode, tree?.children)
+    }
+  }
 }

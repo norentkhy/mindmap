@@ -14,6 +14,7 @@ const queryElementByLabelText = screen.queryByLabelText
 const queryElementByText = screen.queryByText
 const clickElement = userEvent.click
 const doubleClickElement = fireEvent.doubleClick
+const queryAllElementsByRole = screen.queryAllByRole
 
 export {
   queryElementByLabelText,
@@ -29,6 +30,7 @@ export {
   getFocus,
   getInputSelection,
   generateUUID,
+  queryAllElementsByRole,
 }
 
 function typeWithKeyboard(keys) {

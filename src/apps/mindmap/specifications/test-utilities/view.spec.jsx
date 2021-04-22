@@ -1,8 +1,7 @@
-import { expect, describe, test } from '@jest/globals'
 import { view, getWaitForOptions } from '~mindmap/test-utilities/view'
+import { expect, describe, test } from '@jest/globals'
+import { screen } from '@testing-library/react'
 import React from 'react'
-import { screen, waitFor } from '@testing-library/react'
-import { mapObject } from 'utils/FunctionalProgramming'
 
 describe('query', () => {
   test('elements with text', () => {

@@ -1,6 +1,5 @@
 import MindMapApp from '~mindmap/App'
 import { view } from '~mindmap/test-utilities/view'
-import { createRootNodeWithProperties } from '~mindmap/test-utilities/integrated-view'
 
 import React from 'react'
 import { screen } from '@testing-library/react'
@@ -11,7 +10,7 @@ describe('undo/redo', () => {
 
     const rootNode = { text: 'root node' }
 
-    await createRootNodeWithProperties(rootNode)
+    await view.actionSequence.createRootNodeWithProperties(rootNode)
     view.expect.node(rootNode).toBeVisible()
 
     view.mouseAction.clickOn.menu.undoAction()

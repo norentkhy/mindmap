@@ -103,17 +103,3 @@ export async function findNodeDifferences(callback) {
     }
   }
 }
-
-export function findNodeInput() {
-  return screen.findByLabelText(nodeInputLabel)
-}
-
-export function queryNode(args) {
-  const { text } = args
-
-  if (text) return screen.queryByText(text)
-
-  throw new Error('unknown args')
-}
-
-const nodeInputLabel = 'editing node'
