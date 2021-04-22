@@ -1,4 +1,4 @@
-import { model } from '~mindmap/test-utilities'
+import { viewmodel } from '~mindmap/test-utilities'
 import { describe, test, expect } from '@jest/globals'
 
 describe('dimensions', () => {
@@ -27,7 +27,7 @@ describe('dimensions', () => {
   })
 
   test('update mind surface layout dimensions', () => {
-    const { state, action, actionSequence } = model.render()
+    const { state, action, actionSequence } = viewmodel.render()
 
     const boundingClientRect = 'object containing bounding client rect'
     const offsetRect = 'object containing offset rect'
@@ -38,7 +38,7 @@ describe('dimensions', () => {
   })
 
   function renderHookTestAndCreateRootNode() {
-    const rendered = model.render()
+    const rendered = viewmodel.render()
     rendered.action.createRootNode()
     return rendered
   }
@@ -63,13 +63,13 @@ describe('logging of changes', () => {
     }
     action.registerNodeLayout({ id, boundingClientRect, offsetRect })
 
-    model.expect
+    viewmodel.expect
       .mockFunction(log)
       .toBeCalledWith({ id, boundingClientRect, offsetRect })
 
     function renderHookTestWithNodeForLogging() {
-      const log = model.create.mockFunction()
-      const rendered = model.render({
+      const log = viewmodel.create.mockFunction()
+      const rendered = viewmodel.render({
         extraModelProviderProps: { logResize: log },
       })
       rendered.action.createRootNode()

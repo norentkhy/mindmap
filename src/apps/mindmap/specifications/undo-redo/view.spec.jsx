@@ -1,25 +1,25 @@
 import { Actions } from '~mindmap/components'
-import { model } from '~mindmap/test-utilities'
+import { viewmodel } from '~mindmap/test-utilities'
 import { fireEvent, render, screen } from '@testing-library/react'
 import React from 'react'
 
 describe('with mock providers', () => {
   test('undo', () => {
-    const undo = model.create.mockFunction()
+    const undo = viewmodel.create.mockFunction()
     renderWithMockHook({ undo })
 
     ui.undo()
 
-    model.expect.mockFunction(undo).toBeCalledWith()
+    viewmodel.expect.mockFunction(undo).toBeCalledWith()
   })
 
   test('redo', () => {
-    const redo = model.create.mockFunction()
+    const redo = viewmodel.create.mockFunction()
     renderWithMockHook({ redo })
 
     ui.redo()
 
-    model.expect.mockFunction(redo).toBeCalledWith()
+    viewmodel.expect.mockFunction(redo).toBeCalledWith()
   })
 
   function renderWithMockHook(hookModifications) {

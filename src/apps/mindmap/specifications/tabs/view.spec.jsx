@@ -1,21 +1,21 @@
 import { Tabs } from '~mindmap/components'
-import { ui, model } from '~mindmap/test-utilities'
+import { ui, viewmodel } from '~mindmap/test-utilities'
 import React from 'react'
 
 describe('rendered with mocks', () => {
   const tabs = [
-    model.create.tab({ selected: true }),
-    model.create.tab({ selected: false }),
-    model.create.tab({ selected: false }),
+    viewmodel.create.tab({ selected: true }),
+    viewmodel.create.tab({ selected: false }),
+    viewmodel.create.tab({ selected: false }),
   ]
 
   describe('views', () => {
     test('add new tab', () => {
-      const addNewTab = model.create.mockFunction()
+      const addNewTab = viewmodel.create.mockFunction()
       renderWithMock({ addNewTab })
 
       ui.createNew.tab()
-      model.expect.mockFunction(addNewTab).toBeCalled()
+      viewmodel.expect.mockFunction(addNewTab).toBeCalled()
     })
 
     test('render of tabs in state', () => {
@@ -29,13 +29,13 @@ describe('rendered with mocks', () => {
 
   describe('tab selection', () => {
     test('function call to view model', () => {
-      const selectTab = model.create.mockFunction()
+      const selectTab = viewmodel.create.mockFunction()
       renderWithMock({ state: { tabs }, selectTab })
 
       tabs.forEach(({ id }, index) => {
         ui.mouseAction.clickOn.tab({ index })
         const nthCall = index + 1
-        model.expect.mockFunction(selectTab).nthCalledWith(nthCall, id)
+        viewmodel.expect.mockFunction(selectTab).nthCalledWith(nthCall, id)
       })
     })
 
@@ -52,13 +52,13 @@ describe('rendered with mocks', () => {
 
   describe('tab renaming', () => {
     test('function call to view model', () => {
-      const initiateRenameTab = model.create.mockFunction()
+      const initiateRenameTab = viewmodel.create.mockFunction()
       renderWithMock({ state: { tabs }, initiateRenameTab })
 
       tabs.forEach((tab, index) => {
         ui.rename.tab({ index })
         const nthCall = index + 1
-        model.expect
+        viewmodel.expect
           .mockFunction(initiateRenameTab)
           .nthCalledWith(nthCall, tab.id)
       })
@@ -79,7 +79,7 @@ describe('rendered with mocks', () => {
       const someNewTitle = 'some new title'
       ui.keyboardAction.typeAndPressEnter(someNewTitle)
 
-      model.expect.mockFunction(finishRenameTab).nthCalledWith(1, {
+      viewmodel.expect.mockFunction(finishRenameTab).nthCalledWith(1, {
         id: tabTarget.id,
         newTitle: someNewTitle,
       })
@@ -91,7 +91,7 @@ describe('rendered with mocks', () => {
           state,
         } = createSituationWithOneRenaming()
 
-        const finishRenameTab = model.create.mockFunction()
+        const finishRenameTab = viewmodel.create.mockFunction()
         renderWithMock({ state, finishRenameTab })
 
         return {

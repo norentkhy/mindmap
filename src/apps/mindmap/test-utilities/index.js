@@ -1,4 +1,4 @@
 import { ui } from './view'
-import { model } from './model'
+import { viewmodel } from './viewmodel'
 
-export { ui, model }
+export { ui, viewmodel }

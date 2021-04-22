@@ -1,5 +1,5 @@
 import { MainView } from '~mindmap/components'
-import { ui, model } from '~mindmap/test-utilities'
+import { ui, viewmodel } from '~mindmap/test-utilities'
 import React from 'react'
 
 describe('node folding: view', () => {
@@ -20,13 +20,13 @@ describe('node folding: view', () => {
       return { invisibleNode, foldedNode }
 
       function createInitialStateWithRootAndChildNode() {
-        const childNode = model.create.node({ text: 'folded away' })
-        const rootNode = model.create.node({
+        const childNode = viewmodel.create.node({ text: 'folded away' })
+        const rootNode = viewmodel.create.node({
           text: 'fold this',
           folded: true,
           children: [childNode],
         })
-        const initialState = model.create.state({
+        const initialState = viewmodel.create.state({
           rootNodes: [rootNode],
         })
 
@@ -41,11 +41,11 @@ describe('node folding: view', () => {
     ui.mouseAction.clickOn.node({ text: nodeToFold.text })
     ui.keyboardAction.foldSelectedNode()
 
-    model.expect.mockFunction(foldNode).toBeCalledWith(nodeToFold.id)
+    viewmodel.expect.mockFunction(foldNode).toBeCalledWith(nodeToFold.id)
 
     function renderNodeToFold() {
       const { rootNode, initialState } = createInitialStateWithRootNode()
-      const foldNode = model.create.mockFunction()
+      const foldNode = viewmodel.create.mockFunction()
 
       renderTest({
         initialState,
@@ -55,8 +55,8 @@ describe('node folding: view', () => {
       return { nodeToFold: rootNode, foldNode }
 
       function createInitialStateWithRootNode() {
-        const rootNode = model.create.node({ text: 'fold this' })
-        const initialState = model.create.state({
+        const rootNode = viewmodel.create.node({ text: 'fold this' })
+        const initialState = viewmodel.create.state({
           rootNodes: [rootNode],
         })
 

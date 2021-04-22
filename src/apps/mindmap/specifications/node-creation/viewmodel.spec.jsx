@@ -1,9 +1,9 @@
 import { describe, test, expect } from '@jest/globals'
-import { model } from '~mindmap/test-utilities'
+import { viewmodel } from '~mindmap/test-utilities'
 
 describe('node creation', () => {
   test('handle root node creation', () => {
-    const { state, action } = model.render()
+    const { state, action } = viewmodel.render()
     expect(state.getRootNodes()).toEqual([])
 
     for (let i = 0; i < 5; i++) {
@@ -23,7 +23,7 @@ describe('node creation', () => {
   })
 
   test('handle child node creation', () => {
-    const { action, actionSequence } = model.render()
+    const { action, actionSequence } = viewmodel.render()
     const parent = actionSequence.createRootNodeWithProperties({
       text: 'root node',
     })
@@ -33,7 +33,7 @@ describe('node creation', () => {
 
   describe('node edit', () => {
     test('handle start', () => {
-      const { state, action, actionSequence } = model.render()
+      const { state, action, actionSequence } = viewmodel.render()
       const initialText = 'initial'
       const node = actionSequence.createRootNodeWithProperties({
         text: initialText,
@@ -45,7 +45,7 @@ describe('node creation', () => {
     })
 
     test('handle end', () => {
-      const { state, action } = model.render()
+      const { state, action } = viewmodel.render()
       action.createRootNode()
       const { id } = state.getNewestRootNode()
 

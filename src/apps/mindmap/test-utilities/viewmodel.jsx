@@ -6,7 +6,7 @@ import { act, renderHook } from '@testing-library/react-hooks'
 import { jest } from '@jest/globals'
 import React from 'react'
 
-export const model = {
+export const viewmodel = {
   render: renderModel,
   create: {
     node: createNode,

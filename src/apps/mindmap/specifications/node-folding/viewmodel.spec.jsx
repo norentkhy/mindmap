@@ -1,9 +1,9 @@
-import { model } from '~mindmap/test-utilities'
+import { viewmodel } from '~mindmap/test-utilities'
 import { describe, test, expect } from '@jest/globals'
 
 describe('node-folding: viewmodel', () => {
   test('toggle fold: fold and unfold', () => {
-    const { state, action, actionSequence } = model.render()
+    const { state, action, actionSequence } = viewmodel.render()
     const { id } = actionSequence.createRootNodeWithProperties({
       text: 'root node',
     })

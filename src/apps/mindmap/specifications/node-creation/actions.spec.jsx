@@ -1,13 +1,13 @@
 import { Actions } from '~mindmap/components'
-import { ui, model } from '~mindmap/test-utilities'
+import { ui, viewmodel } from '~mindmap/test-utilities'
 import React from 'react'
 
 describe('with mock providers', () => {
   test('node creation', () => {
-    const createRootNode = model.create.mockFunction()
+    const createRootNode = viewmodel.create.mockFunction()
     renderWithMockHook({ createRootNode })
     ui.mouseAction.clickOn.menu.createRootNode()
-    model.expect.mockFunction(createRootNode).toBeCalled()
+    viewmodel.expect.mockFunction(createRootNode).toBeCalled()
   })
 
   function renderWithMockHook(mockHookModifications) {

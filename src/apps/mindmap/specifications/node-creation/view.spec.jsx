@@ -1,5 +1,5 @@
 import { MainView } from '~mindmap/components'
-import { ui, model } from '~mindmap/test-utilities'
+import { ui, viewmodel } from '~mindmap/test-utilities'
 import React from 'react'
 
 describe('node creation view', () => {
@@ -10,8 +10,8 @@ describe('node creation view', () => {
       ui.expect.node(node).toBeVisible()
 
       function renderWithOneRootNode() {
-        const node = model.create.node({ text: 'original text' })
-        const initialState = model.create.state({ rootNodes: [node] })
+        const node = viewmodel.create.node({ text: 'original text' })
+        const initialState = viewmodel.create.state({ rootNodes: [node] })
         renderTest({ initialState })
 
         return node
@@ -34,8 +34,10 @@ describe('node creation view', () => {
 
         function createInitialStateWithMultipleRootNodes() {
           const nodeTexts = ['a', 'b', 'c', 'd']
-          const rootNodes = nodeTexts.map((text) => model.create.node({ text }))
-          const initialState = model.create.state({
+          const rootNodes = nodeTexts.map((text) =>
+            viewmodel.create.node({ text })
+          )
+          const initialState = viewmodel.create.state({
             rootNodes,
           })
           return { rootNodes, initialState }
@@ -51,10 +53,10 @@ describe('node creation view', () => {
         ui.expect.nodeInput().not.toBeVisible()
 
         ui.mouseAction.createRootNode()
-        model.expect.mockFunction(createRootNode).toBeCalled()
+        viewmodel.expect.mockFunction(createRootNode).toBeCalled()
 
         function renderTestForRootNodeCreation() {
-          const createRootNode = model.create.mockFunction()
+          const createRootNode = viewmodel.create.mockFunction()
           renderTest({ modifications: { createRootNode } })
 
           return createRootNode
@@ -69,15 +71,15 @@ describe('node creation view', () => {
         const someNewText = 'some new text'
         ui.keyboardAction.typeAndPressEnter(someNewText)
 
-        model.expect.mockFunction(finalizeEditNode).toBeCalled()
-        model.expect.mockFunction(finalizeEditNode).toBeCalledWith({
+        viewmodel.expect.mockFunction(finalizeEditNode).toBeCalled()
+        viewmodel.expect.mockFunction(finalizeEditNode).toBeCalledWith({
           id: node.id,
           text: someNewText,
         })
 
         function renderNodeInEditMode() {
           const { node, initialState } = createInitialStateWithNodeInEditMode()
-          const finalizeEditNode = model.create.mockFunction()
+          const finalizeEditNode = viewmodel.create.mockFunction()
           renderTest({
             initialState,
             modifications: { finalizeEditNode },
@@ -86,11 +88,11 @@ describe('node creation view', () => {
           return { node, finalizeEditNode }
 
           function createInitialStateWithNodeInEditMode() {
-            const node = model.create.node({
+            const node = viewmodel.create.node({
               text: 'original text',
               editing: true,
             })
-            const initialState = model.create.state({
+            const initialState = viewmodel.create.state({
               rootNodes: [node],
             })
             return { node, initialState }
@@ -109,12 +111,14 @@ describe('node creation view', () => {
         ui.mouseAction.clickOn.node(rootNode)
         ui.keyboardAction.createChildNodeOfSelectedNode()
 
-        model.expect.mockFunction(createChildNode).toBeCalled()
-        model.expect.mockFunction(createChildNode).toBeCalledWith(rootNode.id)
+        viewmodel.expect.mockFunction(createChildNode).toBeCalled()
+        viewmodel.expect
+          .mockFunction(createChildNode)
+          .toBeCalledWith(rootNode.id)
 
         function renderWithOneRootNodeForChildNodeCreation() {
           const { rootNode, initialState } = createInitialStateWithOneRootNode()
-          const createChildNode = model.create.mockFunction()
+          const createChildNode = viewmodel.create.mockFunction()
           renderTest({
             initialState,
             modifications: { createChildNode },
@@ -123,8 +127,8 @@ describe('node creation view', () => {
           return { rootNode, createChildNode }
 
           function createInitialStateWithOneRootNode() {
-            const rootNode = model.create.node({ text: 'root node' })
-            const initialState = model.create.state({
+            const rootNode = viewmodel.create.node({ text: 'root node' })
+            const initialState = viewmodel.create.state({
               rootNodes: [rootNode],
             })
             return { rootNode, initialState }
@@ -143,8 +147,8 @@ describe('node creation view', () => {
         const someNewText = 'some new text'
         ui.keyboardAction.typeAndPressEnter(someNewText)
 
-        model.expect.mockFunction(finalizeEditNode).toBeCalled()
-        model.expect.mockFunction(finalizeEditNode).toBeCalledWith({
+        viewmodel.expect.mockFunction(finalizeEditNode).toBeCalled()
+        viewmodel.expect.mockFunction(finalizeEditNode).toBeCalledWith({
           id: childNode.id,
           text: someNewText,
         })
@@ -154,7 +158,7 @@ describe('node creation view', () => {
             childNode,
             initialState,
           } = createInitialStateWithChildNodeInEditMode()
-          const finalizeEditNode = model.create.mockFunction()
+          const finalizeEditNode = viewmodel.create.mockFunction()
           renderTest({
             initialState,
             modifications: { finalizeEditNode },
@@ -163,15 +167,15 @@ describe('node creation view', () => {
           return { childNode, finalizeEditNode }
 
           function createInitialStateWithChildNodeInEditMode() {
-            const childNode = model.create.node({
+            const childNode = viewmodel.create.node({
               text: 'child',
               editing: true,
             })
-            const rootNode = model.create.node({
+            const rootNode = viewmodel.create.node({
               text: 'parent',
               children: [childNode],
             })
-            const initialState = model.create.state({
+            const initialState = viewmodel.create.state({
               rootNodes: [rootNode],
             })
 
@@ -191,8 +195,8 @@ describe('node creation view', () => {
         ui.mouseAction.clickOn.node({ text: parentNode.text })
         ui.mouseAction.editSelectedNode()
 
-        model.expect.mockFunction(initiateEditNode).toBeCalled()
-        model.expect
+        viewmodel.expect.mockFunction(initiateEditNode).toBeCalled()
+        viewmodel.expect
           .mockFunction(initiateEditNode)
           .toBeCalledWith(parentNode.id)
 
@@ -201,7 +205,7 @@ describe('node creation view', () => {
             initialState,
             parentNode,
           } = createInitialStateWithParentAndChildNode()
-          const initiateEditNode = model.create.mockFunction()
+          const initiateEditNode = viewmodel.create.mockFunction()
 
           renderTest({
             initialState,
@@ -211,12 +215,12 @@ describe('node creation view', () => {
           return { parentNode, initiateEditNode }
 
           function createInitialStateWithParentAndChildNode() {
-            const childNode = model.create.node({ text: 'child' })
-            const parentNode = model.create.node({
+            const childNode = viewmodel.create.node({ text: 'child' })
+            const parentNode = viewmodel.create.node({
               text: 'parent',
               children: [childNode],
             })
-            const initialState = model.create.state({
+            const initialState = viewmodel.create.state({
               rootNodes: [parentNode],
             })
 

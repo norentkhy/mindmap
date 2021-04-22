@@ -1,5 +1,5 @@
 import MindMapApp from '~mindmap/App'
-import { ui, model } from '~mindmap/test-utilities'
+import { ui, viewmodel } from '~mindmap/test-utilities'
 import React from 'react'
 
 describe('mocks due to test environment', () => {
@@ -58,7 +58,7 @@ describe('mocks due to test environment', () => {
   })
 
   function renderMindMapWithMockResizeObserver() {
-    const logResize = model.create.mockFunction()
+    const logResize = viewmodel.create.mockFunction()
 
     const { fireResizeEvent } = ui.renderView({
       injectMockModelIntoJSX: ({ useMockResizeObserver }) => (

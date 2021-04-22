@@ -1,17 +1,17 @@
 import { MainView } from '~mindmap/components'
-import { ui, model } from '~mindmap/test-utilities'
+import { ui, viewmodel } from '~mindmap/test-utilities'
 import React from 'react'
 
 describe('dimensions of each node', () => {
   test('offsets given to each roottree', () => {
     const offsetLeft = 10
     const offsetTop = 11
-    const node = model.create.node({
+    const node = viewmodel.create.node({
       text: 'offset test',
       desiredTreeCss: { offsetLeft, offsetTop },
     })
     renderTest({
-      initialState: model.create.state({
+      initialState: viewmodel.create.state({
         rootNodes: [node],
       }),
     })

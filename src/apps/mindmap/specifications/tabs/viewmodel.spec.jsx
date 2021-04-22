@@ -1,13 +1,13 @@
 import React, { useContext } from 'react'
 import { act, renderHook } from '@testing-library/react-hooks'
 import { TabsProvider, TabsContext } from '~mindmap/components'
-import { model } from '~mindmap/test-utilities'
+import { viewmodel } from '~mindmap/test-utilities'
 import produce from 'immer'
 
 const tabs = [
-  model.create.tab({ title: 'untitled' }),
-  model.create.tab({ title: 'untitled' }),
-  model.create.tab({ title: 'untitled' }),
+  viewmodel.create.tab({ title: 'untitled' }),
+  viewmodel.create.tab({ title: 'untitled' }),
+  viewmodel.create.tab({ title: 'untitled' }),
 ]
 
 describe('overlap with Tabs.spec', () => {
@@ -101,7 +101,7 @@ describe('overlap with Tabs.spec', () => {
 })
 
 function renderTest({ initialState }) {
-  return model.render({
+  return viewmodel.render({
     useThisModel: () => useContext(TabsContext),
     wrapParents: ({ children }) => (
       <TabsProvider initialState={initialState}>{children}</TabsProvider>

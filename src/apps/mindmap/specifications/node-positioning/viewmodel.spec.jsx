@@ -1,4 +1,4 @@
-import { model } from '~mindmap/test-utilities'
+import { viewmodel } from '~mindmap/test-utilities'
 import { describe, test, expect } from '@jest/globals'
 import { mapMultipleArrays } from 'utils/FunctionalProgramming'
 import { disableConsoleErrorWithin } from 'utils/JestTools'
@@ -32,7 +32,7 @@ describe('dimensions', () => {
       const eventChains = definePlausibleEventChains()
 
       test.each(eventChains)('event chain: %p', (executeEventChain) => {
-        const { state, action, actionSequence } = model.render()
+        const { state, action, actionSequence } = viewmodel.render()
 
         executeEventChain({ state, action, actionSequence }, layout)
 
@@ -43,7 +43,7 @@ describe('dimensions', () => {
       test(
         'throw error on NaN offsets',
         disableConsoleErrorWithin(() => {
-          const { state, action, actionSequence } = model.render()
+          const { state, action, actionSequence } = viewmodel.render()
           const nonsenseLayout = { boundingClientRect: {}, offsetRect: {} }
           expect(() => {
             action.registerSurfaceLayout(nonsenseLayout)
@@ -131,7 +131,7 @@ describe('dimensions', () => {
     })
 
     test('child node creations: no offset assignment', () => {
-      const { state, action, actionSequence } = model.render()
+      const { state, action, actionSequence } = viewmodel.render()
       const parent = actionSequence.createRootNodeWithProperties({
         text: 'parent',
       })

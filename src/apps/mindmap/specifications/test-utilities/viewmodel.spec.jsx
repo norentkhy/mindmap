@@ -1,8 +1,8 @@
-import { model } from '~mindmap/test-utilities'
+import { viewmodel } from '~mindmap/test-utilities'
 
 describe('utilities', () => {
   test('createRootNodeWithProperties', () => {
-    const { state, action, actionSequence } = model.render()
+    const { state, action, actionSequence } = viewmodel.render()
     const text = 'tesadf'
     const rootNode = actionSequence.createRootNodeWithProperties({ text })
 
@@ -13,7 +13,12 @@ describe('utilities', () => {
   })
 
   test('captureNodeChanges', () => {
-    const { state, action, actionSequence, stateObservation } = model.render()
+    const {
+      state,
+      action,
+      actionSequence,
+      stateObservation,
+    } = viewmodel.render()
     const firstRootNode = createAndCaptureFirstRootNode()
     createAndCaptureSecondRootNode()
     createAndCaptureFirstChildNode(firstRootNode.id)
@@ -49,7 +54,12 @@ describe('utilities', () => {
   })
 
   test('createChildNodeWithProperties', () => {
-    const { state, action, actionSequence, stateObservation } = model.render()
+    const {
+      state,
+      action,
+      actionSequence,
+      stateObservation,
+    } = viewmodel.render()
 
     const parent = actionSequence.createRootNodeWithProperties({
       text: 'parent',
@@ -68,7 +78,12 @@ describe('utilities', () => {
   })
 
   test('getNode', () => {
-    const { state, action, actionSequence, stateObservation } = model.render()
+    const {
+      state,
+      action,
+      actionSequence,
+      stateObservation,
+    } = viewmodel.render()
 
     const parent = actionSequence.createRootNodeWithProperties({
       text: 'I am parent',

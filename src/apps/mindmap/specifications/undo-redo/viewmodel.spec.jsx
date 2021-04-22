@@ -1,9 +1,14 @@
-import { model } from '~mindmap/test-utilities'
+import { viewmodel } from '~mindmap/test-utilities'
 import { describe, test, expect } from '@jest/globals'
 
 describe('undo and redo', () => {
   test('undo and redo', () => {
-    const { state, action, actionSequence, stateObservation } = model.render()
+    const {
+      state,
+      action,
+      actionSequence,
+      stateObservation,
+    } = viewmodel.render()
     const stateBefore = state.getState()
     action.createRootNode()
     const { id } = state.getNewestRootNode()

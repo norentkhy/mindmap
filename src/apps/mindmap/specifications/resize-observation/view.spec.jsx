@@ -1,5 +1,5 @@
 import { MainView } from '~mindmap/components'
-import { model, ui } from '~mindmap/test-utilities'
+import { viewmodel, ui } from '~mindmap/test-utilities'
 import React from 'react'
 
 describe('Observation of dimensions', () => {
@@ -23,7 +23,7 @@ describe('Observation of dimensions', () => {
   }
 
   test('Rootnode', () => {
-    const registerNodeLayout = model.create.mockFunction()
+    const registerNodeLayout = viewmodel.create.mockFunction()
     const { fireResizeEvent, node } = renderTest({
       registerNodeLayout,
     })
@@ -32,7 +32,7 @@ describe('Observation of dimensions', () => {
     const { boundingClientRect, offsetRect } = sample
     fireResizeEvent(Node, { boundingClientRect, offsetRect })
 
-    model.expect.mockFunction(registerNodeLayout).toBeCalledWith({
+    viewmodel.expect.mockFunction(registerNodeLayout).toBeCalledWith({
       id: node.id,
       boundingClientRect,
       offsetRect: convertOffsetRect(offsetRect),
@@ -40,7 +40,7 @@ describe('Observation of dimensions', () => {
   })
 
   test('Rootnode container', () => {
-    const registerTreeLayout = model.create.mockFunction()
+    const registerTreeLayout = viewmodel.create.mockFunction()
     const { fireResizeEvent, node } = renderTest({
       registerTreeLayout,
     })
@@ -50,7 +50,7 @@ describe('Observation of dimensions', () => {
 
     fireResizeEvent(TreeContainer, { boundingClientRect, offsetRect })
 
-    model.expect.mockFunction(registerTreeLayout).toBeCalledWith({
+    viewmodel.expect.mockFunction(registerTreeLayout).toBeCalledWith({
       id: node.id,
       boundingClientRect,
       offsetRect: convertOffsetRect(offsetRect),
@@ -58,7 +58,7 @@ describe('Observation of dimensions', () => {
   })
 
   test('Node space', () => {
-    const registerSurfaceLayout = model.create.mockFunction()
+    const registerSurfaceLayout = viewmodel.create.mockFunction()
     const { fireResizeEvent } = renderTest({
       registerSurfaceLayout,
     })
@@ -68,20 +68,20 @@ describe('Observation of dimensions', () => {
 
     fireResizeEvent(Surface, { boundingClientRect, offsetRect })
 
-    model.expect.mockFunction(registerSurfaceLayout).toBeCalledWith({
+    viewmodel.expect.mockFunction(registerSurfaceLayout).toBeCalledWith({
       boundingClientRect,
       offsetRect: convertOffsetRect(offsetRect),
     })
   })
 
   function renderTest(mockFunctions) {
-    const node = model.create.node({ text: 'this will resize' })
+    const node = viewmodel.create.node({ text: 'this will resize' })
 
     const { rendered, fireResizeEvent } = ui.renderView({
       injectMockModelIntoJSX: ({ useMock }) => (
         <MainView useThisModel={useMock} />
       ),
-      initialState: model.create.state({ rootNodes: [node] }),
+      initialState: viewmodel.create.state({ rootNodes: [node] }),
       mockHookModifications: mockFunctions,
     })
 
