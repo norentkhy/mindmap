@@ -11,7 +11,7 @@ import {
   getFocus,
   getInputSelection,
   queryAllElementsByRole,
-} from './dependencies'
+} from '../dependencies'
 import 'jest-styled-components'
 import { mapObject } from 'utils/FunctionalProgramming'
 import produce from 'immer'
