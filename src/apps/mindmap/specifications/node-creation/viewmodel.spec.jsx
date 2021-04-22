@@ -1,24 +1,18 @@
 import { describe, test, expect } from '@jest/globals'
-import { act } from '@testing-library/react-hooks'
-import {
-  getTrees,
-  createRootNodeWithProperties,
-  getNewestRootNode,
-  renderHookTest,
-} from '~mindmap/test-utilities/viewmodel'
+import { model } from '~mindmap/test-utilities'
 
 describe('node creation', () => {
   test('handle root node creation', () => {
-    const { result } = renderHookTest()
-    expect(getTrees(result)).toEqual([])
+    const { state, action } = model.render()
+    expect(state.getRootNodes()).toEqual([])
 
     for (let i = 0; i < 5; i++) {
-      act(() => result.current.createRootNode())
+      action.createRootNode()
 
       const amountOfRootNodes = i + 1
-      expect(getTrees(result).length).toBe(amountOfRootNodes)
+      expect(state.getRootNodes().length).toBe(amountOfRootNodes)
 
-      const node = getTrees(result)[i]
+      const node = state.getNewestRootNode()
       expect(node.id).toBeTruthy()
       expect(node).toMatchObject({
         id: expect.any(String),
@@ -29,34 +23,36 @@ describe('node creation', () => {
   })
 
   test('handle child node creation', () => {
-    const { result } = renderHookTest()
-    const parentId = createRootNodeWithProperties(result, {
+    const { action, actionSequence } = model.render()
+    const parent = actionSequence.createRootNodeWithProperties({
       text: 'root node',
     })
 
-    act(() => result.current.createChildNode(parentId))
+    action.createChildNode(parent.id)
   })
 
   describe('node edit', () => {
     test('handle start', () => {
-      const { result } = renderHookTest()
+      const { state, action, actionSequence } = model.render()
       const initialText = 'initial'
-      const id = createRootNodeWithProperties(result, { text: initialText })
+      const node = actionSequence.createRootNodeWithProperties({
+        text: initialText,
+      })
 
-      act(() => result.current.initiateEditNode(id))
+      action.initiateEditNode(node.id)
 
-      expect(getNewestRootNode(result).editing).toBe(true)
+      expect(state.getNode(node.id).editing).toBe(true)
     })
 
     test('handle end', () => {
-      const { result } = renderHookTest()
+      const { state, action } = model.render()
+      action.createRootNode()
+      const { id } = state.getNewestRootNode()
 
-      act(() => result.current.createRootNode())
-      const { id } = getNewestRootNode(result)
       const someNewText = 'some new text'
+      action.finalizeEditNode({ id, text: someNewText })
 
-      act(() => result.current.finalizeEditNode({ id, text: someNewText }))
-      expect(getNewestRootNode(result).text).toBe(someNewText)
+      expect(state.getNode(id).text).toBe(someNewText)
     })
   })
 })

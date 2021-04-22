@@ -1,13 +1,6 @@
+import { model } from '~mindmap/test-utilities'
 import { describe, test, expect } from '@jest/globals'
-import { act } from '@testing-library/react-hooks'
-import { mapMultipleArrays, mapObject } from 'utils/FunctionalProgramming'
-import {
-  createRootNodeWithProperties,
-  getNewestRootNode,
-  renderHookTest,
-  getNode,
-  createChildNodeWithProperties,
-} from '~mindmap/test-utilities/viewmodel'
+import { mapMultipleArrays } from 'utils/FunctionalProgramming'
 import { disableConsoleErrorWithin } from 'utils/JestTools'
 
 describe('dimensions', () => {
@@ -39,32 +32,25 @@ describe('dimensions', () => {
       const eventChains = definePlausibleEventChains()
 
       test.each(eventChains)('event chain: %p', (executeEventChain) => {
-        const { result } = renderHookTest()
+        const { state, action, actionSequence } = model.render()
 
-        executeEventChain(result, layout)
+        executeEventChain({ state, action, actionSequence }, layout)
 
-        const desiredTreeCss = getNewestRootNode(result).desiredTreeCss
+        const desiredTreeCss = state.getNewestRootNode().desiredTreeCss
         expect(desiredTreeCss).toMatchObject(desiredTreeOffset)
       })
 
       test(
         'throw error on NaN offsets',
         disableConsoleErrorWithin(() => {
-          const { result } = renderHookTest()
+          const { state, action, actionSequence } = model.render()
           const nonsenseLayout = { boundingClientRect: {}, offsetRect: {} }
           expect(() => {
-            const {
-              registerTreeLayout,
-              registerSurfaceLayout,
-              registerNodeLayout,
-              createRootNode,
-            } = getActionsOnResult(result)
-
-            registerSurfaceLayout(nonsenseLayout)
-            createRootNode()
-            const { id } = getNewestRootNode(result)
-            registerTreeLayout({ id, ...nonsenseLayout })
-            registerNodeLayout({ id, ...nonsenseLayout })
+            action.registerSurfaceLayout(nonsenseLayout)
+            action.createRootNode()
+            const { id } = state.getNewestRootNode()
+            action.registerTreeLayout({ id, ...nonsenseLayout })
+            action.registerNodeLayout({ id, ...nonsenseLayout })
           }).toThrowError()
         })
       )
@@ -110,94 +96,57 @@ describe('dimensions', () => {
         ]
 
         function registerNodeLayoutLast(
-          result,
+          { state, action, actionSequence },
           { surfaceLayout, treeLayout, nodeLayout }
         ) {
-          const {
-            registerTreeLayout,
-            registerSurfaceLayout,
-            registerNodeLayout,
-            createRootNode,
-          } = getActionsOnResult(result)
-
-          registerSurfaceLayout(surfaceLayout)
-          createRootNode()
-          const { id } = getNewestRootNode(result)
-          registerTreeLayout({ id, ...treeLayout })
-          registerNodeLayout({ id, ...nodeLayout })
+          action.registerSurfaceLayout(surfaceLayout)
+          action.createRootNode()
+          const { id } = state.getNewestRootNode()
+          action.registerTreeLayout({ id, ...treeLayout })
+          action.registerNodeLayout({ id, ...nodeLayout })
         }
 
         function registerTreeLayoutLast(
-          result,
+          { state, action, actionSequence },
           { surfaceLayout, treeLayout, nodeLayout }
         ) {
-          const {
-            registerTreeLayout,
-            registerSurfaceLayout,
-            registerNodeLayout,
-            createRootNode,
-          } = getActionsOnResult(result)
-
-          registerSurfaceLayout(surfaceLayout)
-          createRootNode()
-          const { id } = getNewestRootNode(result)
-          registerNodeLayout({ id, ...nodeLayout })
-          registerTreeLayout({ id, ...treeLayout })
+          action.registerSurfaceLayout(surfaceLayout)
+          action.createRootNode()
+          const { id } = state.getNewestRootNode()
+          action.registerNodeLayout({ id, ...nodeLayout })
+          action.registerTreeLayout({ id, ...treeLayout })
         }
 
         function registerSurfaceLayoutLast(
-          result,
+          { state, action, actionSequence },
           { surfaceLayout, treeLayout, nodeLayout }
         ) {
-          const {
-            registerTreeLayout,
-            registerSurfaceLayout,
-            registerNodeLayout,
-            createRootNode,
-          } = getActionsOnResult(result)
-
-          createRootNode()
-          const { id } = getNewestRootNode(result)
-          registerNodeLayout({ id, ...nodeLayout })
-          registerTreeLayout({ id, ...treeLayout })
-          registerSurfaceLayout(surfaceLayout)
+          action.createRootNode()
+          const { id } = state.getNewestRootNode()
+          action.registerNodeLayout({ id, ...nodeLayout })
+          action.registerTreeLayout({ id, ...treeLayout })
+          action.registerSurfaceLayout(surfaceLayout)
         }
       }
     })
 
     test('child node creations: no offset assignment', () => {
-      const { result } = renderHookTest()
-      const {
-        registerTreeLayout,
-        registerSurfaceLayout,
-        registerNodeLayout,
-      } = getActionsOnResult(result)
-
-      const parentId = createRootNodeWithProperties(result, { text: 'parent' })
-      const childId = createChildNodeWithProperties({
-        result,
-        parentId,
+      const { state, action, actionSequence } = model.render()
+      const parent = actionSequence.createRootNodeWithProperties({
+        text: 'parent',
+      })
+      const child = actionSequence.createChildNodeWithProperties({
+        parentId: parent.id,
         properties: { text: 'child' },
       })
 
-      registerSurfaceLayout(surfaceLayout)
-      registerTreeLayout({ id: childId, ...treeLayout })
-      registerNodeLayout({ id: childId, ...nodeLayout })
+      action.registerSurfaceLayout(surfaceLayout)
+      action.registerTreeLayout({ id: child.id, ...treeLayout })
+      action.registerNodeLayout({ id: child.id, ...nodeLayout })
 
-      const childNode = getNode({ result, id: childId })
+      const childNode = state.getNode(child.id)
       expect(childNode).not.toHaveProperty('desiredTreeCss.offsetLeft')
       expect(childNode).not.toHaveProperty('desiredTreeCss.offsetTop')
     })
   })
 })
-
-function getActionsOnResult(result) {
-  const { state, ...actions } = result.current
-  const wrappedActions = mapObject(actions, wrapActionInAct)
-
-  return wrappedActions
-
-  function wrapActionInAct(doAction) {
-    return (...args) => act(() => doAction(...args))
-  }
-}

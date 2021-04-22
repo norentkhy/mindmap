@@ -1,78 +1,59 @@
-import React, { useContext } from 'react'
 import { model } from '~mindmap/test-utilities'
 import { describe, test, expect } from '@jest/globals'
-import { act, renderHook } from '@testing-library/react-hooks'
-import { createMockResizeObserverHook } from 'test-utils/react-mocks'
-import { ModelContext, ModelProvider } from '~mindmap/components'
 
 describe('dimensions', () => {
   test('update of node layout dimensions', () => {
-    const { result } = renderHookTestAndCreateRootNode()
-    const { id } = getNewestRootNode(result)
+    const { state, action, actionSequence } = renderHookTestAndCreateRootNode()
+    const { id } = state.getNewestRootNode()
 
     const boundingClientRect = 'object containing bounding client rect'
     const offsetRect = 'object containing offset rect'
-    act(() =>
-      result.current.registerNodeLayout({
-        id,
-        boundingClientRect,
-        offsetRect,
-      })
-    )
+    action.registerNodeLayout({ id, boundingClientRect, offsetRect })
 
-    const node = getNewestRootNode(result)
+    const node = state.getNode(id)
     expect(node.measuredNode).toEqual({ boundingClientRect, offsetRect })
   })
 
   test('update of tree layout dimensions', () => {
-    const { result } = renderHookTestAndCreateRootNode()
-    const { id } = getNewestRootNode(result)
+    const { state, action, actionSequence } = renderHookTestAndCreateRootNode()
+    const { id } = state.getNewestRootNode()
 
     const boundingClientRect = 'object containing bounding client rect'
     const offsetRect = 'object containing offset rect'
-    act(() =>
-      result.current.registerTreeLayout({
-        id,
-        boundingClientRect,
-        offsetRect,
-      })
-    )
+    action.registerTreeLayout({ id, boundingClientRect, offsetRect })
 
-    const node = getNewestRootNode(result)
+    const node = state.getNode(id)
     expect(node.measuredTree).toEqual({ boundingClientRect, offsetRect })
   })
 
   test('update mind surface layout dimensions', () => {
-    const { result } = renderHookTest()
+    const { state, action, actionSequence } = model.render()
 
     const boundingClientRect = 'object containing bounding client rect'
     const offsetRect = 'object containing offset rect'
-    act(() =>
-      result.current.registerSurfaceLayout({
-        boundingClientRect,
-        offsetRect,
-      })
-    )
+    action.registerSurfaceLayout({ boundingClientRect, offsetRect })
 
-    const { measuredSurface } = getState(result)
-    expect(measuredSurface).toEqual({
-      boundingClientRect,
-      offsetRect,
-    })
+    const { measuredSurface } = state.getState()
+    expect(measuredSurface).toEqual({ boundingClientRect, offsetRect })
   })
 
   function renderHookTestAndCreateRootNode() {
-    const rendered = renderHookTest()
-    act(() => rendered.result.current.createRootNode())
+    const rendered = model.render()
+    rendered.action.createRootNode()
     return rendered
   }
 })
 
 describe('logging of changes', () => {
   test('dimensions update', () => {
-    const { result, log } = renderHookTestWithNodeForLogging()
+    const {
+      state,
+      action,
+      actionSequence,
+      log,
+    } = renderHookTestWithNodeForLogging()
 
-    const { id } = getNewestRootNode(result)
+    const { id } = state.getNewestRootNode()
     const boundingClientRect = 'bounding client rectangle'
     const offsetRect = {
       offsetLeft: 'offset left',
@@ -80,13 +61,7 @@ describe('logging of changes', () => {
       offsetWidth: 'offset width',
       offsetHeight: 'offset height',
     }
-    act(() =>
-      result.current.registerNodeLayout({
-        id,
-        boundingClientRect: boundingClientRect,
-        offsetRect,
-      })
-    )
+    action.registerNodeLayout({ id, boundingClientRect, offsetRect })
 
     model.expect
       .mockFunction(log)
@@ -94,40 +69,12 @@ describe('logging of changes', () => {
 
     function renderHookTestWithNodeForLogging() {
       const log = model.create.mockFunction()
-      const { result } = renderHookTest(log)
-      act(() => result.current.createRootNode())
+      const rendered = model.render({
+        extraModelProviderProps: { logResize: log },
+      })
+      rendered.action.createRootNode()
 
-      return { result, log }
+      return { ...rendered, log }
     }
   })
 })
-
-function getRootNodes(result) {
-  const state = getState(result)
-  return state.trees
-}
-
-function getNewestRootNode(result) {
-  const rootNodes = getRootNodes(result)
-  return rootNodes[rootNodes.length - 1]
-}
-
-function getState(result) {
-  return result.current.state
-}
-
-function renderHookTest(log) {
-  const { useMockResizeObserver } = createMockResizeObserverHook()
-
-  return renderHook(() => useContext(ModelContext), {
-    wrapper: ({ children }) => (
-      <ModelProvider
-        useThisResizeObserver={useMockResizeObserver}
-        logResize={log}
-      >
-        {' '}
-        {children}
-      </ModelProvider>
-    ),
-  })
-}

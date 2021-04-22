@@ -1,56 +1,31 @@
-import {
-  getNewestRootNode,
-  getState,
-  renderHookTest,
-} from '~mindmap/test-utilities/viewmodel'
-import { act } from '@testing-library/react-hooks'
+import { model } from '~mindmap/test-utilities'
 import { describe, test, expect } from '@jest/globals'
 
 describe('undo and redo', () => {
   test('undo and redo', () => {
-    const { result } = renderHookTest()
-    const stateBefore = getState(result)
-    createNode()
-    const stateAfter = getState(result)
+    const { state, action, actionSequence, stateObservation } = model.render()
+    const stateBefore = state.getState()
+    action.createRootNode()
+    const { id } = state.getNewestRootNode()
+    const stateAfter = state.getState()
 
-    undo()
-    expect(getState(result)).toEqual(stateBefore)
+    action.undo()
+    expect(state.getState()).toEqual(stateBefore)
 
-    undo()
-    expect(getState(result)).toEqual(stateBefore)
+    action.undo()
+    expect(state.getState()).toEqual(stateBefore)
 
-    redo()
-    expect(getState(result)).toEqual(stateAfter)
+    action.redo()
+    expect(state.getState()).toEqual(stateAfter)
 
-    redo()
-    expect(getState(result)).toEqual(stateAfter)
+    action.redo()
+    expect(state.getState()).toEqual(stateAfter)
 
-    renameNode('this will be undone')
-    const stateToBeUndone = getState(result)
-    undo()
-    renameNode('new name')
-    redo()
-    expect(getState(result)).not.toEqual(stateToBeUndone)
-
-    function renameNode(text) {
-      act(() =>
-        result.current.finalizeEditNode({
-          id: getNewestRootNode(result).id,
-          text,
-        })
-      )
-    }
-
-    function createNode() {
-      act(result.current.createRootNode)
-    }
-
-    function undo() {
-      act(() => result.current.undo())
-    }
-
-    function redo() {
-      act(() => result.current.redo())
-    }
+    action.finalizeEditNode({ id, text: 'this will be undone' })
+    const stateToBeUndone = state.getState()
+    action.undo()
+    action.finalizeEditNode({ id, text: 'new name' })
+    action.redo()
+    expect(state.getState()).not.toEqual(stateToBeUndone)
   })
 })

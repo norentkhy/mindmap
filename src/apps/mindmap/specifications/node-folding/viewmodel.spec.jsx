@@ -1,26 +1,22 @@
-import {
-  createRootNodeWithProperties,
-  getNewestRootNode,
-  renderHookTest,
-} from '~mindmap/test-utilities/viewmodel'
-
-import { act } from '@testing-library/react-hooks'
+import { model } from '~mindmap/test-utilities'
 import { describe, test, expect } from '@jest/globals'
 
 describe('node-folding: viewmodel', () => {
   test('toggle fold: fold and unfold', () => {
-    const { result } = renderHookTest()
-    const id = createRootNodeWithProperties(result, { text: 'root node' })
+    const { state, action, actionSequence } = model.render()
+    const { id } = actionSequence.createRootNodeWithProperties({
+      text: 'root node',
+    })
 
-    const initialNode = getNewestRootNode(result)
+    const initialNode = state.getNewestRootNode()
     expect(initialNode.folded).toBeFalsy()
 
-    act(() => result.current.foldNode(id))
-    const foldedNode = getNewestRootNode(result)
+    action.foldNode(id)
+    const foldedNode = state.getNewestRootNode()
     expect(foldedNode.folded).toBe(true)
 
-    act(() => result.current.foldNode(id))
-    const unfoldedNode = getNewestRootNode(result)
+    action.foldNode(id)
+    const unfoldedNode = state.getNewestRootNode()
     expect(unfoldedNode.folded).toBe(false)
   })
 })

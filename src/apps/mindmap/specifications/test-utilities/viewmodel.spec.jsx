@@ -1,36 +1,27 @@
-import { act } from '@testing-library/react-hooks'
-import {
-  getNode,
-  createRootNodeWithProperties,
-  getRootNodes,
-  captureNewNodes,
-  createChildNodeWithProperties,
-  renderHookTest,
-} from '~mindmap/test-utilities/viewmodel'
+import { model } from '~mindmap/test-utilities'
 
 describe('utilities', () => {
   test('createRootNodeWithProperties', () => {
-    const { result } = renderHookTest()
+    const { state, action, actionSequence } = model.render()
     const text = 'tesadf'
-    const rootNodeId = createRootNodeWithProperties(result, { text })
+    const rootNode = actionSequence.createRootNodeWithProperties({ text })
 
-    const rootNodes = getRootNodes(result)
+    const rootNodes = state.getRootNodes()
 
     expect(rootNodes.length).toBe(1)
-    expect(rootNodes[0].id).toBe(rootNodeId)
+    expect(rootNodes[0].id).toBe(rootNode.id)
   })
 
   test('captureNodeChanges', () => {
-    const { result } = renderHookTest()
+    const { state, action, actionSequence, stateObservation } = model.render()
     const firstRootNode = createAndCaptureFirstRootNode()
     createAndCaptureSecondRootNode()
     createAndCaptureFirstChildNode(firstRootNode.id)
 
     function createAndCaptureFirstRootNode() {
-      const nodeChanges = captureNewNodes({
-        result,
-        change: () => createRootNodeWithProperties(result, { text: 'asdf' }),
-      })
+      const nodeChanges = stateObservation.captureNewNodes(() =>
+        actionSequence.createRootNodeWithProperties({ text: 'asdf' })
+      )
 
       expect(nodeChanges.length).toBe(1)
       expect(nodeChanges[0]).toMatchObject({ text: 'asdf', editing: false })
@@ -39,22 +30,18 @@ describe('utilities', () => {
     }
 
     function createAndCaptureSecondRootNode() {
-      const nodeChanges = captureNewNodes({
-        result,
-        change: () => createRootNodeWithProperties(result, { text: 'second' }),
-      })
+      const nodeChanges = stateObservation.captureNewNodes(() =>
+        actionSequence.createRootNodeWithProperties({ text: 'second' })
+      )
 
       expect(nodeChanges.length).toBe(1)
       expect(nodeChanges[0]).toMatchObject({ text: 'second', editing: false })
     }
 
     function createAndCaptureFirstChildNode(rootId) {
-      const nodeChanges = captureNewNodes({
-        result,
-        change: () => {
-          act(() => result.current.createChildNode(rootId))
-        },
-      })
+      const nodeChanges = stateObservation.captureNewNodes(() =>
+        action.createChildNode(rootId)
+      )
 
       expect(nodeChanges.length).toBe(1)
       expect(nodeChanges[0]).toMatchObject({ text: '', editing: true })
@@ -62,39 +49,37 @@ describe('utilities', () => {
   })
 
   test('createChildNodeWithProperties', () => {
-    const { result } = renderHookTest()
+    const { state, action, actionSequence, stateObservation } = model.render()
 
-    const parentId = createRootNodeWithProperties(result, { text: 'parent' })
+    const parent = actionSequence.createRootNodeWithProperties({
+      text: 'parent',
+    })
 
     const text = 'child'
-    const newNodes = captureNewNodes({
-      result,
-      change: () =>
-        createChildNodeWithProperties({
-          result,
-          parentId,
-          properties: { text },
-        }),
-    })
+    const newNodes = stateObservation.captureNewNodes(() =>
+      actionSequence.createChildNodeWithProperties({
+        parentId: parent.id,
+        properties: { text },
+      })
+    )
 
     expect(newNodes.length).toBe(1)
     expect(newNodes[0]).toMatchObject({ text })
   })
 
   test('getNode', () => {
-    const { result } = renderHookTest()
+    const { state, action, actionSequence, stateObservation } = model.render()
 
-    const parentId = createRootNodeWithProperties(result, {
+    const parent = actionSequence.createRootNodeWithProperties({
       text: 'I am parent',
     })
-    const childId = createChildNodeWithProperties({
-      result,
-      parentId,
+    const child = actionSequence.createChildNodeWithProperties({
+      parentId: parent.id,
       properties: { text: 'I am child' },
     })
 
-    const node = getNode({ result, id: childId })
+    const node = state.getNode(child.id)
 
-    expect(node.id).toBe(childId)
+    expect(node.id).toBe(child.id)
   })
 })

@@ -13,22 +13,18 @@ const tabs = [
 describe('overlap with Tabs.spec', () => {
   test('selectTab', () => {
     const initialState = { tabs }
-    const wrapper = ({ children }) => (
-      <TabsProvider initialState={initialState}>{children}</TabsProvider>
-    )
-    const { result } = renderHook(() => useContext(TabsContext), { wrapper })
+    const {
+      state: { getState },
+      actions: { selectTab },
+    } = renderTest({ initialState })
 
     tabs.forEach(({ id }) => {
-      act(() => result.current.selectTab(id))
+      selectTab(id)
 
-      const targettedTab = result.current.state.tabs.find(
-        (tab) => tab.id === id
-      )
+      const targettedTab = getState().tabs.find((tab) => tab.id === id)
       expect(targettedTab.selected).toBe(true)
 
-      const nonTargettedTabs = result.current.state.tabs.filter(
-        (tab) => tab.id !== id
-      )
+      const nonTargettedTabs = getState().tabs.filter((tab) => tab.id !== id)
       nonTargettedTabs.forEach((tab) => {
         expect(tab.selected).toBe(false)
       })
@@ -37,17 +33,17 @@ describe('overlap with Tabs.spec', () => {
 
   test('addNewTab', () => {
     const initialState = { tabs: [] }
-    const wrapper = ({ children }) => (
-      <TabsProvider initialState={initialState}>{children}</TabsProvider>
-    )
-    const { result } = renderHook(() => useContext(TabsContext), { wrapper })
+    const {
+      state: { getState },
+      actions: { addNewTab },
+    } = renderTest({ initialState })
 
     ;[0, 1, 2].forEach((i) => {
-      act(() => result.current.addNewTab())
-      expect(result.current.state.tabs.length).toBe(i + 1)
+      addNewTab()
+      expect(getState().tabs.length).toBe(i + 1)
 
-      const selectedTab = result.current.state.tabs[i]
-      const notSelectedTabs = result.current.state.tabs.filter(
+      const selectedTab = getState().tabs[i]
+      const notSelectedTabs = getState().tabs.filter(
         (tab, index) => index !== i
       )
       expect(selectedTab.id).not.toBeFalsy()
@@ -58,7 +54,7 @@ describe('overlap with Tabs.spec', () => {
     expectIdsToBeUnique()
 
     function expectIdsToBeUnique() {
-      const ids = result.current.state.tabs.map((tab) => tab.id)
+      const ids = getState().tabs.map((tab) => tab.id)
       const setIds = new Set(ids)
       expect(ids.length).toBe(setIds.size)
     }
@@ -67,17 +63,15 @@ describe('overlap with Tabs.spec', () => {
   describe('renaming a tab', () => {
     test('initiateRenameTab', () => {
       const initialState = { tabs }
-      const wrapper = ({ children }) => (
-        <TabsProvider initialState={initialState}>{children}</TabsProvider>
-      )
-      const { result } = renderHook(() => useContext(TabsContext), { wrapper })
+      const {
+        state: { getState },
+        actions: { initiateRenameTab },
+      } = renderTest({ initialState })
 
       const idTarget = tabs[0].id
-      act(() => result.current.initiateRenameTab(idTarget))
-      const targettedTab = result.current.state.tabs.find(
-        (tab) => tab.id === idTarget
-      )
-      const nonTargettedTabs = result.current.state.tabs.filter(
+      initiateRenameTab(idTarget)
+      const targettedTab = getState().tabs.find((tab) => tab.id === idTarget)
+      const nonTargettedTabs = getState().tabs.filter(
         (tab) => tab.id !== idTarget
       )
       expect(targettedTab.renaming).toBe(true)
@@ -90,22 +84,27 @@ describe('overlap with Tabs.spec', () => {
         newTabs[1].renaming = true
       })
       const initialState = { tabs: tabsWithOneRenaming }
-      const wrapper = ({ children }) => (
-        <TabsProvider initialState={initialState}>{children}</TabsProvider>
-      )
-      const { result } = renderHook(() => useContext(TabsContext), { wrapper })
+      const {
+        state: { getState },
+        actions: { finishRenameTab },
+      } = renderTest({ initialState })
 
       const idTarget = tabs[indexTarget].id
       const newTitle = 'renamed title'
-      act(() => result.current.finishRenameTab({ id: idTarget, newTitle }))
+      finishRenameTab({ id: idTarget, newTitle })
 
-      const tabTarget = result.current.state.tabs.find(
-        (tab) => tab.id === idTarget
-      )
+      const tabTarget = getState().tabs.find((tab) => tab.id === idTarget)
       expect(tabTarget.title).toBe(newTitle)
-      result.current.state.tabs.forEach((tab) =>
-        expect(tab.renaming).toBeFalsy()
-      )
+      getState().tabs.forEach((tab) => expect(tab.renaming).toBeFalsy())
     })
   })
 })
+
+function renderTest({ initialState }) {
+  return model.render({
+    useThisModel: () => useContext(TabsContext),
+    wrapParents: ({ children }) => (
+      <TabsProvider initialState={initialState}>{children}</TabsProvider>
+    ),
+  })
+}
