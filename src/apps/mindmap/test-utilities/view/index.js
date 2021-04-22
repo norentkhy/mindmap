@@ -1,27 +1,19 @@
 import { query } from './queries'
-import { expectations, definedElementExpects } from './expectations'
+import { expectations } from './expectations'
+import { waitForExpectation, getWaitForOptions } from './wait-for-expectations'
 import {
   clickElement,
   doubleClickElement,
   queryElementByLabelText,
   queryElementByText,
-  expect,
-  waitFor,
   renderView,
   typeWithKeyboard,
   typeAndPressEnter,
-  getInputSelection,
   queryAllElementsByRole,
 } from '../dependencies'
 import 'jest-styled-components'
-import { mapObject } from 'utils/FunctionalProgramming'
 
-const waitForDefinedElement = mapObject(
-  definedElementExpects,
-  (getExpectOptions) => getWaitForOptions({ getExpectOptions })
-)
-
-export const view = {
+const view = {
   render: renderView,
   query,
   action: {
@@ -56,43 +48,7 @@ export const view = {
     },
   },
   expect: expectations,
-  waitFor: {
-    ...waitForDefinedElement,
-  },
-}
-
-export function getWaitForOptions({
-  getExpectOptions,
-  structureSample = definedElementExpects.nodeInput(),
-}) {
-  return (...args) =>
-    proxyWaitFor({
-      getTarget: () => getExpectOptions(...args),
-      facade: structureSample,
-    })
-
-  function proxyWaitFor({ getTarget, facade }) {
-    return new Proxy(facade, { get: getWaitFor })
-
-    function getWaitFor(facade, key) {
-      if (isDeeperProxyRequest(facade, key))
-        return proxyWaitFor({
-          getTarget: () => getTarget()[key],
-          facade: facade[key],
-        })
-
-      return (...keyArgs) =>
-        waitFor(() => {
-          const target = getTarget()
-          if (key in target) return target[key](...keyArgs)
-          throwPropertiesError(target, key)
-        })
-    }
-  }
-
-  function isDeeperProxyRequest(target, key) {
-    return typeof target[key] === 'object' && target[key] !== null
-  }
+  waitFor: waitForExpectation,
 }
 
 function queryNode({ text }) {
@@ -156,26 +112,9 @@ function editSelectedNode() {
   return typeWithKeyboard('{enter}')
 }
 
-function expectToHaveInputSelection(expectToBeTrue) {
-  return (Element) => (expectation) => {
-    const inputSelection = getInputSelection(Element)
-    if (expectToBeTrue) expect(inputSelection).toBe(expectation)
-    if (!expectToBeTrue) expect(inputSelection).not.toBe(expectation)
-  }
-}
-
 function createRootNodeUsingActionPanel() {
   const Button = queryElementByLabelText('create root node')
   return clickElement(Button)
-}
-
-function throwPropertiesError(target, key) {
-  throw new Error(
-    `${key} is not part of the available properties:` +
-      Object.keys(target)
-        .map((key) => `\n- ${key}`)
-        .join('')
-  )
 }
 
 function undoAction() {
@@ -261,3 +200,5 @@ async function createChildTrees(ParentNode, trees) {
     }
   }
 }
+
+export { getWaitForOptions, view }
