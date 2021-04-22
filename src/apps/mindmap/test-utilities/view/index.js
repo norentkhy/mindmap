@@ -1,4 +1,5 @@
-import { query, definedElementQueries } from './queries'
+import { query } from './queries'
+import { expectations, definedElementExpects } from './expectations'
 import {
   clickElement,
   doubleClickElement,
@@ -14,18 +15,7 @@ import {
 } from '../dependencies'
 import 'jest-styled-components'
 import { mapObject } from 'utils/FunctionalProgramming'
-import produce from 'immer'
 
-const label = {
-  nodeInput: 'editing node',
-  tabs: { tabInput: 'renaming this tab' },
-}
-
-const text = {
-  tabs: { untitled: 'untitled' },
-}
-
-const definedElementExpects = mapObject(definedElementQueries, expectElement)
 const waitForDefinedElement = mapObject(
   definedElementExpects,
   (getExpectOptions) => getWaitForOptions({ getExpectOptions })
@@ -65,18 +55,7 @@ export const view = {
       },
     },
   },
-  expect: produce(definedElementExpects, (draftExpect) => {
-    draftExpect.element = (queryElement) => expectElement(queryElement)()
-
-    if (!draftExpect.numberOf) draftExpect.numberOf = {}
-    //TODO encapsulate this feature for all multi element queries
-    draftExpect.numberOf.untitledTabs = () => {
-      const UntitledTabs = queryAllUntitledTabs()
-      return {
-        toBe: (amount) => expect(UntitledTabs.length).toBe(amount),
-      }
-    }
-  }),
+  expect: expectations,
   waitFor: {
     ...waitForDefinedElement,
   },
@@ -116,35 +95,12 @@ export function getWaitForOptions({
   }
 }
 
-function expectElement(queryElement) {
-  return (elementInfo) => {
-    const Element = queryElement(elementInfo)
-    const expectThisElement = expect(Element)
-    return {
-      toBeVisible: expectThisElement.toBeVisible,
-      toHaveFocus: expectThisElement.toHaveFocus,
-      toHaveStyle: expectToHaveStyle(true)(Element),
-      toHaveTextSelection: expectToHaveInputSelection(true)(Element),
-      not: {
-        toBeVisible: expectThisElement.toBeNull,
-        toHaveFocus: expectThisElement.not.toHaveFocus,
-        toHaveStyle: expectToHaveStyle(false)(Element),
-        toHaveTextSelection: expectToHaveInputSelection(false)(Element),
-      },
-    }
-  }
-}
-
 function queryNode({ text }) {
   return queryElementByText(text)
 }
 
 function queryAllNodes() {
   return queryAllElementsByRole('button')
-}
-
-function queryAllUntitledTabs() {
-  return queryAllTabs({ title: text.tabs.untitled })
 }
 
 function queryAllTabs({ id, title }) {
@@ -161,20 +117,6 @@ function queryTab({ index, id, title, numberOfFirstMatchesToSkip = 0 }) {
   const MatchedTabs = queryAllTabs({ id, title })
   if (!MatchedTabs.length) return null
   return MatchedTabs[numberOfFirstMatchesToSkip]
-}
-
-function expectToHaveStyle(positiveExpectation) {
-  return (Element) => (style) => {
-    const styleEntries = Object.entries(style)
-    styleEntries.forEach(expectToHaveStyleRule(positiveExpectation)(Element))
-  }
-}
-
-function expectToHaveStyleRule(positiveExpectation) {
-  if (positiveExpectation)
-    return (Element) => (style) => expect(Element).toHaveStyleRule(...style)
-  if (!positiveExpectation)
-    return (Element) => (style) => expect(Element).not.toHaveStyleRule(...style)
 }
 
 function addNewTab() {

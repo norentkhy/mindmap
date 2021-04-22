@@ -32,6 +32,7 @@ export const query = {
   ...definedElementQueries,
   allElements: queryAllElements,
   allNodes: queryAllNodes,
+  allUntitlesTabs: queryAllUntitledTabs,
   relevantResizeElements: queryRelevantResizeElements,
 }
 
