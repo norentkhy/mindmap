@@ -38,8 +38,8 @@ describe('node folding: view', () => {
   test('fold call to view model', () => {
     const { nodeToFold, foldNode } = renderNodeToFold()
 
-    view.mouseAction.clickOn.node({ text: nodeToFold.text })
-    view.keyboardAction.foldSelectedNode()
+    view.action.mouse.clickOn.node({ text: nodeToFold.text })
+    view.action.keyboard.foldSelectedNode()
 
     viewmodel.expect.mockFunction(foldNode).toBeCalledWith(nodeToFold.id)
 

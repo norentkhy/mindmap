@@ -7,7 +7,7 @@ describe('utilities', () => {
     view.render({ JSX: <MindMapApp /> })
 
     const text = 'root node with properties'
-    await view.actionSequence.createRootNodeWithProperties({ text })
+    await view.action.sequence.createRootNodeWithProperties({ text })
 
     await view.waitFor.node({ text }).toBeVisible()
   })
@@ -15,13 +15,13 @@ describe('utilities', () => {
   test('create a child node with properties', async () => {
     view.render({ JSX: <MindMapApp /> })
     let parentText = 'parent node'
-    await view.actionSequence.createRootNodeWithProperties({
+    await view.action.sequence.createRootNodeWithProperties({
       text: parentText,
     })
-    view.mouseAction.clickOn.node({ text: parentText })
+    view.action.mouse.clickOn.node({ text: parentText })
 
     const text = 'child node with properties'
-    await view.actionSequence.createChildNodeWithProperties({
+    await view.action.sequence.createChildNodeWithProperties({
       text,
     })
 
@@ -39,7 +39,7 @@ describe('utilities', () => {
       'create a mindmap from tree datastructures',
       async (trees) => {
         view.render({ JSX: <MindMapApp /> })
-        await view.actionSequence.createTrees(trees)
+        await view.action.sequence.createTrees(trees)
         expectTreesToBeVisible(trees)
       }
     )

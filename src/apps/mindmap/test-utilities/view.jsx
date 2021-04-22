@@ -50,34 +50,36 @@ export const view = {
     allElements: queryAllElements,
     relevantResizeElements: queryRelevantResizeElements,
   },
-  actionSequence: {
-    createRootNodeWithProperties,
-    createChildNodeWithProperties,
-    createTrees,
-  },
-  keyboardAction: {
-    foldSelectedNode,
-    createChildNodeOfSelectedNode,
-    typeAndPressEnter,
-  },
-  mouseAction: {
-    createRootNode,
-    editSelectedNode,
-    clickOn: {
-      node: selectNode,
-      tab: selectTab,
-      menu: {
-        createRootNode: createRootNodeUsingActionPanel,
-        undoAction,
-        redoAction,
+  action: {
+    sequence: {
+      createRootNodeWithProperties,
+      createChildNodeWithProperties,
+      createTrees,
+    },
+    keyboard: {
+      foldSelectedNode,
+      createChildNodeOfSelectedNode,
+      typeAndPressEnter,
+    },
+    mouse: {
+      createRootNode,
+      editSelectedNode,
+      createNew: {
+        tab: addNewTab,
+      },
+      rename: {
+        tab: renameTab,
+      },
+      clickOn: {
+        node: selectNode,
+        tab: selectTab,
+        menu: {
+          createRootNode: createRootNodeUsingActionPanel,
+          undoAction,
+          redoAction,
+        },
       },
     },
-  },
-  createNew: {
-    tab: addNewTab,
-  },
-  rename: {
-    tab: renameTab,
   },
   expect: produce(definedElementExpects, (draftExpect) => {
     draftExpect.element = (queryElement) => expectElement(queryElement)()
@@ -348,7 +350,7 @@ async function createRootNodeWithProperties({ text, ...rest }) {
 
 async function completeNodeNaming(text) {
   await view.waitFor.nodeInput().toHaveFocus()
-  view.keyboardAction.typeAndPressEnter(text)
+  view.action.keyboard.typeAndPressEnter(text)
   await view.waitFor.nodeInput().not.toBeVisible()
 }
 

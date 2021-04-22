@@ -7,8 +7,8 @@ describe('node creation: integration', () => {
     view.render({ JSX: <MindMapApp /> })
 
     const someNewText = 'some new text'
-    view.mouseAction.createRootNode()
-    view.keyboardAction.typeAndPressEnter(someNewText)
+    view.action.mouse.createRootNode()
+    view.action.keyboard.typeAndPressEnter(someNewText)
 
     await view.waitFor.node({ text: someNewText }).toBeVisible()
   })
@@ -18,8 +18,8 @@ describe('node creation: integration', () => {
 
     const rootTexts = ['root node 1', 'root node 2']
     for (const text of rootTexts) {
-      view.mouseAction.createRootNode()
-      view.keyboardAction.typeAndPressEnter(text)
+      view.action.mouse.createRootNode()
+      view.action.keyboard.typeAndPressEnter(text)
 
       await view.waitFor.node({ text }).toBeVisible()
     }
@@ -29,16 +29,16 @@ describe('node creation: integration', () => {
     view.render({ JSX: <MindMapApp /> })
     const rootText = 'root text'
 
-    view.mouseAction.createRootNode()
-    view.keyboardAction.typeAndPressEnter(rootText)
+    view.action.mouse.createRootNode()
+    view.action.keyboard.typeAndPressEnter(rootText)
 
     await view.waitFor.node({ text: rootText }).toBeVisible()
-    view.mouseAction.clickOn.node({ text: rootText })
-    view.keyboardAction.createChildNodeOfSelectedNode()
+    view.action.mouse.clickOn.node({ text: rootText })
+    view.action.keyboard.createChildNodeOfSelectedNode()
 
     const childText = 'child text'
     await view.waitFor.nodeInput().toHaveFocus()
-    view.keyboardAction.typeAndPressEnter(childText)
+    view.action.keyboard.typeAndPressEnter(childText)
 
     await view.waitFor.nodeInput().not.toBeVisible()
     await view.waitFor.node({ text: rootText }).toBeVisible()
@@ -49,16 +49,16 @@ describe('node creation: integration', () => {
     view.render({ JSX: <MindMapApp /> })
 
     const rootNode = { text: 'root node' }
-    view.mouseAction.createRootNode()
-    view.keyboardAction.typeAndPressEnter(rootNode.text)
+    view.action.mouse.createRootNode()
+    view.action.keyboard.typeAndPressEnter(rootNode.text)
 
     await view.waitFor.nodeInput().not.toBeVisible()
-    view.mouseAction.clickOn.node(rootNode)
-    view.mouseAction.editSelectedNode()
+    view.action.mouse.clickOn.node(rootNode)
+    view.action.mouse.editSelectedNode()
 
     const newText = 'some new text'
     await view.waitFor.nodeInput().toHaveFocus()
-    view.keyboardAction.typeAndPressEnter(newText)
+    view.action.keyboard.typeAndPressEnter(newText)
     await view.waitFor.node({ text: newText }).toBeVisible()
   })
 })

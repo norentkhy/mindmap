@@ -6,7 +6,7 @@ describe('with mock providers', () => {
   test('node creation', () => {
     const createRootNode = viewmodel.create.mockFunction()
     renderWithMockHook({ createRootNode })
-    view.mouseAction.clickOn.menu.createRootNode()
+    view.action.mouse.clickOn.menu.createRootNode()
     viewmodel.expect.mockFunction(createRootNode).toBeCalled()
   })
 

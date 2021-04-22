@@ -14,7 +14,7 @@ describe('rendered with mocks', () => {
       const addNewTab = viewmodel.create.mockFunction()
       renderWithMock({ addNewTab })
 
-      view.createNew.tab()
+      view.action.mouse.createNew.tab()
       viewmodel.expect.mockFunction(addNewTab).toBeCalled()
     })
 
@@ -33,7 +33,7 @@ describe('rendered with mocks', () => {
       renderWithMock({ state: { tabs }, selectTab })
 
       tabs.forEach(({ id }, index) => {
-        view.mouseAction.clickOn.tab({ index })
+        view.action.mouse.clickOn.tab({ index })
         const nthCall = index + 1
         viewmodel.expect.mockFunction(selectTab).nthCalledWith(nthCall, id)
       })
@@ -56,7 +56,7 @@ describe('rendered with mocks', () => {
       renderWithMock({ state: { tabs }, initiateRenameTab })
 
       tabs.forEach((tab, index) => {
-        view.rename.tab({ index })
+        view.action.mouse.rename.tab({ index })
         const nthCall = index + 1
         viewmodel.expect
           .mockFunction(initiateRenameTab)
@@ -77,7 +77,7 @@ describe('rendered with mocks', () => {
       view.expect.focus().toHaveTextSelection(tabTarget.title)
 
       const someNewTitle = 'some new title'
-      view.keyboardAction.typeAndPressEnter(someNewTitle)
+      view.action.keyboard.typeAndPressEnter(someNewTitle)
 
       viewmodel.expect.mockFunction(finishRenameTab).nthCalledWith(1, {
         id: tabTarget.id,

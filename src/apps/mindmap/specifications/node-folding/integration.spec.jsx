@@ -24,12 +24,12 @@ describe('node folding: integration', () => {
     for (const text of texts) {
       view.expect.node({ text: text.grandchild }).toBeVisible()
 
-      view.mouseAction.clickOn.node({ text: text.child })
-      view.keyboardAction.foldSelectedNode()
+      view.action.mouse.clickOn.node({ text: text.child })
+      view.action.keyboard.foldSelectedNode()
       await view.waitFor.node({ text: text.grandchild }).not.toBeVisible()
 
-      view.mouseAction.clickOn.node({ text: text.child })
-      view.keyboardAction.foldSelectedNode()
+      view.action.mouse.clickOn.node({ text: text.child })
+      view.action.keyboard.foldSelectedNode()
       await view.waitFor.node({ text: text.grandchild }).toBeVisible()
     }
 

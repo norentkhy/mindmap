@@ -66,7 +66,7 @@ export async function createRootNodeWithProperties({ text, ...rest }) {
 
 export async function completeNodeNaming(text) {
   await view.waitFor.nodeInput().toBeVisible()
-  view.keyboardAction.typeAndPressEnter(text)
+  view.action.keyboard.typeAndPressEnter(text)
 
   await view.waitFor.nodeInput().not.toBeVisible()
 }

@@ -52,7 +52,7 @@ describe('node creation view', () => {
         const createRootNode = renderTestForRootNodeCreation()
         view.expect.nodeInput().not.toBeVisible()
 
-        view.mouseAction.createRootNode()
+        view.action.mouse.createRootNode()
         viewmodel.expect.mockFunction(createRootNode).toBeCalled()
 
         function renderTestForRootNodeCreation() {
@@ -69,7 +69,7 @@ describe('node creation view', () => {
         view.expect.nodeInput().toHaveFocus()
         view.expect.nodeInput().toHaveTextSelection(node.text)
         const someNewText = 'some new text'
-        view.keyboardAction.typeAndPressEnter(someNewText)
+        view.action.keyboard.typeAndPressEnter(someNewText)
 
         viewmodel.expect.mockFunction(finalizeEditNode).toBeCalled()
         viewmodel.expect.mockFunction(finalizeEditNode).toBeCalledWith({
@@ -108,8 +108,8 @@ describe('node creation view', () => {
           createChildNode,
         } = renderWithOneRootNodeForChildNodeCreation()
 
-        view.mouseAction.clickOn.node(rootNode)
-        view.keyboardAction.createChildNodeOfSelectedNode()
+        view.action.mouse.clickOn.node(rootNode)
+        view.action.keyboard.createChildNodeOfSelectedNode()
 
         viewmodel.expect.mockFunction(createChildNode).toBeCalled()
         viewmodel.expect
@@ -145,7 +145,7 @@ describe('node creation view', () => {
         view.expect.nodeInput().toHaveFocus()
         view.expect.nodeInput().toHaveTextSelection(childNode.text)
         const someNewText = 'some new text'
-        view.keyboardAction.typeAndPressEnter(someNewText)
+        view.action.keyboard.typeAndPressEnter(someNewText)
 
         viewmodel.expect.mockFunction(finalizeEditNode).toBeCalled()
         viewmodel.expect.mockFunction(finalizeEditNode).toBeCalledWith({
@@ -192,8 +192,8 @@ describe('node creation view', () => {
           initiateEditNode,
         } = renderTestWithParentAndChildNode()
 
-        view.mouseAction.clickOn.node({ text: parentNode.text })
-        view.mouseAction.editSelectedNode()
+        view.action.mouse.clickOn.node({ text: parentNode.text })
+        view.action.mouse.editSelectedNode()
 
         viewmodel.expect.mockFunction(initiateEditNode).toBeCalled()
         viewmodel.expect

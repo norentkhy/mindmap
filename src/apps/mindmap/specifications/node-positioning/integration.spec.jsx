@@ -5,8 +5,8 @@ import React from 'react'
 describe('mocks due to test environment', () => {
   test('resize elements specifically', async () => {
     const { fireResizeEvent } = renderMindMapWithMockResizeObserver()
-    view.mouseAction.createRootNode()
-    view.keyboardAction.typeAndPressEnter('test')
+    view.action.mouse.createRootNode()
+    view.action.keyboard.typeAndPressEnter('test')
 
     simulateResizeOfRelevantElements()
 

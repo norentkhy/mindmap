@@ -10,27 +10,27 @@ describe('undo/redo', () => {
 
     const rootNode = { text: 'root node' }
 
-    await view.actionSequence.createRootNodeWithProperties(rootNode)
+    await view.action.sequence.createRootNodeWithProperties(rootNode)
     view.expect.node(rootNode).toBeVisible()
 
-    view.mouseAction.clickOn.menu.undoAction()
+    view.action.mouse.clickOn.menu.undoAction()
     await view.waitFor.nodeInput().toHaveFocus()
 
     const EmptyScreen = screen
-    view.mouseAction.clickOn.menu.undoAction()
+    view.action.mouse.clickOn.menu.undoAction()
     expect(screen).toEqual(EmptyScreen)
 
-    view.mouseAction.clickOn.menu.undoAction()
+    view.action.mouse.clickOn.menu.undoAction()
     await view.waitFor.node(rootNode).not.toBeVisible()
 
-    view.mouseAction.clickOn.menu.redoAction()
+    view.action.mouse.clickOn.menu.redoAction()
     await view.waitFor.nodeInput().toBeVisible()
 
-    view.mouseAction.clickOn.menu.redoAction()
+    view.action.mouse.clickOn.menu.redoAction()
     await view.waitFor.node(rootNode).toBeVisible()
 
     const NonEmptyScreen = screen
-    view.mouseAction.clickOn.menu.redoAction()
+    view.action.mouse.clickOn.menu.redoAction()
     expect(screen).toEqual(NonEmptyScreen)
     expect(screen).toEqual(EmptyScreen)
   })
