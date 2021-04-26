@@ -15,6 +15,7 @@ const queryElementByText = screen.queryByText
 const clickElement = userEvent.click
 const doubleClickElement = fireEvent.doubleClick
 const queryAllElementsByRole = screen.queryAllByRole
+const debugView = screen.debug
 
 export {
   queryElementByLabelText,
@@ -25,6 +26,7 @@ export {
   waitFor,
   render,
   renderView,
+  debugView,
   typeWithKeyboard,
   typeAndPressEnter,
   getFocus,

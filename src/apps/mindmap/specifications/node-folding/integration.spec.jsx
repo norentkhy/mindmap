@@ -1,6 +1,5 @@
 import MindMapApp from '~mindmap/App'
 import { view } from '~mindmap/test-utilities/view'
-import { createTrees } from '~mindmap/test-utilities/integrated-view'
 import React from 'react'
 
 describe('node folding: integration', () => {
@@ -19,7 +18,7 @@ describe('node folding: integration', () => {
       },
     ]
     const trees = texts.map(generateFoldTree)
-    await createTrees(trees)
+    await view.action.sequence.createTrees(trees)
 
     for (const text of texts) {
       view.expect.node({ text: text.grandchild }).toBeVisible()
