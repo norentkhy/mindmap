@@ -24,19 +24,45 @@ describe('dimensions of each node', () => {
   })
 })
 
+describe('call to update sizes of', () => {
+  test('mindspace', () => {
+    const registerSurfaceLayout = viewmodel.create.mockFunction()
+    const { fireResizeEvent } = renderTest({
+      modifications: { registerSurfaceLayout },
+    })
+    const MindSpace = view.query.mindSpace()
+    fireResizeEvent(MindSpace, {})
+
+    viewmodel.expect.mockFunction(registerSurfaceLayout).toBeCalledTimes(2)
+  })
+
+  test('root tree', () => {
+    const text = 'this has a root tree'
+    const registerTreeLayout = viewmodel.create.mockFunction()
+    const { fireResizeEvent } = renderTest({
+      initialState: viewmodel.create.state({
+        rootNodes: [viewmodel.create.node({ text })],
+      }),
+      modifications: { registerTreeLayout },
+    })
+    const RootTree = view.query.rootTree({ text })
+    fireResizeEvent(RootTree, {})
+
+    viewmodel.expect.mockFunction(registerTreeLayout).toBeCalledTimes(2)
+  })
+})
+
 function renderTest(
   { initialState = {}, modifications = {} } = {
     initialState: {},
     modifications: {},
   }
 ) {
-  const { rendered } = view.render({
+  return view.render({
     injectMockModelIntoJSX: ({ useMock }) => (
       <MainView useThisModel={useMock} />
     ),
     initialState,
     mockHookModifications: modifications,
   })
-
-  return rendered
 }

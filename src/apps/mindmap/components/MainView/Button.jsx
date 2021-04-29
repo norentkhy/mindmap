@@ -2,7 +2,7 @@ import styled from 'styled-components'
 
 const Button = styled.button`
   margin: 10px 20px;
-  position: absolute;
+  position: relative;
   ${styleDimensions}
 `
 

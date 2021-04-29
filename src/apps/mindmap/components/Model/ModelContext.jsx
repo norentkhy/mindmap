@@ -169,7 +169,10 @@ function updateTreeOffset({ draftState, id }) {
 
   if (canUpdate({ measuredSurface, node })) {
     if (!node.desiredTreeCss) node.desiredTreeCss = {}
-    const desiredOffsets = computeDesiredOffsets({ measuredSurface, node })
+    const desiredOffsets = computeDesiredOffsets({
+      measuredSurface,
+      node,
+    })
     throwIfObjectValue({
       object: desiredOffsets,
       errorMessage: 'found NaN value',

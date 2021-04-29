@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import useModel from '~mindmap/hooks/useModel'
 import determineNodesToRender from './determineNodesToRender'
 import NodeFamily from './NodeFamily'
+import { MindSpace } from '../Styled'
 
 export function MainView({ useThisModel = useModel }) {
   const { createRootNode, nodesToRender, surfaceRef } = useMainView(
@@ -10,7 +11,11 @@ export function MainView({ useThisModel = useModel }) {
   )
 
   return (
-    <div ref={surfaceRef} aria-label="main view" onDoubleClick={createRootNode}>
+    <MindSpace
+      ref={surfaceRef}
+      aria-label="main view"
+      onDoubleClick={createRootNode}
+    >
       {nodesToRender?.map((node) => (
         <RootContainer
           node={node}
@@ -24,7 +29,7 @@ export function MainView({ useThisModel = useModel }) {
           />
         </RootContainer>
       ))}
-    </div>
+    </MindSpace>
   )
 }
 
