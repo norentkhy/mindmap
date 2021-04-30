@@ -7,3 +7,7 @@ export function getArgsOfLastCall(jestFn) {
 function getArgsOfAllCalls(jestFn) {
   return jestFn.mock.calls
 }
+
+export function testCases(description, testCase, timeout) {
+  return (cases = [[]]) => test.each(cases)(description, testCase, timeout)
+}
