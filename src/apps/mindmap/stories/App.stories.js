@@ -1,5 +1,5 @@
 import React from 'react'
-import MindMapApp from 'src/apps/mindmap/App'
+import MindMapApp from '../App'
 
 function MindMapInstance() {
   return <MindMapApp logResize={console.log} />
