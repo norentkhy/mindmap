@@ -1,16 +1,17 @@
 import React, { createContext, memo, useContext, useRef, useState } from 'react'
+import styled from 'styled-components'
+import { reduceObject } from 'utils/FunctionalProgramming'
 
 function ContextRenderingBehaviour() {
   return (
     <ModelProvider>
-      <Consumer />
       <div>
         <DisplayA />
-        <button onClick={incrementA}>increment A</button>
+        <ButtonA>increment A</ButtonA>
       </div>
       <div>
         <DisplayB />
-        <button onClick={incrementB}>increment B</button>
+        <ButtonB>increment B</ButtonB>
       </div>
     </ModelProvider>
   )
@@ -18,65 +19,89 @@ function ContextRenderingBehaviour() {
 
 function ModelProvider({ children }) {
   console.log('rendering provider')
-  const viewmodel = useModel()
-  
+  const viewmodel = useModel(initialModel)
+
   return (
     <Context.Provider value={viewmodel}>
-      <button onClick={incrementCount}>change context</button>
       {children}
     </Context.Provider>
   )
 }
 
-function useModel() {
-  const [count, setCount] = useState(0)
-  viewmodel.__changes__.count = count
-  viewmodel.__changes__.setCount = setCount
-
-  return { ...viewmodel }
-}
-
-const viewmodel = {
-  __changes__: {
-    count: undefined,
-    setCount: () => {},
-    incrementCount,
-  },
-  state: {
-    a: 0,
-    b: 0,
-  },
-  actions: {
-    incrementA,
-    incrementB,
-  },
-}
-
-function incrementCount() {
-  viewmodel.__changes__.setCount(viewmodel.__changes__.count + 1)
-}
-
-function incrementA() {
-  changeState(() => viewmodel.state.a++)
-}
-
-function incrementB() {
-  changeState(() => viewmodel.state.b++)
-}
-
-function changeState(handleStateChange) {
-  handleStateChange()
-  incrementCount()
-}
-
 const Context = createContext()
 
-function Consumer() {
-  console.log('rendering consumer')
-  const external = useContext(Context)
+function useModel(initialModel) {
+  const [count, setCount] = useState(0)
+  console.log(`number of state updates: ${count}`)
 
-  return <div>{`current count: ${external.__changes__.count}`}</div>
+  const modelRef = useRef(initialModel)
+  syncModel({ modelRef, triggerRerender: () => setCount(count + 1) })
+
+  return { ...modelRef.current }
 }
+
+function syncModel({ modelRef, triggerRerender }) {
+  modelRef.current = {
+    state: getState(modelRef),
+    actions: linkModelActions(modelRef, triggerRerender),
+  }
+}
+
+function getState(modelRef) {
+  return modelRef.current.state
+}
+
+function linkModelActions(modelRef, triggerRerender) {
+  return reduceObject(actionSpecifications, {}, (actions, [name, spec]) => {
+    actions[name] = realizeActionSpecification(spec, modelRef, triggerRerender)
+    return actions
+  })
+}
+
+function realizeActionSpecification(spec, modelRef, triggerRerender) {
+  const { getInputArgs, calculate, setState } = spec
+  return (...args) => {
+    const state = getState(modelRef)
+    const inputArgs = getInputArgs(args, state)
+    const output = calculate(...inputArgs)
+    setState(state, output)
+    triggerRerender()
+  }
+}
+
+const actionSpecifications = {
+  incrementA: {
+    getInputArgs: (_args, state) => [state.a],
+    calculate: increment,
+    setState: (newState, output) => (newState.a = output),
+  },
+  incrementB: {
+    getInputArgs: (_args, state) => [state.b],
+    calculate: increment,
+    setState: (newState, output) => (newState.b = output),
+  },
+}
+
+function increment(x) {
+  return x + 1
+}
+
+const initialModel = {
+  state: {
+    a: 13,
+    b: 37,
+  },
+}
+
+const Button = styled.button``
+
+const ButtonA = withViewmodel(Button, (viewmodel) => ({
+  onClick: viewmodel.actions.incrementA
+}))
+
+const ButtonB = withViewmodel(Button, viewmodel => ({
+  onClick: viewmodel.actions.incrementB
+}))
 
 const DisplayA = withViewmodel(Display, (viewmodel) => ({
   value: viewmodel.state.a,
@@ -96,7 +121,7 @@ function withViewmodel(Component, extractProps) {
 
   function ComponentWithViewModel(propsGiven) {
     console.log('rendering withViewmodel')
-    useContext(Context)
+    const viewmodel = useContext(Context)
     const props = { ...extractProps(viewmodel), ...propsGiven }
     return <ComponentMemo {...props} />
   }
