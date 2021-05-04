@@ -1,3 +1,8 @@
+export function reduceObject(obj, init, reduce) {
+  const entries = Object.entries(obj)
+  return entries.reduce(reduce, init)
+}
+
 export function mapObject(obj, map) {
   const entries = Object.entries(obj)
   return entries.reduce(
