@@ -1,10 +1,19 @@
 import userEvent from '@testing-library/user-event'
+import { mapObject } from '~/utils/FunctionalProgramming'
+import { definedElementQueries, getFocus } from './queries'
+
+const definedElementClicks = mapObject(definedElementQueries, clickElement)
 
 export const action = {
-  keyboard: {
-    typeAndPressEnter,
-  },
-  mouse: {},
+  typeAndPressEnter,
+  click: definedElementClicks,
+}
+
+function clickElement(queryElement) {
+  return (elementInfo) => {
+    const Element = queryElement(elementInfo)
+    return userEvent.click(Element)
+  }
 }
 
 function typeWithKeyboard(keys) {
@@ -14,8 +23,4 @@ function typeWithKeyboard(keys) {
 
 function typeAndPressEnter(text) {
   return typeWithKeyboard(`${text}{enter}`)
-}
-
-export function getFocus() {
-  return document.activeElement || document.body
 }

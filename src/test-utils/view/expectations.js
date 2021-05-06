@@ -1,4 +1,4 @@
-import { definedElementQueries } from './queries'
+import { definedElementQueries, definedMultiElementQueries } from './queries'
 import { getInputSelection } from 'test-utils/dom'
 import { mapObject } from 'utils/FunctionalProgramming'
 import { expect } from '@jest/globals'
@@ -10,8 +10,14 @@ export const definedElementExpects = mapObject(
   expectElement
 )
 
+export const definedMultiElementExpects = mapObject(
+  definedMultiElementQueries,
+  expectElements
+)
+
 export const expectations = {
   ...definedElementExpects,
+  ...definedMultiElementExpects,
   element: (queryElement) => expectElement(queryElement)(),
 }
 
@@ -22,13 +28,27 @@ function expectElement(queryElement) {
     return {
       toBeVisible: expectThisElement.toBeVisible,
       toHaveFocus: expectThisElement.toHaveFocus,
+      toHaveTextContent: expectThisElement.toHaveTextContent,
       toHaveStyle: expectToHaveStyle(true)(Element),
       toHaveTextSelection: expectToHaveInputSelection(true)(Element),
       not: {
         toBeVisible: expectThisElement.toBeNull,
         toHaveFocus: expectThisElement.not.toHaveFocus,
+        toHaveTextContent: expectThisElement.not.toHaveTextContent,
         toHaveStyle: expectToHaveStyle(false)(Element),
         toHaveTextSelection: expectToHaveInputSelection(false)(Element),
+      },
+    }
+  }
+}
+
+function expectElements(queryElements) {
+  return (elementInfo) => {
+    const Elements = queryElements(elementInfo)
+    return {
+      toHaveTextContents(expectedTextContents) {
+        const textContents = Elements.map((Element) => Element.textContent)
+        expect(textContents).toMatchObject(expectedTextContents)
       },
     }
   }

@@ -1,4 +1,3 @@
-import { getFocus } from './actions'
 import { screen } from '@testing-library/react'
 
 export const definedElementQueries = {
@@ -7,8 +6,13 @@ export const definedElementQueries = {
   focus: getFocus,
 }
 
+export const definedMultiElementQueries = {
+  allLabel: screen.queryAllByLabelText,
+}
+
 export const query = {
   ...definedElementQueries,
+  ...definedMultiElementQueries,
   allElements: queryAllElements,
 }
 
@@ -24,4 +28,8 @@ function queryAllChildElements(Element) {
     Element,
     ...ChildElements.flatMap((Element) => queryAllChildElements(Element)),
   ]
+}
+
+export function getFocus() {
+  return document.activeElement || document.body
 }
