@@ -1,3 +1,13 @@
+import { v4 as uuidv4 } from 'uuid'
+
+const Collection = {
+  create: createCollection,
+  add: addToCollection,
+  replace: replaceInCollection,
+  get: getFromCollection,
+  remove: removeFromCollection,
+}
+
 function createCollection(...args) {
   return new Map(...args)
 }
@@ -25,8 +35,10 @@ function removeFromCollection(collection, id) {
 }
 
 function createCollectionId() {
-  return Symbol()
+  return uuidv4()
 }
+
+export default Collection
 
 export {
   createCollection,
