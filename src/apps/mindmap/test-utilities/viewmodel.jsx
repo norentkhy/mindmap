@@ -5,6 +5,7 @@ import { mapObject } from 'utils/FunctionalProgramming'
 import { act, renderHook } from '@testing-library/react-hooks'
 import { jest } from '@jest/globals'
 import React from 'react'
+import Collection from '../data-structures/collection'
 
 export const viewmodel = {
   render: renderModel,
@@ -16,6 +17,7 @@ export const viewmodel = {
   },
   expect: {
     mockFunction: expectMockFunction,
+    anId: expectAnId,
   },
 }
 
@@ -31,6 +33,7 @@ function createTab(
 function createNode({
   text,
   editing = false,
+  shouldFocus = false,
   folded = false,
   children = [],
   desiredTreeCss,
@@ -44,6 +47,7 @@ function createNode({
     id: generateUUID(),
     text,
     editing,
+    shouldFocus,
     folded,
     children,
     desiredTreeCss,
@@ -51,7 +55,39 @@ function createNode({
 }
 
 function createState({ rootNodes }) {
-  return { trees: rootNodes }
+  const [nodes, arrows, user] = createCollectionsFromOldNodes(rootNodes)
+  return { trees: rootNodes, nodes, arrows, user }
+}
+
+function createCollectionsFromOldNodes(oldNodes) {
+  const initialNodes = Collection.create()
+  const initialArrows = Collection.create()
+  const user = { editingNodes: [], foldedNodes: [] }
+  return addOldNodesToCollections(oldNodes, [initialNodes, initialArrows, user])
+}
+
+function addOldNodesToCollections(oldNodes, [nodes, arrows, user], parentId) {
+  if (!oldNodes || oldNodes.length === 0) return [nodes, arrows, user]
+
+  return oldNodes.reduce(
+    ([nodes, arrows, user], oldNode) => {
+      const { editing, folded, shouldFocus, ...node } = oldNode
+      const [newNodes, id] = Collection.add(nodes, node)
+      const newArrows = parentId
+        ? Collection.replace(arrows, parentId, id)
+        : arrows
+      if (editing) user.editingNodes.push(id)
+      if (folded) user.foldedNodes.push(id)
+      if (shouldFocus) user.focusedNode = id
+
+      return addOldNodesToCollections(
+        node?.children,
+        [newNodes, newArrows, user],
+        id
+      )
+    },
+    [nodes, arrows, user]
+  )
 }
 
 function expectMockFunction(mockFn) {
@@ -68,6 +104,10 @@ function expectMockFunction(mockFn) {
       nthCalledWith: expectSubject.not.nthCalledWith,
     },
   }
+}
+
+function expectAnId() {
+  return expect.any(String)
 }
 
 function renderModel(
@@ -159,7 +199,7 @@ function renderModel(
         parentId,
         properties: { text, ...others },
       }) {
-        const newNodes = captureNewNodes(() => createChildNode(parentId))
+        const newNodes = captureNewNodes(() => createChildNode({ parentId }))
         const node = newNodes[0]
         finalizeEditNode({ id: node.id, text, ...others })
         return node

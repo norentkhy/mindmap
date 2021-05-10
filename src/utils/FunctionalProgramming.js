@@ -29,3 +29,7 @@ export function reduceToMinimumLength(minimumLength, arr) {
   if (minimumLength > length) return length
   return minimumLength
 }
+
+export function repeat(n, fn) {
+  for (let i = 0; i < n; i++) fn()
+}

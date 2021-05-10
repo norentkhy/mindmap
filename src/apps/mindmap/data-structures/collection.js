@@ -1,3 +1,4 @@
+import produce from 'immer'
 import { v4 as uuidv4 } from 'uuid'
 
 const Collection = {
@@ -6,6 +7,9 @@ const Collection = {
   replace: replaceInCollection,
   get: getFromCollection,
   remove: removeFromCollection,
+  last: getLastFromCollection,
+  map: mapCollection,
+  modify: modifyItemInCollection,
 }
 
 function createCollection(...args) {
@@ -32,6 +36,27 @@ function removeFromCollection(collection, id) {
   const newCollection = createCollection(collection)
   newCollection.delete(id)
   return newCollection
+}
+
+function getLastFromCollection(collection) {
+  const idsAndItems = getIdsAndItems(collection)
+  const [id, item] = idsAndItems[idsAndItems.length - 1]
+  return [item, id]
+}
+
+function mapCollection(collection, applyMapping) {
+  const idsAndItems = getIdsAndItems(collection)
+  return idsAndItems.map(applyMapping)
+}
+
+function getIdsAndItems(collection) {
+  return Array.from(collection)
+}
+
+function modifyItemInCollection(collection, id, modify) {
+  const item = getFromCollection(collection, id)
+  const newItem = produce(item, modify)
+  return replaceInCollection(collection, id, newItem)
 }
 
 function createCollectionId() {

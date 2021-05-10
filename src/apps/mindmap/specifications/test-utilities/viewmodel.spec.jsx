@@ -45,7 +45,7 @@ describe('utilities', () => {
 
     function createAndCaptureFirstChildNode(rootId) {
       const nodeChanges = stateObservation.captureNewNodes(() =>
-        action.createChildNode(rootId)
+        action.createChildNode({ parentId: rootId })
       )
 
       expect(nodeChanges.length).toBe(1)

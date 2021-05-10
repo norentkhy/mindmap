@@ -41,7 +41,9 @@ describe('node folding: view', () => {
     view.action.mouse.clickOn.node({ text: nodeToFold.text })
     view.action.keyboard.foldSelectedNode()
 
-    viewmodel.expect.mockFunction(foldNode).toBeCalledWith(nodeToFold.id)
+    viewmodel.expect
+      .mockFunction(foldNode)
+      .toBeCalledWith({ id: nodeToFold.id })
 
     function renderNodeToFold() {
       const { rootNode, initialState } = createInitialStateWithRootNode()

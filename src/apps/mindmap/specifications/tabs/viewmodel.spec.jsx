@@ -1,14 +1,75 @@
 import React, { useContext } from 'react'
-import { act, renderHook } from '@testing-library/react-hooks'
 import { TabsProvider, TabsContext } from '~mindmap/components'
 import { viewmodel } from '~mindmap/test-utilities'
 import produce from 'immer'
+import Collection from '../../data-structures/collection'
+import { repeat } from '~/utils/FunctionalProgramming'
 
 const tabs = [
   viewmodel.create.tab({ title: 'untitled' }),
   viewmodel.create.tab({ title: 'untitled' }),
   viewmodel.create.tab({ title: 'untitled' }),
 ]
+
+describe('collection', () => {
+  test('tabs starts with one', () => {
+    const { state } = viewmodel.render()
+    expect(state.getState().tabs.size).toBe(1)
+  })
+
+  test('first tab is untitled', () => {
+    const { state } = viewmodel.render()
+    expect(Collection.last(state.getState().tabs)).toEqual([
+      { name: 'untitled' },
+      viewmodel.expect.anId(),
+    ])
+  })
+
+  test('first tab is selected', () => {
+    const { state } = viewmodel.render()
+    const [_, id] = Collection.last(state.getState().tabs)
+    expect(state.getState().user.selectedTab).toBe(id)
+  })
+
+  test('add tabs', () => {
+    const { state, action } = viewmodel.render()
+    action.addNewTab()
+    expect(state.getState().tabs.size).toBe(2)
+  })
+
+  test('newest tab is selected', () => {
+    const { state, action } = viewmodel.render()
+    action.addNewTab()
+    const [_, id] = Collection.last(state.getState().tabs)
+    expect(state.getState().user.selectedTab).toBe(id)
+  })
+
+  test('select tab', () => {
+    const { state, action } = viewmodel.render()
+    repeat(3, action.addNewTab)
+    const [_tab, id] = Collection.last(state.getState().tabs)
+    action.selectTab(id)
+    expect(state.getState().user.selectedTab).toBe(id)
+  })
+
+  test('initiate rename tab', () => {
+    const { state, action } = viewmodel.render()
+    action.addNewTab()
+    const [_, id] = Collection.last(state.getState().tabs)
+    action.initiateRenameTab(id)
+    expect(state.getState().user.renamingTab).toBe(id)
+  })
+
+  test('rename a tab', () => {
+    const { state, action } = viewmodel.render()
+    action.addNewTab()
+    const [_, id] = Collection.last(state.getState().tabs)
+    action.initiateRenameTab(id)
+    action.finishRenameTab(id, 'renamed tab')
+    const tab = Collection.get(state.getState().tabs, id)
+    expect(tab).toMatchObject({ name: 'renamed tab' })
+  })
+})
 
 describe('overlap with Tabs.spec', () => {
   test('selectTab', () => {

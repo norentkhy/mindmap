@@ -28,9 +28,9 @@ export default function Node({ node, useThisModel }) {
         ref={nodeRef}
         node={node}
         onKeyUp={({ key }) => {
-          key === 'Enter' && initiateEditNode(id)
-          key === 'c' && createChildNode(id)
-          key === 'f' && foldNode(id)
+          key === 'Enter' && initiateEditNode({ id })
+          key === 'c' && createChildNode({ parentId: id })
+          key === 'f' && foldNode({ id })
         }}
       >
         {text}

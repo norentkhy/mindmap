@@ -114,7 +114,7 @@ describe('node creation view', () => {
         viewmodel.expect.mockFunction(createChildNode).toBeCalled()
         viewmodel.expect
           .mockFunction(createChildNode)
-          .toBeCalledWith(rootNode.id)
+          .toBeCalledWith({ parentId: rootNode.id })
 
         function renderWithOneRootNodeForChildNodeCreation() {
           const { rootNode, initialState } = createInitialStateWithOneRootNode()
@@ -198,7 +198,7 @@ describe('node creation view', () => {
         viewmodel.expect.mockFunction(initiateEditNode).toBeCalled()
         viewmodel.expect
           .mockFunction(initiateEditNode)
-          .toBeCalledWith(parentNode.id)
+          .toBeCalledWith({ id: parentNode.id })
 
         function renderTestWithParentAndChildNode() {
           const {

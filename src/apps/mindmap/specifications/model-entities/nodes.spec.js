@@ -40,3 +40,12 @@ describe('remove an item', () => {
     expect(Collection.get(nodes2, id)).toBeUndefined()
   })([{ item: 'to be removed' }])
 })
+
+describe('get last item', () => {
+  test('no parameters', () => {
+    const item = 'this is the last item'
+    const nodes0 = Collection.create()
+    const [nodes1, id1] = Collection.add(nodes0, item)
+    expect(Collection.last(nodes1)).toEqual([item, id1])
+  })
+})
