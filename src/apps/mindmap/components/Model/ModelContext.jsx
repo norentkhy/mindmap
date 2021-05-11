@@ -85,25 +85,6 @@ function useMainView({ initialState, useThisResizeObserver, logResize }) {
     replaceState(newState) {
       dispatch({ type: 'REPLACE_STATE', payload: newState })
     },
-    registerNodeLayout({ id, boundingClientRect, offsetRect }) {
-      dispatch({
-        type: 'REGISTER_NODE_LAYOUT',
-        payload: { id, boundingClientRect, offsetRect },
-      })
-      logResize({ id, boundingClientRect, offsetRect })
-    },
-    registerTreeLayout({ id, boundingClientRect, offsetRect }) {
-      dispatch({
-        type: 'REGISTER_TREE_LAYOUT',
-        payload: { id, boundingClientRect, offsetRect },
-      })
-    },
-    registerSurfaceLayout({ boundingClientRect, offsetRect }) {
-      dispatch({
-        type: 'REGISTER_SURFACE_LAYOUT',
-        payload: { boundingClientRect, offsetRect },
-      })
-    },
     useThisResizeObserver,
     addNewTab() {
       dispatch({ type: 'ADD_NEW_TAB' })
@@ -207,38 +188,6 @@ const stateTransitions = {
       node.folded = !node.folded
     })
   },
-  REGISTER_SURFACE_LAYOUT(state, { boundingClientRect, offsetRect }) {
-    return produce(state, (newState) => {
-      newState.measuredSurface = { boundingClientRect, offsetRect }
-
-      const rootNodes = getRootNodes(newState)
-      rootNodes.forEach(({ id }) =>
-        updateTreeOffset({ draftState: newState, id })
-      )
-    })
-  },
-  REGISTER_TREE_LAYOUT(state, { id, boundingClientRect, offsetRect }) {
-    return produce(state, (newState) => {
-      modifyNode({
-        id,
-        newState,
-        modifications: { measuredTree: { boundingClientRect, offsetRect } },
-      })
-
-      updateTreeOffset({ draftState: newState, id })
-    })
-  },
-  REGISTER_NODE_LAYOUT(state, { id, boundingClientRect, offsetRect }) {
-    return produce(state, (newState) => {
-      modifyNode({
-        id,
-        newState,
-        modifications: { measuredNode: { boundingClientRect, offsetRect } },
-      })
-
-      updateTreeOffset({ draftState: newState, id })
-    })
-  },
   ADD_NEW_TAB(state) {
     return produce(state, (newState) => {
       const [newTabs, tabId] = Collection.add(state.tabs, createTab())
@@ -265,70 +214,6 @@ const stateTransitions = {
   },
 }
 
-function throwIfObjectValue({ object, evaluate, errorMessage = 'oops' }) {
-  Object.values(object).forEach((value) => {
-    if (evaluate(value)) throw new Error(errorMessage)
-  })
-}
-
-function updateTreeOffset({ draftState, id }) {
-  const { measuredSurface } = draftState
-  const node = getNode({
-    id,
-    trees: getRootNodes(draftState),
-  })
-
-  if (canUpdate({ measuredSurface, node })) {
-    if (!node.desiredTreeCss) node.desiredTreeCss = {}
-    const desiredOffsets = computeDesiredOffsets({
-      measuredSurface,
-      node,
-    })
-    throwIfObjectValue({
-      object: desiredOffsets,
-      errorMessage: 'found NaN value',
-      evaluate: isNaN,
-    })
-    modifyObject({
-      target: node.desiredTreeCss,
-      modifications: desiredOffsets,
-    })
-  }
-
-  function canUpdate({
-    measuredSurface,
-    node: { measuredTree, measuredNode, parent },
-  }) {
-    return measuredSurface && measuredTree && measuredNode && !parent
-  }
-
-  function computeDesiredOffsets({
-    measuredSurface,
-    node: { measuredTree, measuredNode },
-  }) {
-    const surfaceCenter = getBoundingCenter(measuredSurface)
-    const nodeCenter = getBoundingCenter(measuredNode)
-    const nodeDistance = calculateDistance({ surfaceCenter, nodeCenter })
-
-    return {
-      offsetLeft: measuredTree.offsetRect.left + nodeDistance.left,
-      offsetTop: measuredTree.offsetRect.top + nodeDistance.top,
-    }
-
-    function getBoundingCenter({
-      boundingClientRect: { left, top, width, height },
-    }) {
-      return { left: left + width / 2, top: top + height / 2 }
-    }
-
-    function calculateDistance({ surfaceCenter, nodeCenter }) {
-      return {
-        left: surfaceCenter.left - nodeCenter.left,
-        top: surfaceCenter.top - nodeCenter.top,
-      }
-    }
-  }
-}
 
 function getRootNodes(state) {
   return state.trees

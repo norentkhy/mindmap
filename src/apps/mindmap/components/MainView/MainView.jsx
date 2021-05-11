@@ -1,14 +1,12 @@
-import React, { useRef } from 'react'
-import styled from 'styled-components'
+import React from 'react'
 import useModel from '~mindmap/hooks/useModel'
 import determineNodesToRender from './determineNodesToRender'
 import NodeFamily from './NodeFamily'
 import { MindSpace } from '../Styled'
 
 export function MainView({ useThisModel = useModel }) {
-  const { createRootNode, nodesToRender, surfaceRef } = useMainView(
-    useThisModel
-  )
+  const { createRootNode, nodesToRender, surfaceRef } =
+    useMainView(useThisModel)
 
   return (
     <MindSpace
@@ -17,11 +15,7 @@ export function MainView({ useThisModel = useModel }) {
       onDoubleClick={createRootNode}
     >
       {nodesToRender?.map((node) => (
-        <RootContainer
-          node={node}
-          key={`container ${node.id}`}
-          useThisModel={useThisModel}
-        >
+        <RootContainer key={`container ${node.id}`}>
           <NodeFamily
             headNode={node}
             key={node.id}
@@ -34,65 +28,12 @@ export function MainView({ useThisModel = useModel }) {
 }
 
 function useMainView(useThisModel) {
-  const {
-    state,
-    createRootNode,
-    registerSurfaceLayout,
-    useThisResizeObserver,
-  } = useThisModel()
+  const { state, createRootNode } = useThisModel()
   const nodesToRender = determineNodesToRender(state)
-  const surfaceRef = useRef()
-  useThisResizeObserver(surfaceRef, handleResizeEvent)
 
-  return { surfaceRef, createRootNode, nodesToRender }
-
-  function handleResizeEvent(event) {
-    const { offsetLeft, offsetTop, offsetWidth, offsetHeight } = event.target
-    registerSurfaceLayout({
-      boundingClientRect: event.target.getBoundingClientRect(),
-      offsetRect: {
-        left: offsetLeft,
-        top: offsetTop,
-        width: offsetWidth,
-        height: offsetHeight,
-      },
-    })
-  }
+  return { createRootNode, nodesToRender }
 }
 
-function RootContainer({ useThisModel, children, node }) {
-  const ref = useRef()
-  const { registerTreeLayout, useThisResizeObserver } = useThisModel()
-  useThisResizeObserver(ref, registerThisTreeLayout)
-
-  return (
-    <AbsolutelyPositionedContainer
-      left={node.desiredTreeCss?.offsetLeft}
-      top={node.desiredTreeCss?.offsetTop}
-      ref={ref}
-      aria-label="container of rootnode"
-    >
-      {children}
-    </AbsolutelyPositionedContainer>
-  )
-
-  function registerThisTreeLayout(event) {
-    const { offsetLeft, offsetTop, offsetWidth, offsetHeight } = event.target
-    registerTreeLayout({
-      id: node.id,
-      boundingClientRect: event.target.getBoundingClientRect(),
-      offsetRect: {
-        left: offsetLeft,
-        top: offsetTop,
-        width: offsetWidth,
-        height: offsetHeight,
-      },
-    })
-  }
+function RootContainer({ children }) {
+  return <div aria-label="container of rootnode">{children}</div>
 }
-
-const AbsolutelyPositionedContainer = styled.div`
-  position: absolute;
-  left: ${({ left }) => (left ? `${left}px` : 'auto')};
-  top: ${({ top }) => (top ? `${top}px` : 'auto')};
-`
