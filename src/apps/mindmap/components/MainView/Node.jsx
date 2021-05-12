@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Button from './Button'
 import NodeInput from './NodeInput'
 import useNode from './useNode'
@@ -13,6 +13,10 @@ export default function Node({ node, useThisModel }) {
     text,
     nodeRef,
   } = useNode({ node, useThisModel })
+
+  useEffect(() => {
+    !editing && nodeRef.current?.focus()
+  }, [editing])
 
   if (editing)
     return (

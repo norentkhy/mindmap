@@ -3,11 +3,7 @@ import { useRef } from 'react'
 export default function useNode({ node, useThisModel }) {
   const { editing, id, text } = node
 
-  const {
-    createChildNode,
-    foldNode,
-    initiateEditNode,
-  } = useThisModel()
+  const { createChildNode, foldNode, initiateEditNode } = useThisModel()
 
   const nodeRef = useRef()
 
@@ -18,5 +14,6 @@ export default function useNode({ node, useThisModel }) {
     createChildNode,
     foldNode,
     initiateEditNode,
+    nodeRef,
   }
 }

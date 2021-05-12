@@ -1,6 +1,28 @@
 import { MainView } from '~mindmap/components'
 import { view, viewmodel } from '~mindmap/test-utilities'
 import React from 'react'
+import Collection from '../../data-structures/collection'
+import produce from 'immer'
+
+describe('new state structure', () => {
+  test('focus', () => {
+    const node = renderWithOneRootNodeFocused()
+    view.expect.node(node).toHaveFocus()
+
+    function renderWithOneRootNodeFocused() {
+      const node = viewmodel.create.node({ text: 'original text' })
+      const state0= viewmodel.create.state({ rootNodes: [node] })
+      const [_, id] = Collection.last(state0.nodes)
+      const initialState = produce(state0, newState => {
+        newState.user.focusedNode = id
+      })
+
+      renderTest({ initialState })
+
+      return node
+    }
+  })
+})
 
 describe('node creation view', () => {
   describe('display of node data', () => {

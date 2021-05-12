@@ -33,3 +33,20 @@ export function reduceToMinimumLength(minimumLength, arr) {
 export function repeat(n, fn) {
   for (let i = 0; i < n; i++) fn()
 }
+
+export function getAllCombinations(...thingsToCombine) {
+  return thingsToCombine.reduce(combineArrayWithCombinations, [[]])
+}
+
+export function mapAllCombinations(variantsToCombine, mapCombination) {
+  const allCombinations = getAllCombinations(...variantsToCombine)
+  return allCombinations.map((combination) => mapCombination(combination))
+}
+
+export function combineArrayWithCombinations(combinations, array) {
+  return combinations.flatMap((combination) => {
+    return array.map((value) => {
+      return [...combination, value]
+    })
+  })
+}

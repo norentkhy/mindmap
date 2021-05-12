@@ -166,7 +166,6 @@ const stateTransitions = {
           newState.user.focusedNode = collectionId
         } else {
           newState.user.editingNodes.pop(collectionId)
-          newState.user.focusedNode = null
         }
       }
       modifyNode({ id, newState, modifications: { editing, ...modifications } })

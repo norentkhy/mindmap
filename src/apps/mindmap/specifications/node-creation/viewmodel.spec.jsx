@@ -69,12 +69,12 @@ describe('editing a node', () => {
     expect(state.getState().user.editingNodes).not.toContain(id)
   })
 
-  test('node edit finish removes focus', () => {
+  test('node edit finish does not remove focus', () => {
     const { state, action } = viewmodel.render()
     action.createRootNode()
     const [_, id] = Collection.last(state.getState().nodes)
     action.finalizeEditNode({ collectionId: id, text: 'checking edit list' })
-    expect(state.getState().user.focusedNode).not.toBe(id)
+    expect(state.getState().user.focusedNode).toBe(id)
   })
 
   test('initiate node edit', () => {
