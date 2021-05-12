@@ -5,6 +5,10 @@ const label = {
   createRootNodeButton: 'create root node',
 }
 
+export function clickOnElementWithText(cy, text) {
+  cy.findByText(text).click()
+}
+
 export function clickButtonToCreateNode(cy) {
   cy.findByLabelText(label.createRootNodeButton).click()
 }
@@ -15,6 +19,12 @@ function calculateOffsetCenter(Element) {
   const top = offsetHeight / 2
 
   return { left, top }
+}
+
+export function createChildNodeWithName(cy, name) {
+  pressOnKeyboard(cy, 'c')
+  typeOnKeyboard(cy, name)
+  pressOnKeyboard(cy, 'enter')
 }
 
 export function createRootNodeWithName(cy, name) {
@@ -44,6 +54,10 @@ export function expectFocusedToContainText(cy, nodeName) {
   cy.focused().should('contain.text', nodeName)
 }
 
+export function expectFocusedToHaveText(cy, nodeName) {
+  cy.focused().should('have.text', nodeName)
+}
+
 export function expectToFindMultipleNodes(cy, amount) {
   cy.findAllByLabelText(label.node).should(($n) => {
     if (amount) expect($n).to.have.length(amount)
@@ -52,6 +66,12 @@ export function expectToFindMultipleNodes(cy, amount) {
 
 export function expectToFindNode(cy) {
   cy.findByLabelText(label.node)
+}
+
+export function expectToFindText(cy, text, positive = true) {
+  const Element = cy.findByText(text)
+  if (positive) Element.should('exist')
+  if (!positive) Element.should('not.exist')
 }
 
 export function expectToFindNodeInput(cy, positive = true) {
