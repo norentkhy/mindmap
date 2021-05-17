@@ -3,6 +3,8 @@ const label = {
   node: 'node',
   editingNode: 'editing node',
   createRootNodeButton: 'create root node',
+  undoButton: 'undo action',
+  redoButton: 'redo action'
 }
 
 export function clickOnElementWithText(cy, text) {
@@ -11,6 +13,14 @@ export function clickOnElementWithText(cy, text) {
 
 export function clickButtonToCreateNode(cy) {
   cy.findByLabelText(label.createRootNodeButton).click()
+}
+
+export function clickButtonToUndoAction(cy) {
+  cy.findByLabelText(label.undoButton).click()
+}
+
+export function clickButtonToRedoAction(cy) {
+  cy.findByLabelText(label.redoButton).click()
 }
 
 function calculateOffsetCenter(Element) {
@@ -58,14 +68,23 @@ export function expectFocusedToHaveText(cy, nodeName) {
   cy.focused().should('have.text', nodeName)
 }
 
+export function expectNodeInputToHaveFocus(cy, positive = true) {
+  const NodeInput = cy.findByLabelText(label.editingNode)
+  if (positive) NodeInput.should('have.focus')
+  if (!positive) NodeInput.should('not.have.focus')
+}
+
 export function expectToFindMultipleNodes(cy, amount) {
   cy.findAllByLabelText(label.node).should(($n) => {
     if (amount) expect($n).to.have.length(amount)
   })
 }
 
-export function expectToFindNode(cy) {
-  cy.findByLabelText(label.node)
+export function expectToFindNode(cy, positive = true) {
+  const Element = cy.findByLabelText(label.node)
+  if (positive) Element.should('exist')
+  if (!positive) Element.should('not.exist')
+
 }
 
 export function expectToFindText(cy, text, positive = true) {
