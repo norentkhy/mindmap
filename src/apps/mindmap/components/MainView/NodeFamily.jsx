@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import determineNodesToRender from './determineNodesToRender'
-import Node from './Node'
+import MindNode from './MindNode'
 
 export default function NodeFamily({ headNode, useThisModel }) {
   const model = useThisModel()
@@ -9,7 +9,7 @@ export default function NodeFamily({ headNode, useThisModel }) {
 
   return (
     <FlexRowCentered>
-      <Node node={headNode} key={headNode.id} useThisModel={useThisModel} />
+      <MindNode node={headNode} key={headNode.id} useThisModel={useThisModel} />
       <ChildContainer>
         {nodesToRender?.map((node) => (
           <NodeFamily

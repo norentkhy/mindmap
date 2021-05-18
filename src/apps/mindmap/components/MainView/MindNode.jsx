@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react'
 import NodeInput from './NodeInput'
 
-export default function Node({ node }) {
+export default function MindNode({ node }) {
   const nodeRef = useRef()
   const {
     editing,

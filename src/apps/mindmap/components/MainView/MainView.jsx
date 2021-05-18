@@ -2,9 +2,22 @@ import React from 'react'
 import useModel from '~mindmap/hooks/useModel'
 import determineNodesToRender from './determineNodesToRender'
 import NodeFamily from './NodeFamily'
+import MindNode from './MindNode'
 import { MindSpace } from '../Styled'
 
-export function MainView({ useThisModel = useModel }) {
+export function MainView({ useThisModel = useModel, nodes, createRootNode }) {
+  if (!nodes) return OldMainView(useThisModel)
+
+  return (
+    <MindSpace aria-label="main view" onDoubleClick={createRootNode}>
+      {nodes?.map((node) => (
+        <MindNode node={node} />
+      ))}
+    </MindSpace>
+  )
+}
+
+function OldMainView(useThisModel) {
   const { createRootNode, nodesToRender, surfaceRef } =
     useMainView(useThisModel)
 
