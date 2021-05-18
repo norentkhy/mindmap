@@ -1,13 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react'
 
-export default function NodeInput({
-  node: { id, text, editing },
-  useThisModel,
-}) {
+export default function NodeInput({ node: { text, editing, changeNodeText } }) {
   const [newText, setNewText] = useState(text)
   const inputRef = useRef()
-
-  const { finalizeEditNode } = useThisModel()
 
   useEffect(() => {
     editing && inputRef.current?.focus()
@@ -20,9 +15,7 @@ export default function NodeInput({
       value={newText}
       onChange={({ target }) => setNewText(target.value)}
       onFocus={({ target }) => target.select()}
-      onKeyUp={({ key }) =>
-        key === 'Enter' && finalizeEditNode({ id, text: newText })
-      }
+      onKeyUp={({ key }) => key === 'Enter' && changeNodeText(newText)}
     />
   )
 }

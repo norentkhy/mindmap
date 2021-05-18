@@ -28,8 +28,9 @@ export function MainView({ useThisModel = useModel }) {
 }
 
 function useMainView(useThisModel) {
-  const { state, createRootNode } = useThisModel()
-  const nodesToRender = determineNodesToRender(state)
+  const model = useThisModel()
+  const { state, createRootNode } = model
+  const nodesToRender = determineNodesToRender(state, model)
 
   return { createRootNode, nodesToRender }
 }

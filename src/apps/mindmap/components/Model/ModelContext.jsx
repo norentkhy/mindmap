@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { useTime } from '~mindmap/hooks/useTime'
 import useResizeObserver from '@react-hook/resize-observer'
 import Collection from '~mindmap/data-structures/collection'
+import updateCurrentView from './update-current-view'
 enableMapSet()
 
 export const ModelContext = createContext()
@@ -49,18 +50,34 @@ export function ModelProvider({
   )
 }
 
-function useMainView({ initialState, useThisResizeObserver, logResize }) {
+function useMainView({ initialState, useThisResizeObserver }) {
   const [state, dispatch] = useReducer(reduce, initialState)
   const { timeline, insertIntoTimeline, goBack, goForward } = useTime()
+  const actions = bindActionsTo(dispatch)
 
   useEffect(() => {
-    insertIntoTimeline(state)
+    const stateWithCurrentView = updateCurrentView(state, actions)
+    insertIntoTimeline(stateWithCurrentView)
   }, [state])
 
   return {
     state: timeline.present,
     undo: goBack,
     redo: goForward,
+    useThisResizeObserver,
+    ...actions,
+  }
+
+  function reduce(state, action) {
+    const transition = stateTransitions[action.type]
+    const newState = transition(state, action.payload)
+
+    return newState
+  }
+}
+
+function bindActionsTo(dispatch) {
+  return {
     createRootNode() {
       dispatch({ type: 'CREATE_ROOT_NODE' })
     },
@@ -85,7 +102,6 @@ function useMainView({ initialState, useThisResizeObserver, logResize }) {
     replaceState(newState) {
       dispatch({ type: 'REPLACE_STATE', payload: newState })
     },
-    useThisResizeObserver,
     addNewTab() {
       dispatch({ type: 'ADD_NEW_TAB' })
     },
@@ -101,13 +117,6 @@ function useMainView({ initialState, useThisResizeObserver, logResize }) {
         payload: { collectionId, newName },
       })
     },
-  }
-
-  function reduce(state, action) {
-    const transition = stateTransitions[action.type]
-    const newState = transition(state, action.payload)
-
-    return newState
   }
 }
 
@@ -212,7 +221,6 @@ const stateTransitions = {
     })
   },
 }
-
 
 function getRootNodes(state) {
   return state.trees

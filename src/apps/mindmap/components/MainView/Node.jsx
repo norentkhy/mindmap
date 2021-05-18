@@ -1,18 +1,15 @@
-import React, { useEffect } from 'react'
-import Button from './Button'
+import React, { useEffect, useRef } from 'react'
 import NodeInput from './NodeInput'
-import useNode from './useNode'
 
-export default function Node({ node, useThisModel }) {
+export default function Node({ node }) {
+  const nodeRef = useRef()
   const {
-    createChildNode,
-    foldNode,
-    initiateEditNode,
     editing,
-    id,
     text,
-    nodeRef,
-  } = useNode({ node, useThisModel })
+    startToEditThisNode,
+    toggleFoldOnThisNode,
+    createChildOfThisNode,
+  } = node
 
   useEffect(() => {
     !editing && nodeRef.current?.focus()
@@ -20,24 +17,23 @@ export default function Node({ node, useThisModel }) {
 
   if (editing)
     return (
-      <Button aria-label="node" ref={nodeRef} node={node}>
-        <NodeInput useThisModel={useThisModel} node={node} />
-      </Button>
+      <button aria-label="node" ref={nodeRef} node={node}>
+        <NodeInput node={node} />
+      </button>
     )
 
   if (!editing)
     return (
-      <Button
+      <button
         aria-label="node"
         ref={nodeRef}
-        node={node}
         onKeyUp={({ key }) => {
-          key === 'Enter' && initiateEditNode({ id })
-          key === 'c' && createChildNode({ parentId: id })
-          key === 'f' && foldNode({ id })
+          key === 'Enter' && startToEditThisNode()
+          key === 'c' && createChildOfThisNode()
+          key === 'f' && toggleFoldOnThisNode()
         }}
       >
         {text}
-      </Button>
+      </button>
     )
 }

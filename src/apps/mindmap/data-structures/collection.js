@@ -9,6 +9,7 @@ const Collection = {
   remove: removeFromCollection,
   last: getLastFromCollection,
   map: mapCollection,
+  filter: filterCollection,
   modify: modifyItemInCollection,
 }
 
@@ -47,6 +48,11 @@ function getLastFromCollection(collection) {
 function mapCollection(collection, applyMapping) {
   const idsAndItems = getIdsAndItems(collection)
   return idsAndItems.map(applyMapping)
+}
+
+function filterCollection(collection, applyFilter) {
+  const idsAndItems = getIdsAndItems(collection)
+  return idsAndItems.filter(applyFilter)
 }
 
 function getIdsAndItems(collection) {

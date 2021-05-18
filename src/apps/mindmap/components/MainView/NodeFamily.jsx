@@ -4,7 +4,8 @@ import determineNodesToRender from './determineNodesToRender'
 import Node from './Node'
 
 export default function NodeFamily({ headNode, useThisModel }) {
-  const nodesToRender = determineNodesToRender(headNode)
+  const model = useThisModel()
+  const nodesToRender = determineNodesToRender(headNode, model)
 
   return (
     <FlexRowCentered>
