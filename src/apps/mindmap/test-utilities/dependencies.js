@@ -32,6 +32,7 @@ export {
   getFocus,
   getInputSelection,
   generateUUID,
+  addIdTo,
   queryAllElementsByRole,
 }
 
@@ -141,4 +142,8 @@ function renderView({
       }
     }
   }
+}
+
+function addIdTo(object) {
+  return { id: generateUUID(), ...object }
 }

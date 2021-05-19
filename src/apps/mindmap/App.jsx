@@ -6,6 +6,7 @@ import {
   Tabs,
   TabsProvider,
 } from './components'
+import useModel from '~mindmap/hooks/useModel'
 
 export default function MindMap({ logResize, useThisResizeObserver }) {
   return (
@@ -15,9 +16,16 @@ export default function MindMap({ logResize, useThisResizeObserver }) {
     >
       <Tabs />
       <Actions />
-      <MainView />
+      <StatefulMainView />
     </Providers>
   )
+}
+
+function StatefulMainView() {
+  const model = useModel()
+  const { nodes, createRootNode } = model
+
+  return <MainView nodes={nodes} createNode={createRootNode} />
 }
 
 function Providers({ children, logResize, useThisResizeObserver }) {

@@ -1,4 +1,4 @@
-import { query } from './queries'
+import { query, definedElementQueries } from './queries'
 import { waitForExpectation } from './wait-for-expectations'
 import {
   debugView,
@@ -9,6 +9,7 @@ import {
   typeAndPressEnter,
   getFocus,
 } from '../dependencies'
+import { mapObject } from '~/utils/FunctionalProgramming'
 
 const queryNode = query.node
 const queryTab = query.tab
@@ -17,6 +18,13 @@ const waitForNodeInputToHaveFocus = async () =>
   await waitForExpectation.nodeInput().toHaveFocus()
 const waitForNodeInputNotToBeVisible = async () =>
   await waitForExpectation.nodeInput().not.toBeVisible()
+
+const definedDoubleClicks = mapObject(definedElementQueries, (queryElement) => {
+  return (...args) => {
+    const Element = queryElement(...args)
+    return doubleClickElement(Element)
+  }
+})
 
 export const action = {
   sequence: {
@@ -47,6 +55,9 @@ export const action = {
         redoAction,
       },
     },
+  },
+  doubleClickOn: {
+    ...definedDoubleClicks,
   },
 }
 

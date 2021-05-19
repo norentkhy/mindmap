@@ -1,26 +1,27 @@
-import produce from 'immer'
 import Collection from '../../data-structures/collection'
 
-export default function updateCurrentView(state, actions) {
-  return produce(state, (newState) => {
-    if (!newState.currentView) newState.currentView = {}
-
-    newState.currentView.nodesToRender = computeNodesToRender({
+export default function computeViewmodel(state, actions) {
+  return {
+    nodes: computeNodesToRender({
       nodes: state.nodes,
       arrows: state.arrows,
+      editingNodeIds: state.user.editingNodes,
       foldedNodeIds: state.user.foldedNodes,
+      focusedNodeId: state.user.focusedNode,
       startToEditNode: actions.initiateEditNode,
       applyNodeEdit: actions.finalizeEditNode,
       toggleFoldOnNode: actions.foldNode,
       createChildNode: actions.createChildNode,
-    })
-  })
+    }),
+  }
 }
 
 function computeNodesToRender({
   nodes,
   arrows,
+  editingNodeIds,
   foldedNodeIds,
+  focusedNodeId,
   startToEditNode,
   applyNodeEdit,
   toggleFoldOnNode,
@@ -34,21 +35,24 @@ function computeNodesToRender({
     ([id]) => !hiddenNodeIds.includes(id)
   )
 
-  visibleNodes.map(([id, node]) => {
-    return {
-      ...node,
-      id,
-      startToEditThisNode: () => startToEditNode({collectionId: id}),
-      changeNodeText: (text) => applyNodeEdit({collectionId: id, text }),
-      toggleFoldOnThisNode: () => toggleFoldOnNode({collectionId: id}),
-      createChildOfThisNode: () => createChildNode({collectionId: id}),
-    }
-  })
+  return visibleNodes.map(([id, node]) => ({
+    ...node,
+    id,
+    editing: editingNodeIds.includes(id),
+    folded: foldedNodeIds.includes(id),
+    focused: id === focusedNodeId,
+    do: {
+      startToEdit: () => startToEditNode({ id }),
+      changeNodeText: (text) => applyNodeEdit({ id, text }),
+      toggleFold: () => toggleFoldOnNode({ id }),
+      createChild: () => createChildNode({ parentId: id }),
+    },
+  }))
 }
 
 function getConnectedNodes(id, arrows) {
   const connectedId = Collection.get(arrows, id)
   if (!connectedId) return []
 
-  return [connectedId, getConnectedNodes(connectedId, arrows)]
+  return [connectedId, ...getConnectedNodes(connectedId, arrows)]
 }

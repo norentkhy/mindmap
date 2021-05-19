@@ -2,9 +2,17 @@ import produce from 'immer'
 import { useReducer } from 'react'
 
 export function useTime(
-  initialTimeline = { pasts: [], present: null, futures: [] }
+  { initialPasts = [], initialPresent = null, initialFutures = [] } = {
+    initialPasts: [],
+    initialPresent: null,
+    initialFutures: [],
+  }
 ) {
-  const [timeline, dispatch] = useReducer(reduce, initialTimeline)
+  const [timeline, dispatch] = useReducer(reduce, {
+    pasts: initialPasts,
+    present: initialPresent,
+    futures: initialFutures,
+  })
 
   return {
     timeline,

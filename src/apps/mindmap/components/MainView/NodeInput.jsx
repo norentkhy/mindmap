@@ -1,11 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react'
 
-export default function NodeInput({ node: { text, editing, changeNodeText } }) {
+export default function NodeInput({
+  node: {
+    text,
+    editing,
+    focused,
+    do: { changeNodeText },
+  },
+}) {
   const [newText, setNewText] = useState(text)
   const inputRef = useRef()
 
   useEffect(() => {
-    editing && inputRef.current?.focus()
+    if (editing) inputRef.current?.focus()
   }, [editing])
 
   return (

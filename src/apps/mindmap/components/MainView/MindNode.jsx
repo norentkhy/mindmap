@@ -6,9 +6,6 @@ export default function MindNode({ node }) {
   const {
     editing,
     text,
-    startToEditThisNode,
-    toggleFoldOnThisNode,
-    createChildOfThisNode,
   } = node
 
   useEffect(() => {
@@ -27,10 +24,14 @@ export default function MindNode({ node }) {
       <button
         aria-label="node"
         ref={nodeRef}
+        onDoubleClick={(e) => {
+          e.stopPropagation()
+          node.do.startToEdit()
+        }}
         onKeyUp={({ key }) => {
-          key === 'Enter' && startToEditThisNode()
-          key === 'c' && createChildOfThisNode()
-          key === 'f' && toggleFoldOnThisNode()
+          key === 'Enter' && node.do.startToEdit()
+          key === 'c' && node.do.createChild()
+          key === 'f' && node.do.toggleFold()
         }}
       >
         {text}

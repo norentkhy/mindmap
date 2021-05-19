@@ -1,40 +1,35 @@
-import { viewmodel } from '~mindmap/test-utilities'
 import { describe, test, expect } from '@jest/globals'
-import Collection from '../../data-structures/collection'
+import { renderHook, act } from '@testing-library/react-hooks'
+import useViewmodel from '../../components/Model/useViewmodel'
+
+function renderViewmodel() {
+  const { result } = renderHook(useViewmodel)
+
+  return new Proxy(result.current, {
+    get: (_target, prop) => result.current[prop],
+    set: () => {
+      throw new Error('modify state using the viewmodel handlers')
+    },
+  })
+}
 
 describe('node-folding: viewmodel', () => {
   test('toggle fold: fold and unfold', () => {
-    const { state, action, actionSequence } = viewmodel.render()
-    actionSequence.createRootNodeWithProperties({
-      text: 'root node',
-    })
+    const vm = renderViewmodel()
+    act(() => vm.createRootNode())
+    act(() => vm.nodes[0].do.changeNodeText('fold this'))
+    act(() => vm.nodes[0].do.createChild())
+    act(() => vm.nodes[1].do.changeNodeText('child'))
 
-    const [_, id] = Collection.last(state.getState().nodes)
-    const initialNode = state.getNewestRootNode()
-    expect(initialNode.folded).toBeFalsy()
+    expect(vm.nodes[0]).toMatchObject({ folded: false })
+    expect(vm.nodes.length).toBe(2)
 
-    action.foldNode({collectionId: id})
-    expect(state.getState().user.foldedNodes).toContain(id)
+    act(() => vm.nodes[0].do.toggleFold())
+    expect(vm.nodes[0]).toMatchObject({ folded: true })
+    expect(vm.nodes.length).toBe(1)
 
-    action.foldNode({collectionId: id})
-    expect(state.getState().user.foldedNodes).not.toContain(id)
-  })
-
-  test('toggle fold: fold and unfold', () => {
-    const { state, action, actionSequence } = viewmodel.render()
-    const { id } = actionSequence.createRootNodeWithProperties({
-      text: 'root node',
-    })
-
-    const initialNode = state.getNewestRootNode()
-    expect(initialNode.folded).toBeFalsy()
-
-    action.foldNode({id})
-    const foldedNode = state.getNewestRootNode()
-    expect(foldedNode.folded).toBe(true)
-
-    action.foldNode({id})
-    const unfoldedNode = state.getNewestRootNode()
-    expect(unfoldedNode.folded).toBe(false)
+    act(() => vm.nodes[0].do.toggleFold())
+    expect(vm.nodes[0]).toMatchObject({ folded: false })
+    expect(vm.nodes.length).toBe(2)
   })
 })
