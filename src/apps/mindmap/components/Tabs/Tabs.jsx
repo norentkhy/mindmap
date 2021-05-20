@@ -1,41 +1,26 @@
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
-import { TabsContext } from './TabsContext'
 
-export function Tabs({ theTabsContext = TabsContext }) {
-  const { state, addNewTab } = useContext(theTabsContext)
-  const tabsToRender = getTabsToRender(state)
-
+export function Tabs({ tabs, createTab }) {
   return (
     <TabsBar aria-label="tabs">
-      {tabsToRender.map((tab) => (
-        <Tab
-          key={tab.id}
-          data-id={tab.id}
-          tab={tab}
-          theTabsContext={theTabsContext}
-        />
+      {tabs.map((tab) => (
+        <Tab key={tab.id} tab={tab} />
       ))}
-      <button aria-label="add new tab" onClick={addNewTab}>
+      <button aria-label="add new tab" onClick={createTab}>
         +
       </button>
     </TabsBar>
   )
 }
 
-function getTabsToRender(state) {
-  return state?.tabs || []
+function Tab({ tab }) {
+  if (tab.renaming) return <TabInput tab={tab} />
+  else return <TabButton tab={tab} />
 }
 
-function Tab({ tab, theTabsContext }) {
-  const { renaming } = tab
-
-  if (renaming) return <TabInput tab={tab} theTabsContext={theTabsContext} />
-  else return <TabButton tab={tab} theTabsContext={theTabsContext} />
-}
-
-function TabInput({ tab: { id, title, renaming }, theTabsContext }) {
-  const { finishRenameTab } = useContext(theTabsContext)
+function TabInput({ tab }) {
+  const { title, renaming } = tab
   const [newTitle, setNewTitle] = useState(title)
   const inputRef = useRef()
 
@@ -47,22 +32,22 @@ function TabInput({ tab: { id, title, renaming }, theTabsContext }) {
       aria-label="renaming this tab"
       value={newTitle}
       onChange={({ target }) => setNewTitle(target.value)}
-      onKeyUp={({ key }) =>
-        key === 'Enter' && finishRenameTab({ id, newTitle })
-      }
+      onKeyUp={({ key }) => {
+        key === 'Enter' && tab.do.rename(newTitle)
+      }}
       onFocus={({ target }) => target.select()}
     />
   )
 }
 
-function TabButton({ tab: { id, title, selected }, theTabsContext }) {
-  const { selectTab, initiateRenameTab } = useContext(theTabsContext)
+function TabButton({ tab }) {
+  const { id, title, selected } = tab
 
   return (
     <Button
       data-id={id}
-      onClick={() => selectTab(id)}
-      onDoubleClick={() => initiateRenameTab(id)}
+      onClick={() => tab.do.select()}
+      onDoubleClick={() => tab.do.editName()}
       selected={selected}
     >
       {title}

@@ -11,13 +11,7 @@ describe('accessibility: view components', () => {
   })
 
   test('tabs', () => {
-    view.render({
-      JSX: (
-        <MockProvider>
-          <Tabs theTabsContext={MockContext} />
-        </MockProvider>
-      ),
-    })
+    view.render({ JSX: <Tabs tabs={[]} /> })
     view.expect.byLabel('tabs').toBeVisible()
   })
 

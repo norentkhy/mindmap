@@ -39,7 +39,11 @@ export default function useViewmodel(
     initialPresent: state,
   })
   const actions = bindActionsTo(dispatch)
-  const [current, setCurrent] = useState({ nodes: [] })
+  const [current, setCurrent] = useState({
+    nodes: [],
+    tabs: [],
+    do: { createTab() {} },
+  })
 
   useEffect(() => {
     insertIntoTimeline(state)
@@ -172,8 +176,9 @@ const stateTransitions = {
   FINISH_RENAME_TAB(state, { id, newName }) {
     return produce(state, (newState) => {
       newState.tabs = Collection.modify(state.tabs, id, (tab) => {
-        tab.name = newName
+        tab.title = newName
       })
+      newState.user.renamingTab = null
     })
   },
 }
@@ -189,6 +194,6 @@ function createNode() {
   }
 }
 
-function createTab(name = 'untitled') {
-  return { name }
+function createTab(title = 'untitled') {
+  return { title }
 }

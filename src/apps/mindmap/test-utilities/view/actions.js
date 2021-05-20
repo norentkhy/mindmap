@@ -19,6 +19,13 @@ const waitForNodeInputToHaveFocus = async () =>
 const waitForNodeInputNotToBeVisible = async () =>
   await waitForExpectation.nodeInput().not.toBeVisible()
 
+const definedClicks= mapObject(definedElementQueries, (queryElement) => {
+  return (...args) => {
+    const Element = queryElement(...args)
+    return clickElement(Element)
+  }
+})
+
 const definedDoubleClicks = mapObject(definedElementQueries, (queryElement) => {
   return (...args) => {
     const Element = queryElement(...args)
@@ -55,6 +62,9 @@ export const action = {
         redoAction,
       },
     },
+  },
+  clickOn: {
+    ...definedClicks
   },
   doubleClickOn: {
     ...definedDoubleClicks,

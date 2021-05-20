@@ -2,6 +2,14 @@ import Collection from '../../data-structures/collection'
 
 export default function computeViewmodel(state, actions) {
   return {
+    tabs: computeTabsToRender({
+      tabs: state.tabs,
+      selectedTab: state.user.selectedTab,
+      renamingTab: state.user.renamingTab,
+      selectTab: actions.selectTab,
+      startToRenameTab: actions.initiateRenameTab,
+      applyTabRename: actions.finishRenameTab,
+    }),
     nodes: computeNodesToRender({
       nodes: state.nodes,
       arrows: state.arrows,
@@ -13,7 +21,31 @@ export default function computeViewmodel(state, actions) {
       toggleFoldOnNode: actions.foldNode,
       createChildNode: actions.createChildNode,
     }),
+    do: {
+      createTab: actions.addNewTab,
+    },
   }
+}
+
+function computeTabsToRender({
+  tabs,
+  selectedTab,
+  renamingTab,
+  selectTab,
+  startToRenameTab,
+  applyTabRename,
+}) {
+  return Collection.map(tabs, ([id, tab]) => ({
+    ...tab,
+    id,
+    selected: id === selectedTab,
+    renaming: id === renamingTab,
+    do: {
+      select: () => selectTab(id),
+      editName: () => startToRenameTab(id),
+      rename: (newName) => applyTabRename(id, newName),
+    },
+  }))
 }
 
 function computeNodesToRender({

@@ -17,13 +17,17 @@ export default function testTabs(describe, beforeEach, it, cy) {
       visitMindmapApp(cy)
     })
 
-    it('add a new tab', () => {
-      clickButtonToAddTab(cy)
+    it('starts with untitled tab', () => {
       expectToFindText(cy, 'untitled')
     })
 
+    it('add a new tab', () => {
+      clickButtonToAddTab(cy)
+      expectToFindMultipleText(cy, 2, 'untitled')
+    })
+
     it('add multiple new tabs', () => {
-      repeat(5, () => clickButtonToAddTab(cy))
+      repeat(4, () => clickButtonToAddTab(cy))
       expectToFindMultipleText(cy, 5, 'untitled')
     })
   })
