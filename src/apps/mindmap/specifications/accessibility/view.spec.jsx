@@ -1,5 +1,6 @@
 import { Actions, MainView, Tabs } from '~mindmap/components'
 import { view } from '~mindmap/test-utilities/view'
+import { render } from '@testing-library/react'
 import { createMockContextProvider } from 'test-utils/react-mocks'
 import React from 'react'
 
@@ -25,11 +26,7 @@ describe('accessibility: view components', () => {
   })
 
   test('actions', () => {
-    view.render({
-      injectMockModelIntoJSX: ({ useMock }) => (
-        <Actions useThisModel={useMock} />
-      ),
-    })
+    render(<Actions actions={{}} />)
     view.expect.byLabel('actions').toBeVisible()
   })
 })

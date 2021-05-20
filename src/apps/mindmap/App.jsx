@@ -13,11 +13,18 @@ export default function MindMap({ logResize, useThisResizeObserver }) {
       logResize={logResize}
       useThisResizeObserver={useThisResizeObserver}
     >
-      <StateFulTabs />
-      <Actions />
+      <StatefulTabs />
+      <StatefulActions />
       <StatefulMainView />
     </Providers>
   )
+}
+
+function StatefulActions() {
+  const model = useModel()
+  const { createRootNode, undo, redo } = model
+
+  return <Actions actions={{ createRootNode, undo, redo }} />
 }
 
 function StatefulMainView() {
@@ -27,7 +34,7 @@ function StatefulMainView() {
   return <MainView nodes={nodes} createNode={createRootNode} />
 }
 
-function StateFulTabs() {
+function StatefulTabs() {
   const model = useModel()
   const {
     tabs,

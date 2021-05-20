@@ -38,7 +38,7 @@ export default function useViewmodel(
   const { timeline, insertIntoTimeline, goBack, goForward } = useTime({
     initialPresent: state,
   })
-  const actions = bindActionsTo(dispatch)
+  const actions = { ...bindActionsTo(dispatch), undo: goBack, redo: goForward }
   const [current, setCurrent] = useState({
     nodes: [],
     tabs: [],
@@ -58,8 +58,8 @@ export default function useViewmodel(
     undo: goBack,
     redo: goForward,
     useThisResizeObserver,
-    ...current,
     ...actions,
+    ...current,
   }
 
   function reduce(state, action) {
