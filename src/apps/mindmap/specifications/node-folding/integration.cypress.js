@@ -6,7 +6,7 @@ import {
   pressOnKeyboard,
   visitMindmapApp,
   expectToFindText,
-} from '../test-utilities/cypress'
+} from '~mindmap/test-utilities/cypress'
 
 export default function testNodeCreation(describe, it, cy) {
   const { nodeTexts, targetText, foldedTexts, neverFoldedTexts } =

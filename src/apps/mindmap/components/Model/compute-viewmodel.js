@@ -1,4 +1,4 @@
-import Collection from '../../data-structures/collection'
+import Collection from '~mindmap/data-structures/collection'
 
 export default function computeViewmodel(state, actions) {
   return {

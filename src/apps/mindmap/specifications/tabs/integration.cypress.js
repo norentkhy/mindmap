@@ -9,7 +9,7 @@ import {
   typeOnKeyboard,
   pressOnKeyboard,
   expectTabFromLeftToHaveName,
-} from '../test-utilities/cypress'
+} from '~mindmap/test-utilities/cypress'
 
 export default function testTabs(describe, beforeEach, it, cy) {
   describe('add a tab', () => {

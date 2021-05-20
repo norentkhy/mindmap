@@ -1,8 +1,8 @@
 import React from 'react'
-import MindMapApp from '../App'
+import MindMapApp from '~mindmap/App'
 
 function MindMapInstance() {
-  return <MindMapApp logResize={console.log} />
+  return <MindMapApp />
 }
 
 export default { title: 'MindMap' }

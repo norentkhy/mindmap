@@ -1,20 +1,25 @@
 import { Actions } from '~mindmap/components'
-import { viewmodel, view } from '~mindmap/test-utilities'
-import { render } from '@testing-library/react'
+import {
+  view,
+  createMockFn,
+  describe,
+  test,
+  expect,
+} from '~mindmap/test-utilities'
 import React from 'react'
 
 describe('actions', () => {
   test('undo', () => {
-    const undo = viewmodel.create.mockFunction()
-    render(<Actions actions={{ undo }} />)
-    view.action.mouse.clickOn.menu.undoAction()
-    viewmodel.expect.mockFunction(undo).toBeCalled()
+    const undo = createMockFn()
+    view.render(<Actions actions={{ undo }} />)
+    view.clickOn.undoButton()
+    expect(undo).toBeCalled()
   })
 
   test('redo', () => {
-    const redo = viewmodel.create.mockFunction()
-    render(<Actions actions={{ redo }} />)
-    view.action.mouse.clickOn.menu.redoAction()
-    viewmodel.expect.mockFunction(redo).toBeCalled()
+    const redo = createMockFn()
+    view.render(<Actions actions={{ redo }} />)
+    view.clickOn.redoButton()
+    expect(redo).toBeCalled()
   })
 })

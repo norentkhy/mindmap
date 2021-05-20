@@ -1,32 +1,20 @@
 import { Actions, MainView, Tabs } from '~mindmap/components'
-import { view } from '~mindmap/test-utilities/view'
-import { render } from '@testing-library/react'
-import { createMockContextProvider } from 'test-utils/react-mocks'
+import { view, describe, test } from '~mindmap/test-utilities/view'
 import React from 'react'
 
 describe('accessibility: view components', () => {
-  const [MockContext, MockProvider] = createMockContextProvider({
-    modifications: {
-      useThisResizeObserver() {},
-    },
-  })
-
   test('tabs', () => {
-    view.render({ JSX: <Tabs tabs={[]} /> })
-    view.expect.byLabel('tabs').toBeVisible()
+    view.render(<Tabs tabs={[]} />)
+    view.expect.label('tabs').toBeVisible()
   })
 
   test('main view', () => {
-    view.render({
-      injectMockModelIntoJSX: ({ useMock }) => (
-        <MainView useThisModel={useMock} />
-      ),
-    })
-    view.expect.byLabel('main view').toBeVisible()
+    view.render(<MainView nodes={[]} />)
+    view.expect.label('main view').toBeVisible()
   })
 
   test('actions', () => {
-    render(<Actions actions={{}} />)
-    view.expect.byLabel('actions').toBeVisible()
+    view.render(<Actions actions={{}} />)
+    view.expect.label('actions').toBeVisible()
   })
 })

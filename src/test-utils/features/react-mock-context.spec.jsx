@@ -1,7 +1,6 @@
 import { renderHook, act } from '@testing-library/react-hooks'
 import React, { useContext } from 'react'
 import { createMockContextProvider } from '../react-mocks'
-import { getActions } from '../testing-library-react-hooks'
 
 describe('mock context and provider', () => {
   test('argumentless usage', () => {

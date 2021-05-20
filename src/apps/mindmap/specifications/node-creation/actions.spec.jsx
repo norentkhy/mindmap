@@ -1,13 +1,18 @@
 import { Actions } from '~mindmap/components'
-import { view, viewmodel } from '~mindmap/test-utilities'
-import { render } from '@testing-library/react'
+import {
+  view,
+  createMockFn,
+  describe,
+  test,
+  expect,
+} from '~mindmap/test-utilities'
 import React from 'react'
 
 describe('actions', () => {
   test('node creation', () => {
-    const createRootNode = viewmodel.create.mockFunction()
-    render(<Actions actions={{ createRootNode }} />)
-    view.action.mouse.clickOn.menu.createRootNode()
-    viewmodel.expect.mockFunction(createRootNode).toBeCalled()
+    const createRootNode = createMockFn()
+    view.render(<Actions actions={{ createRootNode }} />)
+    view.clickOn.createRootNodeButton()
+    expect(createRootNode).toBeCalled()
   })
 })

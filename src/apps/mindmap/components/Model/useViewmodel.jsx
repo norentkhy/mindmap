@@ -2,7 +2,6 @@ import { useEffect, useReducer, useState } from 'react'
 import produce, { enableMapSet } from 'immer'
 import { v4 as uuidv4 } from 'uuid'
 import { useTime } from '~mindmap/hooks/useTime'
-import useResizeObserver from '@react-hook/resize-observer'
 import Collection from '~mindmap/data-structures/collection'
 import computeViewmodel from './compute-viewmodel'
 enableMapSet()
@@ -11,7 +10,6 @@ function createInitialState() {
   const emptyCollection = Collection.create()
   const [tabs, tabId] = Collection.add(emptyCollection, createTab())
   return {
-    trees: [],
     tabs,
     nodes: emptyCollection,
     arrows: emptyCollection,
@@ -28,10 +26,8 @@ function createInitialState() {
 export default function useViewmodel(
   {
     initialState = createInitialState(),
-    useThisResizeObserver = useResizeObserver,
   } = {
     initialState: createInitialState(),
-    useThisResizeObserver: useThisResizeObserver,
   }
 ) {
   const [state, dispatch] = useReducer(reduce, initialState)
@@ -55,9 +51,6 @@ export default function useViewmodel(
 
   return {
     state: timeline.present,
-    undo: goBack,
-    redo: goForward,
-    useThisResizeObserver,
     ...actions,
     ...current,
   }

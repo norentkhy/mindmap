@@ -1,14 +1,19 @@
-import { view, getWaitForOptions } from '~mindmap/test-utilities/view'
-import { expect, describe, test } from '@jest/globals'
-import { screen } from '@testing-library/react'
+import {
+  view,
+  getWaitForOptions,
+  expect,
+  describe,
+  test,
+} from '~mindmap/test-utilities/view'
+import { render, screen } from '@testing-library/react'
 import React from 'react'
 
 describe('query', () => {
   test('elements with text', () => {
     const text = 'this will be queried'
-    view.render({ JSX: <button>{text}</button> })
+    render(<button>{text}</button>)
 
-    const Element = view.query.byText(text)
+    const Element = view.query.text(text)
 
     expect(Element).not.toBeNull()
     expect(Element).toBe(screen.queryByText(text))
@@ -18,9 +23,9 @@ describe('query', () => {
 describe('expect', () => {
   test('element visibility', () => {
     const text = 'this is visible'
-    view.render({ JSX: <button>{text}</button> })
+    render(<button>{text}</button>)
 
-    const queryElement = () => view.query.byText(text)
+    const queryElement = () => view.query.text(text)
     expect(queryElement()).toBeVisible()
 
     view.expect.element(queryElement).toBeVisible()

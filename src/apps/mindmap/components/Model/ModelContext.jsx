@@ -3,16 +3,9 @@ import useViewmodel from './useViewmodel'
 
 export const ModelContext = createContext()
 
-export function ModelProvider({
-  children,
-  initialState,
-  useThisResizeObserver,
-  logResize = () => {},
-}) {
+export function ModelProvider({ children, initialState }) {
   const newViewModel = useViewmodel({
     initialState,
-    useThisResizeObserver,
-    logResize,
   })
 
   return (

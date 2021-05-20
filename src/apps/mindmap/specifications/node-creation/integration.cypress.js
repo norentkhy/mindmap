@@ -9,7 +9,7 @@ import {
   pressOnKeyboard,
   typeOnKeyboard,
   visitMindmapApp,
-} from '../test-utilities/cypress'
+} from '~mindmap/test-utilities/cypress'
 
 export default function testNodeCreation(describe, beforeEach, it, cy) {
   beforeEach(() => {

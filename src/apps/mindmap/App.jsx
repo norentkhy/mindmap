@@ -1,18 +1,10 @@
 import React from 'react'
-import {
-  Actions,
-  MainView,
-  ModelProvider,
-  Tabs,
-} from './components'
+import { Actions, MainView, ModelProvider, Tabs } from './components'
 import useModel from '~mindmap/hooks/useModel'
 
-export default function MindMap({ logResize, useThisResizeObserver }) {
+export default function MindMap() {
   return (
-    <Providers
-      logResize={logResize}
-      useThisResizeObserver={useThisResizeObserver}
-    >
+    <Providers>
       <StatefulTabs />
       <StatefulActions />
       <StatefulMainView />
@@ -44,13 +36,6 @@ function StatefulTabs() {
   return <Tabs tabs={tabs} createTab={createTab} />
 }
 
-function Providers({ children, logResize, useThisResizeObserver }) {
-  return (
-    <ModelProvider
-      logResize={logResize}
-      useThisResizeObserver={useThisResizeObserver}
-    >
-      {children}
-    </ModelProvider>
-  )
+function Providers({ children }) {
+  return <ModelProvider>{children}</ModelProvider>
 }

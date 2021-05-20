@@ -1,21 +1,11 @@
-import { describe, test, expect } from '@jest/globals'
-import { renderHook, act } from '@testing-library/react-hooks'
-import useViewmodel from '../../components/Model/useViewmodel'
-
-function renderViewmodel() {
-  const { result } = renderHook(useViewmodel)
-
-  return new Proxy(result.current, {
-    get: (_target, prop) => result.current[prop],
-    set: () => {
-      throw new Error('modify state using the viewmodel handlers')
-    },
-  })
-}
-
-function expectAnId() {
-  return expect.any(String)
-}
+import {
+  describe,
+  test,
+  expect,
+  expectAnId,
+  renderViewmodel,
+  act,
+} from '~mindmap/test-utilities/viewmodel'
 
 describe('nodes', () => {
   test('nodes to be rendered are available as an array', () => {

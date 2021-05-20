@@ -1,29 +1,11 @@
-import { describe, test, expect } from '@jest/globals'
-import { renderHook, act } from '@testing-library/react-hooks'
-import useViewmodel from '../../components/Model/useViewmodel'
+import {
+  describe,
+  test,
+  expect,
+  renderViewmodel,
+  act,
+} from '~mindmap/test-utilities/viewmodel'
 import { repeat } from '~/utils/FunctionalProgramming'
-
-function renderViewmodel() {
-  const { result } = renderHook(useViewmodel)
-
-  return new Proxy(result.current, {
-    get: (_target, prop) => result.current[prop],
-    set: () => {
-      throw new Error('modify state using the viewmodel handlers')
-    },
-  })
-}
-
-function getRelevantState(vm) {
-  return {
-    state: vm.state,
-    nodes: vm.nodes.map((node) => {
-      const copy = { ...node }
-      delete copy.do
-      return copy
-    }),
-  }
-}
 
 describe('prerequisites', () => {
   test('createRootNode changes relevant state', () => {
@@ -83,3 +65,14 @@ describe('undo and redo', () => {
     expect(getRelevantState(vm)).toEqual(stateAfter)
   })
 })
+
+function getRelevantState(vm) {
+  return {
+    state: vm.state,
+    nodes: vm.nodes.map((node) => {
+      const copy = { ...node }
+      delete copy.do
+      return copy
+    }),
+  }
+}

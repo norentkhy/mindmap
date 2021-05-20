@@ -4,11 +4,19 @@ import {
   getFocus,
   queryAllElementsByRole,
 } from '../dependencies'
-import 'jest-styled-components'
 
 const label = {
+  mindSpace: 'main view',
+  rootTree: 'container of rootnode',
+  node: 'node',
   nodeInput: 'editing node',
   tabs: { tabInput: 'renaming this tab' },
+  button: {
+    createRootNode: 'create root node',
+    createTab: 'add new tab',
+    undo: 'undo action',
+    redo: 'redo action',
+  },
 }
 
 const text = {
@@ -16,8 +24,8 @@ const text = {
 }
 
 export const definedElementQueries = {
-  byLabel: queryElementByLabelText,
-  byText: queryElementByText,
+  label: queryElementByLabelText,
+  text: queryElementByText,
   focus: getFocus,
   tab: queryTab,
   tabInput: queryTabInput,
@@ -25,7 +33,12 @@ export const definedElementQueries = {
   nodeInput: queryNodeInput,
   node: queryNode,
   rootTree: queryRootTree,
-  mindSpace: queryMindSpace,
+  mindSpace: () => queryElementByLabelText(label.mindSpace),
+  createRootNodeButton: () =>
+    queryElementByLabelText(label.button.createRootNode),
+  createTabButton: () => queryElementByLabelText(label.button.createTab),
+  undoButton: () => queryElementByLabelText(label.button.undo),
+  redoButton: () => queryElementByLabelText(label.button.redo),
 }
 
 export const query = {
@@ -72,19 +85,19 @@ function queryAllElements() {
 }
 
 function queryMindSpace() {
-  return queryElementByLabelText('main view')
+  return queryElementByLabelText(label.mindSpace)
 }
 
 function isMindSpace(Element) {
-  return Element.getAttribute('aria-label') === 'main view'
+  return Element.getAttribute('aria-label') === label.mindSpace
 }
 
 function isRootTree(Element) {
-  return Element.getAttribute('aria-label') === 'container of rootnode'
+  return Element.getAttribute('aria-label') === label.rootTree
 }
 
 function isNode(Element) {
-  return Element.getAttribute('aria-label') === 'node'
+  return Element.getAttribute('aria-label') === label.node
 }
 
 function queryRootTree(node) {
@@ -95,7 +108,7 @@ function queryRootTree(node) {
 function getRootTree(Node) {
   const ParentElement = Node.parentElement
   if (!ParentElement) throw new Error('no root container')
-  if (ParentElement.getAttribute('aria-label') === 'container of rootnode')
+  if (ParentElement.getAttribute('aria-label') === label.rootTree)
     return ParentElement
   else return getRootTree(ParentElement)
 }

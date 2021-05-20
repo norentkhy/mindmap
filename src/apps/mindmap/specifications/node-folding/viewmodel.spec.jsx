@@ -1,17 +1,10 @@
-import { describe, test, expect } from '@jest/globals'
-import { renderHook, act } from '@testing-library/react-hooks'
-import useViewmodel from '../../components/Model/useViewmodel'
-
-function renderViewmodel() {
-  const { result } = renderHook(useViewmodel)
-
-  return new Proxy(result.current, {
-    get: (_target, prop) => result.current[prop],
-    set: () => {
-      throw new Error('modify state using the viewmodel handlers')
-    },
-  })
-}
+import {
+  describe,
+  test,
+  expect,
+  renderViewmodel,
+  act,
+} from '~mindmap/test-utilities/viewmodel'
 
 describe('node-folding: viewmodel', () => {
   test('toggle fold: fold and unfold', () => {

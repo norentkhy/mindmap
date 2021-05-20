@@ -10,7 +10,7 @@ import {
   expectToFindText,
   createRootNodeWithName,
   createChildNodeWithName,
-} from '../test-utilities/cypress'
+} from '~mindmap/test-utilities/cypress'
 import { repeat } from '~/utils/FunctionalProgramming'
 
 export default function testUndoRedo(describe, beforeEach, it, cy) {
