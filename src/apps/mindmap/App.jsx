@@ -1,13 +1,16 @@
 import React from 'react'
 import { Actions, MainView, ModelProvider, Tabs } from './components'
 import useModel from '~mindmap/hooks/useModel'
+import styled from 'styled-components'
 
 export default function MindMap() {
   return (
     <Providers>
-      <StatefulTabs />
-      <StatefulActions />
-      <StatefulMainView />
+      <FlexRowFullHeight>
+        <StatefulTabs />
+        <StatefulActions />
+        <StatefulMainView />
+      </FlexRowFullHeight>
     </Providers>
   )
 }
@@ -39,3 +42,9 @@ function StatefulTabs() {
 function Providers({ children }) {
   return <ModelProvider>{children}</ModelProvider>
 }
+
+const FlexRowFullHeight = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+`
