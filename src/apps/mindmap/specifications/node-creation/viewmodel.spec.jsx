@@ -44,6 +44,28 @@ describe('nodes', () => {
     ])
   })
 
+  test('properties of child node creation', () => {
+    const vm = renderViewmodel()
+    act(() => vm.createRootNode())
+    act(() => vm.nodes[0].do.changeNodeText('parent node'))
+    act(() => vm.nodes[0].do.createChild())
+    expect(vm.nodes).toEqual([
+      expect.any(Object),
+      expect.objectContaining({
+        id: expectAnId(),
+        text: '',
+        editing: true,
+        focused: true,
+        do: {
+          startToEdit: expect.any(Function),
+          changeNodeText: expect.any(Function),
+          toggleFold: expect.any(Function),
+          createChild: expect.any(Function),
+        },
+      }),
+    ])
+  })
+
   test('change node text', () => {
     const vm = renderViewmodel()
     act(() => vm.createRootNode())

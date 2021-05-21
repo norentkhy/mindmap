@@ -58,6 +58,7 @@ describe('new state structure', () => {
     const nodeInEdit = addIdTo({
       text: '',
       editing: true,
+      focused: true,
       do: { changeNodeText: createMockFn() },
     })
     view.render(<MainView nodes={[nodeInEdit]} />)

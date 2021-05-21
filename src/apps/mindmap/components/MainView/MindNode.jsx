@@ -3,14 +3,11 @@ import NodeInput from './NodeInput'
 
 export default function MindNode({ node }) {
   const nodeRef = useRef()
-  const {
-    editing,
-    text,
-  } = node
+  const { editing, focused, text } = node
 
   useEffect(() => {
-    !editing && nodeRef.current?.focus()
-  }, [editing])
+    if (focused && !editing) nodeRef.current?.focus()
+  }, [focused, editing, nodeRef.current])
 
   if (editing)
     return (

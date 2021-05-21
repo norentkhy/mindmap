@@ -24,9 +24,7 @@ function createInitialState() {
 }
 
 export default function useViewmodel(
-  {
-    initialState = createInitialState(),
-  } = {
+  { initialState = createInitialState() } = {
     initialState: createInitialState(),
   }
 ) {
@@ -122,6 +120,7 @@ const stateTransitions = {
       newState.nodes = newNodes
       newState.arrows = Collection.replace(state.arrows, parentId, id)
       newState.user.editingNodes.push(id)
+      newState.user.focusedNode = id
     })
   },
   EDIT_NODE(state, { id, editing, ...modifications }) {
@@ -147,6 +146,7 @@ const stateTransitions = {
           )
         else newState.user.foldedNodes.push(id)
       }
+      newState.user.focusedNode = id
     })
   },
   ADD_NEW_TAB(state) {

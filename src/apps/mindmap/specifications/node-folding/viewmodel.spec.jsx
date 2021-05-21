@@ -18,11 +18,11 @@ describe('node-folding: viewmodel', () => {
     expect(vm.nodes.length).toBe(2)
 
     act(() => vm.nodes[0].do.toggleFold())
-    expect(vm.nodes[0]).toMatchObject({ folded: true })
+    expect(vm.nodes[0]).toMatchObject({ folded: true, focused: true })
     expect(vm.nodes.length).toBe(1)
 
     act(() => vm.nodes[0].do.toggleFold())
-    expect(vm.nodes[0]).toMatchObject({ folded: false })
+    expect(vm.nodes[0]).toMatchObject({ folded: false, focused: true })
     expect(vm.nodes.length).toBe(2)
   })
 })

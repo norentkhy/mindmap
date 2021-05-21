@@ -25,8 +25,8 @@ export default function testNodeCreation(describe, it, cy) {
       pressOnKeyboard(cy, 'f')
       nodeTexts.forEach((text) => expectToFindText(cy, text))
       /** use this once the project is on the new state data structure*/
-      // waitForPossibleFocusChange(cy)
-      // expectFocusedToHaveText(cy, targetText)
+      waitForPossibleFocusChange(cy)
+      expectFocusedToHaveText(cy, targetText)
     })
   })
 }

@@ -12,8 +12,8 @@ export default function NodeInput({
   const inputRef = useRef()
 
   useEffect(() => {
-    if (editing) inputRef.current?.focus()
-  }, [editing])
+    if (focused && editing) inputRef.current?.focus()
+  }, [focused, editing, inputRef.current])
 
   return (
     <input
