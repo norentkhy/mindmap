@@ -1,3 +1,2 @@
-import MindSpace from './MindSpace'
-
-export { MindSpace }
+export { default as MindSpace } from './MindSpace'
+export { default as NodeContainer } from './NodeContainer'

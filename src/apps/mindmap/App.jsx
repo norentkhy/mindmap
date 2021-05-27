@@ -24,9 +24,12 @@ function StatefulActions() {
 
 function StatefulMainView() {
   const model = useModel()
-  const { nodes, createRootNode } = model
+  const {
+    nodes,
+    do: { createNodeOnMouse },
+  } = model
 
-  return <MainView nodes={nodes} createNode={createRootNode} />
+  return <MainView nodes={nodes} createNode={createNodeOnMouse} />
 }
 
 function StatefulTabs() {

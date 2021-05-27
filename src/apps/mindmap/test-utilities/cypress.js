@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from 'uuid'
+
 const label = {
   tabsContainer: 'tabs',
   addTabButton: 'add new tab',
@@ -52,10 +54,10 @@ export function doubleClickToRenameTabFromLeft(cy, index) {
   _findTabFromLeft(cy, index).dblclick()
 }
 
-function calculateOffsetCenter(Element) {
+function calculateOffset(Element, horizontalRatio, verticalRatio) {
   const { offsetWidth, offsetHeight } = Element
-  const left = offsetWidth / 2
-  const top = offsetHeight / 2
+  const left = offsetWidth * horizontalRatio
+  const top = offsetHeight * verticalRatio
 
   return { left, top }
 }
@@ -67,7 +69,7 @@ export function createChildNodeWithName(cy, name) {
 }
 
 export function createRootNodeWithName(cy, name) {
-  doubleClickToCreateNode(cy)
+  clickButtonToCreateNode(cy)
   typeOnKeyboard(cy, name)
   pressOnKeyboard(cy, 'enter')
 }
@@ -81,12 +83,22 @@ function doubleClickMindSpace({ cy, provideClickOffset, offsetName }) {
     }))
     .then(({ MindSpace, offset }) => {
       if (offsetName) cy.wrap(offset).as(offsetName)
-      cy.wrap(MindSpace).dblclick([offset.left, offset.top])
+      cy.wrap(MindSpace).dblclick(offset.left, offset.top)
     })
 }
 
-export function doubleClickToCreateNode(cy) {
-  doubleClickMindSpace({ cy, provideClickOffset: calculateOffsetCenter })
+export function doubleClickToCreateNode(
+  cy,
+  horizontalRatio = 0.5,
+  verticalRatio = 0.5,
+  offsetName
+) {
+  return doubleClickMindSpace({
+    cy,
+    provideClickOffset: (Element) =>
+      calculateOffset(Element, horizontalRatio, verticalRatio),
+    offsetName,
+  })
 }
 
 export function expectFocusedToContainText(cy, nodeName) {
@@ -107,6 +119,42 @@ export function expectToFindMultipleNodes(cy, amount) {
   cy.findAllByLabelText(label.node).should(($n) => {
     if (amount) expect($n).to.have.length(amount)
   })
+}
+
+export function expectToFindNodeAt(cy, offsetLabel) {
+  cy.all(
+    cy.findByLabelText(label.node),
+    cy.get('@MindSpace'),
+    cy.get(`@${offsetLabel}`)
+  )
+    .then(([[Node], [MindSpace], mouseOffset]) => ({
+      Node,
+      MindSpace,
+      mouseOffset,
+    }))
+    .then(({ Node, MindSpace, mouseOffset }) => ({
+      offsetNode: calculateOffsetFromMindSpace({ Element: Node, MindSpace }),
+      mouseOffset,
+    }))
+    .should(({ offsetNode, mouseOffset }) => {
+      expectTargetToSurroundPoint({ target: offsetNode, point: mouseOffset })
+    })
+}
+
+export function expectToFocusedAt(cy, offsetLabel) {
+  cy.all(cy.focused(), cy.get('@MindSpace'), cy.get(`@${offsetLabel}`))
+    .then(([[Focused], [MindSpace], mouseOffset]) => ({
+      Focused,
+      MindSpace,
+      mouseOffset,
+    }))
+    .then(({ Focused, MindSpace, mouseOffset }) => ({
+      offsetNode: calculateOffsetFromMindSpace({ Element: Focused, MindSpace }),
+      mouseOffset,
+    }))
+    .should(({ offsetNode, mouseOffset }) => {
+      expectTargetToSurroundPoint({ target: offsetNode, point: mouseOffset })
+    })
 }
 
 export function expectToFindNode(cy, positive = true) {
@@ -144,4 +192,27 @@ export function typeOnKeyboard(cy, typingContent) {
 
 export function visitMindmapApp(cy) {
   cy.visit('http://localhost:8080/mindmap')
+}
+
+function expectTargetToSurroundPoint({ target, point }) {
+  expect(target.left).to.be.below(point.left)
+  expect(target.left + target.width).to.be.above(point.left)
+  expect(target.top).to.be.below(point.top)
+  expect(target.top + target.height).to.be.above(point.top)
+}
+
+function calculateOffsetFromMindSpace({ Element, MindSpace }) {
+  const MindSpaceRect = MindSpace.getBoundingClientRect()
+  const ElementRect = Element.getBoundingClientRect()
+
+  return {
+    left: ElementRect.left - MindSpaceRect.left,
+    top: ElementRect.top - MindSpaceRect.top,
+    width: ElementRect.width,
+    height: ElementRect.height,
+  }
+}
+
+export function generateUniqueString() {
+  return uuidv4()
 }

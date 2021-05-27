@@ -2,19 +2,18 @@ import testNodeCreation from '~mindmap/specifications/node-creation/integration.
 import testNodeFolding from '~mindmap/specifications/node-folding/integration.cypress'
 import testTabs from '~mindmap/specifications/tabs/integration.cypress'
 import testUndoRedo from '~mindmap/specifications/undo-redo/integration.cypress'
+import testNodePlacement from '~mindmap/specifications/node-placement/integration.cypress'
 
-describe('node creation', () => {
-  testNodeCreation(describe, beforeEach, it, cy)
-})
+const testSpecifications = [
+  ['node creation', testNodeCreation],
+  ['node folding', testNodeFolding],
+  ['tabs', testTabs],
+  ['undo redo nodes', testUndoRedo],
+  ['node placement', testNodePlacement],
+]
 
-describe('node folding', () => {
-  testNodeFolding(describe, it, cy)
-})
-
-describe('tabs', () => {
-  testTabs(describe, beforeEach, it, cy)
-})
-
-describe('undo redo nodes', () => {
-  testUndoRedo(describe, beforeEach, it, cy)
+testSpecifications.forEach(([description, executeTests]) => {
+  describe(description, () => {
+    executeTests(describe, beforeEach, it, cy)
+  })
 })

@@ -72,6 +72,7 @@ function getRelevantState(vm) {
     nodes: vm.nodes.map((node) => {
       const copy = { ...node }
       delete copy.do
+      delete copy.compute
       return copy
     }),
   }

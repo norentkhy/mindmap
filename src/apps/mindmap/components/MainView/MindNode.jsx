@@ -1,9 +1,12 @@
-import React, { useEffect, useRef } from 'react'
 import NodeInput from './NodeInput'
+import { NodeContainer } from '../Styled'
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
 
 export default function MindNode({ node }) {
   const nodeRef = useRef()
   const { editing, focused, text } = node
+
+  const containerStyle = useContainerStyle(nodeRef, node)
 
   useEffect(() => {
     if (focused && !editing) nodeRef.current?.focus()
@@ -11,16 +14,22 @@ export default function MindNode({ node }) {
 
   if (editing)
     return (
-      <button aria-label="node" ref={nodeRef} node={node}>
+      <NodeContainer
+        aria-label="node"
+        ref={nodeRef}
+        node={node}
+        position={containerStyle}
+      >
         <NodeInput node={node} />
-      </button>
+      </NodeContainer>
     )
 
   if (!editing)
     return (
-      <button
+      <NodeContainer
         aria-label="node"
         ref={nodeRef}
+        position={containerStyle}
         onDoubleClick={(e) => {
           e.stopPropagation()
           node.do.startToEdit()
@@ -32,6 +41,27 @@ export default function MindNode({ node }) {
         }}
       >
         {text}
-      </button>
+      </NodeContainer>
     )
+}
+
+function useContainerStyle(ref, node) {
+  const [size, setSize] = useState({ width: 169, height: 27 })
+  const [containerStyle, setContainerStyle] = useState({})
+
+  useLayoutEffect(() => {
+    const newContainerStyle =
+      node?.compute?.containerStyle?.({
+        width: size.width,
+        height: size.height,
+      }) || {}
+    setContainerStyle(newContainerStyle)
+  }, [size.width, size.height])
+
+  node?.use?.sizeObserver(ref, (e) => {
+    const { width, height } = e.target.getBoundingClientRect()
+    setSize({ width, height })
+  })
+
+  return containerStyle
 }

@@ -5,7 +5,7 @@ export function Actions({ actions }) {
   const { createRootNode, undo, redo } = actions
   return (
     <FlexRow aria-label="actions">
-      <button onClick={createRootNode} aria-label="create root node">
+      <button onClick={() => createRootNode()} aria-label="create root node">
         create root node
       </button>
       <button onClick={() => undo()} aria-label="undo action">

@@ -2,8 +2,9 @@ import { useEffect, useReducer, useState } from 'react'
 import produce, { enableMapSet } from 'immer'
 import { v4 as uuidv4 } from 'uuid'
 import { useTime } from '~mindmap/hooks/useTime'
-import Collection from '~mindmap/data-structures/collection'
+import { Collection, Space, Children } from '~mindmap/data-structures'
 import computeViewmodel from './compute-viewmodel'
+import useResizeObserver from '@react-hook/resize-observer'
 enableMapSet()
 
 function createInitialState() {
@@ -12,6 +13,7 @@ function createInitialState() {
   return {
     tabs,
     nodes: emptyCollection,
+    space: Space.create(),
     arrows: emptyCollection,
     user: {
       editingNodes: [],
@@ -24,8 +26,12 @@ function createInitialState() {
 }
 
 export default function useViewmodel(
-  { initialState = createInitialState() } = {
+  {
+    initialState = createInitialState(),
+    hooks = { useSizeObserver: useResizeObserver },
+  } = {
     initialState: createInitialState(),
+    hooks: { useSizeObserver: useResizeObserver },
   }
 ) {
   const [state, dispatch] = useReducer(reduce, initialState)
@@ -44,7 +50,8 @@ export default function useViewmodel(
   }, [state])
 
   useEffect(() => {
-    setCurrent(computeViewmodel(timeline.present, actions))
+    const newViewmodel = computeViewmodel(timeline.present, actions, hooks)
+    setCurrent(newViewmodel)
   }, [timeline.present])
 
   return {
@@ -63,8 +70,8 @@ export default function useViewmodel(
 
 function bindActionsTo(dispatch) {
   return {
-    createRootNode() {
-      dispatch({ type: 'CREATE_ROOT_NODE' })
+    createRootNode(centerOffset) {
+      dispatch({ type: 'CREATE_ROOT_NODE', payload: centerOffset })
     },
     createChildNode({ parentId }) {
       dispatch({
@@ -106,21 +113,34 @@ function bindActionsTo(dispatch) {
 }
 
 const stateTransitions = {
-  CREATE_ROOT_NODE(state) {
+  CREATE_ROOT_NODE(state, centerOffset) {
     return produce(state, (newState) => {
       const [newNodes, id] = Collection.add(state.nodes, createNode())
       newState.nodes = newNodes
+      newState.space = Space.registerRoot(state.space, id, centerOffset)
       newState.user.editingNodes.push(id)
       newState.user.focusedNode = id
     })
   },
   CREATE_CHILD_NODE(state, { parentId }) {
     return produce(state, (newState) => {
-      const [newNodes, id] = Collection.add(state.nodes, createNode())
+      const [newNodes, childId] = Collection.add(state.nodes, createNode())
       newState.nodes = newNodes
-      newState.arrows = Collection.replace(state.arrows, parentId, id)
-      newState.user.editingNodes.push(id)
-      newState.user.focusedNode = id
+      newState.space = Space.registerChild(state.space, {
+        childId,
+        parentId,
+        siblingIds: Children.get(state.arrows, parentId),
+      })
+      newState.arrows = Collection.modify(
+        state.arrows,
+        parentId,
+        (childIds) => {
+          if (!childIds) return [childId]
+          childIds.push(childId)
+        }
+      )
+      newState.user.editingNodes.push(childId)
+      newState.user.focusedNode = childId
     })
   },
   EDIT_NODE(state, { id, editing, ...modifications }) {
