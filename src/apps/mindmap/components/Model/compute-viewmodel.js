@@ -1,4 +1,10 @@
-import { Collection, Children } from '~mindmap/data-structures'
+import {
+  Collection,
+  IdsOf,
+  NodeContents,
+  Ids,
+  Nodes,
+} from '~mindmap/data-structures'
 
 export default function computeViewmodel(state, actions, hooks) {
   return {
@@ -12,11 +18,6 @@ export default function computeViewmodel(state, actions, hooks) {
     }),
     nodes: computeNodesToRender({
       nodes: state.nodes,
-      space: state.space,
-      arrows: state.arrows,
-      editingNodeIds: state.user.editingNodes,
-      foldedNodeIds: state.user.foldedNodes,
-      focusedNodeId: state.user.focusedNode,
       startToEditNode: actions.initiateEditNode,
       applyNodeEdit: actions.finalizeEditNode,
       toggleFoldOnNode: actions.foldNode,
@@ -71,26 +72,17 @@ function computeTabsToRender({
 
 function computeNodesToRender({
   nodes,
-  space,
-  arrows,
-  editingNodeIds,
-  foldedNodeIds,
-  focusedNodeId,
   startToEditNode,
   applyNodeEdit,
   toggleFoldOnNode,
   createChildNode,
   useSizeObserver,
 }) {
-  const visibleNodes = getVisibleNodes(nodes, arrows, foldedNodeIds)
-  return visibleNodes.map(([id, node]) =>
+  const visibleIds = getVisibleNodes(nodes)
+  return visibleIds.map((id) =>
     packageNode({
       id,
-      node,
-      space,
-      editingNodeIds,
-      foldedNodeIds,
-      focusedNodeId,
+      nodes,
       useSizeObserver,
       startToEditNode,
       applyNodeEdit,
@@ -101,25 +93,23 @@ function computeNodesToRender({
 
   function packageNode({
     id,
-    node,
-    space,
-    editingNodeIds,
-    foldedNodeIds,
-    focusedNodeId,
+    nodes,
     useSizeObserver,
     startToEditNode,
     applyNodeEdit,
     toggleFoldOnNode,
     createChildNode,
   }) {
+    const { space, contents, editingIds, foldedIds, focusedId } = nodes
     const { centerOffset } = Collection.get(space, id)
+    const content = NodeContents.get(contents, id)
 
     return {
-      ...node,
       id,
-      editing: editingNodeIds.includes(id),
-      folded: foldedNodeIds.includes(id),
-      focused: id === focusedNodeId,
+      ...content,
+      editing: Ids.has(editingIds, id),
+      folded: Ids.has(foldedIds, id),
+      focused: id === focusedId,
       compute: {
         containerStyle: ({ width, height }) => ({
           position: 'absolute',
@@ -140,19 +130,20 @@ function computeNodesToRender({
   }
 }
 
-function getVisibleNodes(nodes, arrows, foldedNodeIds) {
-  const hiddenNodeIds = foldedNodeIds.flatMap((id) =>
-    getConnectedNodes(id, arrows)
+function getVisibleNodes(nodes) {
+  const { ids, foldedIds, childIdsOf } = nodes
+  const hiddenIds = Array.from(foldedIds).flatMap((foldedId) =>
+    getRecursivelyConnectedIds(foldedId, childIdsOf)
   )
-  return Collection.filter(nodes, ([id]) => !hiddenNodeIds.includes(id))
+  return Ids.filter(ids, (id) => !hiddenIds.includes(id))
 }
 
-function getConnectedNodes(id, arrows) {
-  const connectedIds = Children.get(arrows, id)
+function getRecursivelyConnectedIds(id, idsConnectedTo) {
+  const connectedIds = Array.from(IdsOf.get(idsConnectedTo, id))
   if (!connectedIds.length) return []
 
   const connectedChildIds = connectedIds.flatMap((childId) =>
-    getConnectedNodes(childId, arrows)
+    getRecursivelyConnectedIds(childId, idsConnectedTo)
   )
 
   return [...connectedIds, ...connectedChildIds]

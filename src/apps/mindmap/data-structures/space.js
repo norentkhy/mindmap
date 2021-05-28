@@ -1,4 +1,4 @@
-import Collection from './collection'
+import { Collection, Ids } from './index'
 
 export default {
   create: Collection.create,
@@ -41,13 +41,13 @@ function getFreeIndependentCenterOffset(space) {
 }
 
 function getFreeDescendantCenterOffset(space, { parentId, siblingIds }) {
-  if (!siblingIds.length) {
+  if (!siblingIds.size) {
     const { centerOffset: parentOffset } = Collection.get(space, parentId)
     return computeNextCenterOffset(parentOffset, { rightward: 1 })
   }
 
-  const lastSiblingCenterOffset = siblingIds
-    .map((id) => getCenterOffset(space, id))
+  const lastSiblingCenterOffset = Ids.toArray
+    .map(siblingIds, (id) => getCenterOffset(space, id))
     .reduce(getLaterOffset)
 
   return computeNextCenterOffset(lastSiblingCenterOffset, { downward: 1 })

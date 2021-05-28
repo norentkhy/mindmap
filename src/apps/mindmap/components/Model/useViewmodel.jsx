@@ -1,26 +1,21 @@
 import { useEffect, useReducer, useState } from 'react'
 import produce, { enableMapSet } from 'immer'
-import { v4 as uuidv4 } from 'uuid'
 import { useTime } from '~mindmap/hooks/useTime'
-import { Collection, Space, Children } from '~mindmap/data-structures'
+import { Collection, Nodes } from '~mindmap/data-structures'
 import computeViewmodel from './compute-viewmodel'
 import useResizeObserver from '@react-hook/resize-observer'
+import { update } from '~/utils/FunctionalProgramming'
 enableMapSet()
 
 function createInitialState() {
+  const nodes = Nodes.init()
   const emptyCollection = Collection.create()
   const [tabs, tabId] = Collection.add(emptyCollection, createTab())
   return {
     tabs,
-    nodes: emptyCollection,
-    space: Space.create(),
-    arrows: emptyCollection,
+    nodes,
     user: {
-      editingNodes: [],
-      foldedNodes: [],
       selectedTab: tabId,
-      renamingTab: null,
-      focusedNode: null,
     },
   }
 }
@@ -39,7 +34,7 @@ export default function useViewmodel(
     initialPresent: state,
   })
   const actions = { ...bindActionsTo(dispatch), undo: goBack, redo: goForward }
-  const [current, setCurrent] = useState({
+  const [currentViewmodel, setCurrentViewmodel] = useState({
     nodes: [],
     tabs: [],
     do: { createTab() {} },
@@ -51,13 +46,13 @@ export default function useViewmodel(
 
   useEffect(() => {
     const newViewmodel = computeViewmodel(timeline.present, actions, hooks)
-    setCurrent(newViewmodel)
+    setCurrentViewmodel(newViewmodel)
   }, [timeline.present])
 
   return {
     state: timeline.present,
     ...actions,
-    ...current,
+    ...currentViewmodel,
   }
 
   function reduce(state, action) {
@@ -114,59 +109,23 @@ function bindActionsTo(dispatch) {
 
 const stateTransitions = {
   CREATE_ROOT_NODE(state, centerOffset) {
-    return produce(state, (newState) => {
-      const [newNodes, id] = Collection.add(state.nodes, createNode())
-      newState.nodes = newNodes
-      newState.space = Space.registerRoot(state.space, id, centerOffset)
-      newState.user.editingNodes.push(id)
-      newState.user.focusedNode = id
+    return update(state, {
+      nodes: Nodes.createRoot(state.nodes, centerOffset),
     })
   },
   CREATE_CHILD_NODE(state, { parentId }) {
-    return produce(state, (newState) => {
-      const [newNodes, childId] = Collection.add(state.nodes, createNode())
-      newState.nodes = newNodes
-      newState.space = Space.registerChild(state.space, {
-        childId,
-        parentId,
-        siblingIds: Children.get(state.arrows, parentId),
-      })
-      newState.arrows = Collection.modify(
-        state.arrows,
-        parentId,
-        (childIds) => {
-          if (!childIds) return [childId]
-          childIds.push(childId)
-        }
-      )
-      newState.user.editingNodes.push(childId)
-      newState.user.focusedNode = childId
+    return update(state, {
+      nodes: Nodes.createChild(state.nodes, parentId),
     })
   },
   EDIT_NODE(state, { id, editing, ...modifications }) {
-    return produce(state, (newState) => {
-      newState.nodes = Collection.modify(state.nodes, id, (item) => ({
-        ...item,
-        ...modifications,
-      }))
-      if (editing) {
-        newState.user.editingNodes.push(id)
-        newState.user.focusedNode = id
-      } else {
-        newState.user.editingNodes.pop(id)
-      }
+    return update(state, {
+      nodes: Nodes.editContents(state.nodes, id, modifications),
     })
   },
   TOGGLE_NODE_FOLD(state, { id }) {
-    return produce(state, (newState) => {
-      if (id) {
-        if (state.user.foldedNodes.includes(id))
-          newState.user.foldedNodes = state.user.foldedNodes.filter(
-            (id) => id !== id
-          )
-        else newState.user.foldedNodes.push(id)
-      }
-      newState.user.focusedNode = id
+    return update(state, {
+      nodes: Nodes.toggleFold(state.nodes, id),
     })
   },
   ADD_NEW_TAB(state) {
@@ -194,17 +153,6 @@ const stateTransitions = {
       newState.user.renamingTab = null
     })
   },
-}
-
-function createNode() {
-  const customInitialProperties = {
-    id: uuidv4(),
-  }
-  return {
-    text: '',
-    editing: true,
-    ...customInitialProperties,
-  }
 }
 
 function createTab(title = 'untitled') {

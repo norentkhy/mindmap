@@ -36,6 +36,7 @@ describe('nodes', () => {
     const vm = renderViewmodel()
     act(() => vm.createRootNode())
     act(() => vm.nodes[0].do.changeNodeText('changed node text'))
+    // console.log(vm.nodes)
     expect(vm.nodes).toEqual([
       expect.objectContaining({
         text: 'changed node text',

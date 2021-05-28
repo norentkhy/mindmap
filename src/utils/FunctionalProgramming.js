@@ -1,3 +1,20 @@
+export function update(obj, update) {
+  return {...obj, ...update}
+}
+
+export function modify(obj, applyModification) {
+  const newObj = {...obj}
+  return applyModification(newObj)
+}
+
+export function append(arr, item) {
+  return [...arr, item]
+}
+
+export function remove(arr, item) {
+  return arr.filter(element => element != item)
+}
+
 export function reduceObject(obj, init, reduce) {
   const entries = Object.entries(obj)
   return entries.reduce(reduce, init)
