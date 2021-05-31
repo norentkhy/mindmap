@@ -1,34 +1,15 @@
 import { useEffect, useReducer, useState } from 'react'
-import produce, { enableMapSet } from 'immer'
 import { useTime } from '~mindmap/hooks/useTime'
-import { Collection, Nodes } from '~mindmap/data-structures'
-import computeViewmodel from './compute-viewmodel'
+import { Nodes, Viewmodel, Tabs } from '~mindmap/data-structures'
 import useResizeObserver from '@react-hook/resize-observer'
-import { update } from '~/utils/FunctionalProgramming'
-enableMapSet()
 
-function createInitialState() {
-  const nodes = Nodes.init()
-  const emptyCollection = Collection.create()
-  const [tabs, tabId] = Collection.add(emptyCollection, createTab())
-  return {
-    tabs,
-    nodes,
-    user: {
-      selectedTab: tabId,
-    },
-  }
+const initialState = {
+  nodes: Nodes.init(),
+  tabs: Tabs.init(),
 }
 
-export default function useViewmodel(
-  {
-    initialState = createInitialState(),
-    hooks = { useSizeObserver: useResizeObserver },
-  } = {
-    initialState: createInitialState(),
-    hooks: { useSizeObserver: useResizeObserver },
-  }
-) {
+export default function useViewmodel(modifications) {
+  const hooks = computeHooks(modifications)
   const [state, dispatch] = useReducer(reduce, initialState)
   const { timeline, insertIntoTimeline, goBack, goForward } = useTime({
     initialPresent: state,
@@ -45,7 +26,7 @@ export default function useViewmodel(
   }, [state])
 
   useEffect(() => {
-    const newViewmodel = computeViewmodel(timeline.present, actions, hooks)
+    const newViewmodel = Viewmodel.compute(timeline.present, actions, hooks)
     setCurrentViewmodel(newViewmodel)
   }, [timeline.present])
 
@@ -63,22 +44,23 @@ export default function useViewmodel(
   }
 }
 
+function computeHooks(hooks) {
+  return {
+    useSizeObserver: useResizeObserver,
+    ...hooks,
+  }
+}
+
 function bindActionsTo(dispatch) {
   return {
     createRootNode(centerOffset) {
       dispatch({ type: 'CREATE_ROOT_NODE', payload: centerOffset })
     },
-    createChildNode({ parentId }) {
-      dispatch({
-        type: 'CREATE_CHILD_NODE',
-        payload: { parentId },
-      })
+    createChildNode(parentId) {
+      dispatch({ type: 'CREATE_CHILD_NODE', payload: { parentId } })
     },
-    initiateEditNode({ id }) {
-      dispatch({
-        type: 'EDIT_NODE',
-        payload: { id, editing: true },
-      })
+    initiateEditNode(id) {
+      dispatch({ type: 'EDIT_NODE', payload: { id, editing: true } })
     },
     finalizeEditNode(payload) {
       dispatch({ type: 'EDIT_NODE', payload: { ...payload, editing: false } })
@@ -99,62 +81,34 @@ function bindActionsTo(dispatch) {
       dispatch({ type: 'INITIATE_RENAME_TAB', payload: id })
     },
     finishRenameTab(id, newName) {
-      dispatch({
-        type: 'FINISH_RENAME_TAB',
-        payload: { id, newName },
-      })
+      dispatch({ type: 'FINISH_RENAME_TAB', payload: { id, newName } })
     },
   }
 }
 
 const stateTransitions = {
   CREATE_ROOT_NODE(state, centerOffset) {
-    return update(state, {
-      nodes: Nodes.createRoot(state.nodes, centerOffset),
-    })
+    return { ...state, nodes: Nodes.createRoot(state.nodes, centerOffset) }
   },
   CREATE_CHILD_NODE(state, { parentId }) {
-    return update(state, {
-      nodes: Nodes.createChild(state.nodes, parentId),
-    })
+    return { ...state, nodes: Nodes.createChild(state.nodes, parentId) }
   },
-  EDIT_NODE(state, { id, editing, ...modifications }) {
-    return update(state, {
-      nodes: Nodes.editContents(state.nodes, id, modifications),
-    })
+  EDIT_NODE(state, { id, editing, ...changes }) {
+    return { ...state, nodes: Nodes.editContents(state.nodes, id, changes) }
   },
   TOGGLE_NODE_FOLD(state, { id }) {
-    return update(state, {
-      nodes: Nodes.toggleFold(state.nodes, id),
-    })
+    return { ...state, nodes: Nodes.toggleFold(state.nodes, id) }
   },
   ADD_NEW_TAB(state) {
-    return produce(state, (newState) => {
-      const [newTabs, tabId] = Collection.add(state.tabs, createTab())
-      newState.tabs = newTabs
-      newState.user.selectedTab = tabId
-    })
+    return { ...state, tabs: Tabs.createUntitled(state.tabs) }
   },
   SELECT_TAB(state, id) {
-    return produce(state, (newState) => {
-      newState.user.selectedTab = id
-    })
+    return { ...state, tabs: Tabs.select(state.tabs, id) }
   },
   INITIATE_RENAME_TAB(state, id) {
-    return produce(state, (newState) => {
-      newState.user.renamingTab = id
-    })
+    return { ...state, tabs: Tabs.rename(state.tabs, id) }
   },
   FINISH_RENAME_TAB(state, { id, newName }) {
-    return produce(state, (newState) => {
-      newState.tabs = Collection.modify(state.tabs, id, (tab) => {
-        tab.title = newName
-      })
-      newState.user.renamingTab = null
-    })
+    return { ...state, tabs: Tabs.rename(state.tabs, id, newName) }
   },
-}
-
-function createTab(title = 'untitled') {
-  return { title }
 }

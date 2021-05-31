@@ -1,16 +1,22 @@
-import { Space, IdsOf, NodeContents, Ids } from '~mindmap/data-structures'
+import { Space, IdsOf, NodeContents } from './node-features'
+import { Ids } from './primitives'
 import { update } from '~/utils/FunctionalProgramming'
 
 export default {
-  init: initialiseNodes,
-  getArrayOf: getArrayOfKeys,
-  createRoot: createRootNode,
-  createChild: createChildNode,
-  editContents: editNodeContents,
-  toggleFold: toggleNodeFold,
+  init,
+  getArrayVisibleIds,
+  getCenterOffset,
+  getText,
+  isEditing,
+  isFolded,
+  isFocused,
+  createRoot,
+  createChild,
+  editContents,
+  toggleFold,
 }
 
-function initialiseNodes() {
+function init() {
   return {
     ids: Ids.init(),
     contents: NodeContents.create(),
@@ -22,69 +28,73 @@ function initialiseNodes() {
   }
 }
 
-function getArrayOfKeys(nodes, keyOrKeys) {
-  if (!Array.isArray(keyOrKeys)) {
-    const key = keyOrKeys
-    return getArrayOfKey(nodes, key)
-  }
-
-  const keys = keyOrKeys
-  return keys.map((key) => getArrayOfKey(nodes, key))
+function isEditing(nodes, id) {
+  return Ids.has(nodes.editingIds, id)
 }
 
-function getArrayOfKey(nodes, key) {
-  return Array.from(nodes[key])
+function isFolded(nodes, id) {
+  return Ids.has(nodes.foldedIds, id)
 }
 
-function createRootNode(nodes, centerOffset) {
-  const { space } = nodes
+function isFocused(nodes, id) {
+  return nodes.focusedId === id
+}
+
+function getText(nodes, id) {
+  return NodeContents.getText(nodes.contents, id)
+}
+
+function getCenterOffset(nodes, id) {
+  return Space.get(nodes.space, id).centerOffset
+}
+
+function getArrayVisibleIds(nodes) {
+  const hiddenIds = Array.from(nodes.foldedIds).flatMap((foldedId) =>
+    IdsOf.getRecursive(nodes.childIdsOf, foldedId)
+  )
+  return Ids.filter(nodes.ids, (id) => !hiddenIds.includes(id))
+}
+
+function createRoot(nodes, centerOffset) {
   const [unassignedNodeUpdate, id] = createUnassignedNode(nodes)
-
   return update(nodes, {
     ...unassignedNodeUpdate,
-    space: Space.registerRoot(space, id, centerOffset),
+    space: Space.registerRoot(nodes.space, id, centerOffset),
   })
 }
 
-function createChildNode(nodes, parentId) {
-  const { childIdsOf, space } = nodes
+function createChild(nodes, parentId) {
   const [unassignedNodeUpdate, childId] = createUnassignedNode(nodes)
-  const siblingIds = IdsOf.get(childIdsOf, parentId)
+  const siblingIds = IdsOf.get(nodes.childIdsOf, parentId)
 
   return update(nodes, {
     ...unassignedNodeUpdate,
-    space: Space.registerChild(space, { childId, parentId, siblingIds }),
-    childIdsOf: IdsOf.add(childIdsOf, parentId, childId),
+    space: Space.registerChild(nodes.space, { childId, parentId, siblingIds }),
+    childIdsOf: IdsOf.add(nodes.childIdsOf, parentId, childId),
   })
 }
 
-function editNodeContents(nodes, id, newContent) {
-  const { contents, editingIds } = nodes
-
+function editContents(nodes, id, newContent) {
   return update(nodes, {
-    contents: NodeContents.set(contents, id, newContent),
-    editingIds: Ids.flip(editingIds, id),
+    contents: NodeContents.set(nodes.contents, id, newContent),
+    editingIds: Ids.flip(nodes.editingIds, id),
     focusedId: id,
   })
 }
 
-function toggleNodeFold(nodes, id) {
-  const { foldedIds } = nodes
-
+function toggleFold(nodes, id) {
   return update(nodes, {
-    foldedIds: Ids.flip(foldedIds, id),
+    foldedIds: Ids.flip(nodes.foldedIds, id),
     focusedId: id,
   })
 }
 
 function createUnassignedNode(nodes) {
-  const { ids, contents, editingIds } = nodes
-  const [newIds, id] = Ids.getNew(ids)
-
+  const [newIds, id] = Ids.getNew(nodes.ids)
   const unassignedNodeUpdate = {
     ids: newIds,
-    contents: NodeContents.set(contents, id, { text: '' }),
-    editingIds: Ids.add(editingIds, id),
+    contents: NodeContents.setText(nodes.contents, id, ''),
+    editingIds: Ids.add(nodes.editingIds, id),
     focusedId: id,
   }
 

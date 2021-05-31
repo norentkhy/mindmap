@@ -1,4 +1,4 @@
-import { Collection, Ids } from './index'
+import { Collection, Ids } from '../index'
 
 export default {
   create: Collection.create,

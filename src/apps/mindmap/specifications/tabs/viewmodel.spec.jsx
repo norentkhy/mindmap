@@ -15,7 +15,7 @@ describe('tabs: viewmodel', () => {
         id: expectAnId(),
         selected: true,
         renaming: false,
-        title: 'untitled',
+        name: 'untitled',
         do: {
           rename: expect.any(Function),
           select: expect.any(Function),
@@ -34,7 +34,7 @@ describe('tabs: viewmodel', () => {
         id: expectAnId(),
         selected: true,
         renaming: false,
-        title: 'untitled',
+        name: 'untitled',
         do: {
           rename: expect.any(Function),
           select: expect.any(Function),
@@ -65,7 +65,7 @@ describe('tabs: viewmodel', () => {
     act(() => vm.tabs[0].do.editName())
     act(() => vm.tabs[0].do.rename('renamed tab'))
     expect(vm.tabs).toEqual([
-      expect.objectContaining({ renaming: false, title: 'renamed tab' }),
+      expect.objectContaining({ renaming: false, name: 'renamed tab' }),
     ])
   })
 })

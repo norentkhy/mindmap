@@ -20,8 +20,8 @@ function Tab({ tab }) {
 }
 
 function TabInput({ tab }) {
-  const { title, renaming } = tab
-  const [newTitle, setNewTitle] = useState(title)
+  const { name, renaming } = tab
+  const [newName, setNewName] = useState(name)
   const inputRef = useRef()
 
   useEffect(() => inputRef.current?.focus(), [renaming])
@@ -30,10 +30,10 @@ function TabInput({ tab }) {
     <input
       ref={inputRef}
       aria-label="renaming this tab"
-      value={newTitle}
-      onChange={({ target }) => setNewTitle(target.value)}
+      value={newName}
+      onChange={({ target }) => setNewName(target.value)}
       onKeyUp={({ key }) => {
-        key === 'Enter' && tab.do.rename(newTitle)
+        key === 'Enter' && tab.do.rename(newName)
       }}
       onFocus={({ target }) => target.select()}
     />
@@ -41,7 +41,7 @@ function TabInput({ tab }) {
 }
 
 function TabButton({ tab }) {
-  const { id, title, selected } = tab
+  const { id, name, selected } = tab
 
   return (
     <Button
@@ -50,7 +50,7 @@ function TabButton({ tab }) {
       onDoubleClick={() => tab.do.editName()}
       selected={selected}
     >
-      {title}
+      {name}
     </Button>
   )
 }

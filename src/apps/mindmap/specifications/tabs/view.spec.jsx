@@ -11,13 +11,13 @@ import React from 'react'
 
 describe('tabs: view', () => {
   test('view.render single tab', () => {
-    const tab = addIdTo({ title: 'first tab' })
+    const tab = addIdTo({ name: 'first tab' })
     view.render(<Tabs tabs={[tab]} />)
-    view.expect.tab({ title: 'first tab' }).toBeVisible()
+    view.expect.tab({ name: 'first tab' }).toBeVisible()
   })
 
   test('view.render multiple tabs', () => {
-    const tabs = ['a', 'b', 'c', 'd'].map((title) => addIdTo({ title }))
+    const tabs = ['a', 'b', 'c', 'd'].map((name) => addIdTo({ name }))
     view.render(<Tabs tabs={tabs} />)
     tabs.forEach((tab) => view.expect.tab(tab).toBeVisible())
   })
@@ -31,7 +31,7 @@ describe('tabs: view', () => {
 
   test('select a tab', () => {
     const tab = addIdTo({
-      title: 'selecting this',
+      name: 'selecting this',
       do: { select: createMockFn() },
     })
     view.render(<Tabs tabs={[tab]} />)
@@ -41,7 +41,7 @@ describe('tabs: view', () => {
 
   test('edit name of a tab', () => {
     const tab = addIdTo({
-      title: 'editing this',
+      name: 'editing this',
       renaming: false,
       do: { editName: createMockFn() },
     })
@@ -52,7 +52,7 @@ describe('tabs: view', () => {
 
   test('finish renaming a tab', () => {
     const tab = addIdTo({
-      title: 'this will be renamed',
+      name: 'this will be renamed',
       renaming: true,
       do: { rename: createMockFn() },
     })

@@ -1,4 +1,4 @@
-import Collection from '~mindmap/data-structures/collection'
+import { Collection } from '~/apps/mindmap/data-structures/primitives'
 
 describe('add to collection:', () => {
   test.case('new collection has new item', ({ item }) => {

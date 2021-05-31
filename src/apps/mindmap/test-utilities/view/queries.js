@@ -122,25 +122,25 @@ function queryUntitledTab() {
 }
 
 function queryAllUntitledTabs() {
-  return queryAllTabs({ title: text.tabs.untitled })
+  return queryAllTabs({ name: text.tabs.untitled })
 }
 
-function queryAllTabs({ id, title }) {
+function queryAllTabs({ id, name }) {
   const Tabs = Array.from(queryElementByLabelText('tabs').children)
   if (id) return Tabs.filter((Tab) => Tab.getAttribute('data-id') === id)
-  return Tabs.filter((Tab) => Tab.textContent === title)
+  return Tabs.filter((Tab) => Tab.textContent === name)
 }
 
 function queryTabInput() {
   return queryElementByLabelText(label.tabs.tabInput)
 }
 
-function queryTab({ index, id, title, numberOfFirstMatchesToSkip = 0 }) {
+function queryTab({ index, id, name, numberOfFirstMatchesToSkip = 0 }) {
   if (index || index === 0) {
     const TabsContainer = queryElementByLabelText('tabs')
     return TabsContainer.children[index]
   }
-  const MatchedTabs = queryAllTabs({ id, title })
+  const MatchedTabs = queryAllTabs({ id, name })
   if (!MatchedTabs.length) return null
   return MatchedTabs[numberOfFirstMatchesToSkip]
 }
