@@ -11,10 +11,8 @@ const initialState = {
 export default function useViewmodel(modifications) {
   const hooks = computeHooks(modifications)
   const [state, dispatch] = useReducer(reduce, initialState)
-  const { timeline, insertIntoTimeline, goBack, goForward } = useTime({
-    initialPresent: state,
-  })
-  const actions = { ...bindActionsTo(dispatch), undo: goBack, redo: goForward }
+  const [timeline, forkTimeline, undo, redo] = useTime(state)
+  const actions = { ...bindActionsTo(dispatch), undo, redo }
   const [currentViewmodel, setCurrentViewmodel] = useState({
     nodes: [],
     tabs: [],
@@ -22,7 +20,7 @@ export default function useViewmodel(modifications) {
   })
 
   useEffect(() => {
-    insertIntoTimeline(state)
+    forkTimeline(state)
   }, [state])
 
   useEffect(() => {

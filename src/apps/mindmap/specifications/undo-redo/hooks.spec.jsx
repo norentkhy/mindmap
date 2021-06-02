@@ -3,21 +3,29 @@ import { useTime } from '~mindmap/hooks/useTime'
 import { describe, test, expect } from '@jest/globals'
 
 describe('useTime', () => {
-  const timeInstances = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+  const initialPresent = 0
+  const extraTimeInstances = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+  const timeInstances = [initialPresent, ...extraTimeInstances]
 
   test('hook rendering', () => {
-    renderUseTime()
+    const { result } = renderUseTime(initialPresent)
+    const timeline = getTimeline(result)
+    expect(timeline).toEqual({
+      pasts: [],
+      present: 0,
+      futures: [],
+    })
   })
 
   test('add to target state timeline', () => {
-    const { result } = renderUseTime()
+    const { result } = renderUseTime(initialPresent)
 
-    timeInstances.forEach((desiredTimeInstance, timelineIndex) => {
+    extraTimeInstances.forEach((desiredTimeInstance, timelineIndex) => {
       insertTimeInstance({ result, timeInstance: desiredTimeInstance })
       const timeline = getTimeline(result)
 
       expect(timeline).toEqual({
-        pasts: timeInstances.slice(0, timelineIndex),
+        pasts: timeInstances.slice(0, timelineIndex + 1),
         present: desiredTimeInstance,
         futures: [],
       })
@@ -25,9 +33,9 @@ describe('useTime', () => {
   })
 
   test('go back in target timeline', () => {
-    const { result } = renderUseTime()
+    const { result } = renderUseTime(initialPresent)
 
-    insertTimeInstances({ result, timeInstances })
+    insertTimeInstances({ result, extraTimeInstances })
 
     goBack({ result })
     expect(getTimeline(result)).toEqual({
@@ -66,9 +74,9 @@ describe('useTime', () => {
   })
 
   test('go forward in target timeline', () => {
-    const { result } = renderUseTime()
+    const { result } = renderUseTime(initialPresent)
 
-    insertTimeInstances({ result, timeInstances })
+    insertTimeInstances({ result, extraTimeInstances })
     goBackToTheStart(result)
 
     goForward({ result })
@@ -108,9 +116,9 @@ describe('useTime', () => {
   })
 
   test('go back and insert time instance', () => {
-    const { result } = renderUseTime()
+    const { result } = renderUseTime(initialPresent)
 
-    insertTimeInstances({ result, timeInstances })
+    insertTimeInstances({ result, extraTimeInstances })
     goBack({ result, distance: 5 })
 
     const timeInstance = 'a new future'
@@ -124,16 +132,16 @@ describe('useTime', () => {
   })
 })
 
-function renderUseTime() {
-  return renderHook(useTime)
+function renderUseTime(initialPresent) {
+  return renderHook(() => useTime(initialPresent))
 }
 
 function goForward({ result, distance }) {
-  act(() => result.current.goForward(distance))
+  act(() => result.current[3](distance))
 }
 
 function goBack({ result, distance }) {
-  act(() => result.current.goBack(distance))
+  act(() => result.current[2](distance))
 }
 
 function goBackToTheStart(result) {
@@ -142,15 +150,15 @@ function goBackToTheStart(result) {
 }
 
 function getTimeline(result) {
-  return result.current.timeline
+  return result.current[0]
 }
 
 function insertTimeInstance({ result, timeInstance }) {
-  act(() => result.current.insertIntoTimeline(timeInstance))
+  act(() => result.current[1](timeInstance))
 }
 
-function insertTimeInstances({ result, timeInstances }) {
-  timeInstances.forEach((timeInstance) => {
+function insertTimeInstances({ result, extraTimeInstances }) {
+  extraTimeInstances.forEach((timeInstance) => {
     insertTimeInstance({ result, timeInstance })
   })
 }
