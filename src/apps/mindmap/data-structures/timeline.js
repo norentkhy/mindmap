@@ -11,10 +11,10 @@ function init(initialPresent = null) {
   return { pasts: [], present: initialPresent, futures: [] }
 }
 
-function fork(timeline, newPresent) {
+function fork(timeline, computeNewPresent) {
   return {
     pasts: [...timeline.pasts, timeline.present],
-    present: newPresent,
+    present: computeNewPresent(timeline.present),
     futures: [],
   }
 }

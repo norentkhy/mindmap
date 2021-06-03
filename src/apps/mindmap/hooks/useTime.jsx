@@ -1,5 +1,5 @@
 import { Timeline } from '~mindmap/data-structures'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 const initialTimeline = { pasts: [], present: null, futures: [] }
 
@@ -9,9 +9,9 @@ export function useTime(initialPresent = null) {
     present: initialPresent,
   })
 
-  const actions = bindActions(setTimeline)
+  const actions = useMemo(() => bindActions(setTimeline), [setTimeline])
 
-  return [timeline, ...Object.values(actions)]
+  return [timeline, actions.registerNew, actions.undo, actions.redo]
 }
 
 function bindActions(setTimeline) {

@@ -154,7 +154,7 @@ function getTimeline(result) {
 }
 
 function insertTimeInstance({ result, timeInstance }) {
-  act(() => result.current[1](timeInstance))
+  act(() => result.current[1](() => timeInstance))
 }
 
 function insertTimeInstances({ result, extraTimeInstances }) {
