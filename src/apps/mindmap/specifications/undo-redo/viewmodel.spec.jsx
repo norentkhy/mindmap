@@ -11,7 +11,7 @@ describe('prerequisites', () => {
   test('createRootNode changes relevant state', () => {
     const vm = renderViewmodel()
     const stateBefore = getRelevantState(vm)
-    act(() => vm.createRootNode())
+    act(() => vm.do.createNode())
     expect(getRelevantState(vm)).not.toEqual(stateBefore)
   })
 })
@@ -20,48 +20,48 @@ describe('undo and redo', () => {
   test('undo without any state changes', () => {
     const vm = renderViewmodel()
     const stateBefore = getRelevantState(vm)
-    act(() => vm.undo())
+    act(() => vm.do.undo())
     expect(getRelevantState(vm)).toEqual(stateBefore)
   })
 
   test('redo without any state changes', () => {
     const vm = renderViewmodel()
     const stateBefore = getRelevantState(vm)
-    act(() => vm.redo())
+    act(() => vm.do.redo())
     expect(getRelevantState(vm)).toEqual(stateBefore)
   })
 
   test('1 undo after 1 state change', () => {
     const vm = renderViewmodel()
     const stateBefore = getRelevantState(vm)
-    act(() => vm.createRootNode())
-    act(() => vm.undo())
+    act(() => vm.do.createNode())
+    act(() => vm.do.undo())
     expect(getRelevantState(vm)).toEqual(stateBefore)
   })
 
   test('2 undo after 1 state change', () => {
     const vm = renderViewmodel()
     const stateBefore = getRelevantState(vm)
-    act(() => vm.createRootNode())
-    repeat(2, () => act(() => vm.undo()))
+    act(() => vm.do.createNode())
+    repeat(2, () => act(() => vm.do.undo()))
     expect(getRelevantState(vm)).toEqual(stateBefore)
   })
 
   test('1 redo after 1 undo after 1 state change', () => {
     const vm = renderViewmodel()
-    act(() => vm.createRootNode())
+    act(() => vm.do.createNode())
     const stateAfter = getRelevantState(vm)
-    act(() => vm.undo())
-    act(() => vm.redo())
+    act(() => vm.do.undo())
+    act(() => vm.do.redo())
     expect(getRelevantState(vm)).toEqual(stateAfter)
   })
 
   test('2 redo after 1 undo after 1 state change', () => {
     const vm = renderViewmodel()
-    act(() => vm.createRootNode())
+    act(() => vm.do.createNode())
     const stateAfter = getRelevantState(vm)
-    act(() => vm.undo())
-    repeat(2, () => act(() => vm.redo()))
+    act(() => vm.do.undo())
+    repeat(2, () => act(() => vm.do.redo()))
     expect(getRelevantState(vm)).toEqual(stateAfter)
   })
 })

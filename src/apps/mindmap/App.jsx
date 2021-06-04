@@ -17,9 +17,9 @@ export default function MindMap() {
 
 function StatefulActions() {
   const model = useModel()
-  const { createRootNode, undo, redo } = model
+  const { createNode, undo, redo } = model.do
 
-  return <Actions actions={{ createRootNode, undo, redo }} />
+  return <Actions actions={{ createNode, undo, redo }} />
 }
 
 function StatefulMainView() {

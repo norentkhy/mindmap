@@ -15,7 +15,7 @@ describe('nodes', () => {
 
   test('properties of node creation', () => {
     const vm = renderViewmodel()
-    act(() => vm.createRootNode())
+    act(() => vm.do.createNode())
     expect(vm.nodes).toEqual([
       expect.objectContaining({
         id: expectAnId(),
@@ -34,7 +34,7 @@ describe('nodes', () => {
 
   test('give created node text', () => {
     const vm = renderViewmodel()
-    act(() => vm.createRootNode())
+    act(() => vm.do.createNode())
     act(() => vm.nodes[0].do.changeNodeText('changed node text'))
     expect(vm.nodes).toEqual([
       expect.objectContaining({
@@ -46,7 +46,7 @@ describe('nodes', () => {
 
   test('properties of child node creation', () => {
     const vm = renderViewmodel()
-    act(() => vm.createRootNode())
+    act(() => vm.do.createNode())
     act(() => vm.nodes[0].do.changeNodeText('parent node'))
     act(() => vm.nodes[0].do.createChild())
     expect(vm.nodes).toEqual([
@@ -68,7 +68,7 @@ describe('nodes', () => {
 
   test('change node text', () => {
     const vm = renderViewmodel()
-    act(() => vm.createRootNode())
+    act(() => vm.do.createNode())
     act(() => vm.nodes[0].do.changeNodeText('this will change'))
     act(() => vm.nodes[0].do.startToEdit())
     expect(vm.nodes).toEqual([

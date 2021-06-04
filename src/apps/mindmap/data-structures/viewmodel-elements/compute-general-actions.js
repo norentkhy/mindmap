@@ -1,5 +1,7 @@
 export default function computeGeneralActions(actions) {
   return {
+    undo: actions.undo,
+    redo: actions.redo,
     createTab: actions.addNewTab,
     createNode: actions.createRootNode,
     createNodeOnMouse: computeCreateNodeOnMouse(actions.createRootNode),

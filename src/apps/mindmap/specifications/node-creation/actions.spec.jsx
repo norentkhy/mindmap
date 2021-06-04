@@ -10,9 +10,9 @@ import React from 'react'
 
 describe('actions', () => {
   test('node creation', () => {
-    const createRootNode = createMockFn()
-    view.render(<Actions actions={{ createRootNode }} />)
+    const createNode = createMockFn()
+    view.render(<Actions actions={{ createNode }} />)
     view.clickOn.createRootNodeButton()
-    expect(createRootNode).toBeCalled()
+    expect(createNode).toBeCalled()
   })
 })

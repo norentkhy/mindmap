@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useMemo, useRef } from 'react'
 import { useTime } from '~mindmap/hooks/useTime'
 import { Nodes, Viewmodel, Tabs } from '~mindmap/data-structures'
 import useResizeObserver from '@react-hook/resize-observer'
@@ -15,26 +15,15 @@ const hooks = {
 
 export default function useViewmodel() {
   const [timeline, forkTimeline, undo, redo] = useTime(initialState)
-  const actions = useMemo(
+  const actions = useActions(forkTimeline, undo, redo)
+  return Viewmodel.compute(timeline.present, actions, hooks)
+}
+
+function useActions(forkTimeline, undo, redo) {
+  return useMemo(
     () => ({ ...bindStateChanges(forkTimeline), undo, redo }),
     [forkTimeline, undo, redo]
   )
-  const [currentViewmodel, setCurrentViewmodel] = useState({
-    nodes: [],
-    tabs: [],
-    do: { createTab() {} },
-  })
-
-  useEffect(() => {
-    const newViewmodel = Viewmodel.compute(timeline.present, actions, hooks)
-    setCurrentViewmodel(newViewmodel)
-  }, [timeline.present])
-
-  return {
-    state: timeline.present,
-    ...actions,
-    ...currentViewmodel,
-  }
 }
 
 function bindStateChanges(setState) {
