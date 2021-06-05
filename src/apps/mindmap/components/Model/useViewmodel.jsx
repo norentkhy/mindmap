@@ -16,7 +16,17 @@ const hooks = {
 export default function useViewmodel() {
   const [timeline, forkTimeline, undo, redo] = useTime(initialState)
   const actions = useActions(forkTimeline, undo, redo)
-  return Viewmodel.compute(timeline.present, actions, hooks)
+  // return Viewmodel.compute(timeline.present, actions, hooks)
+  return useViewmodelUpdate(timeline.present, actions, hooks) //
+}
+
+function useViewmodelUpdate(state, actions, hooks) {
+  const prior = useRef({ state: null, viewmodel: null }).current
+  const newViewmodel = Viewmodel.update(prior, state, actions, hooks)
+
+  prior.state = state
+  prior.viewmodel = newViewmodel
+  return newViewmodel
 }
 
 function useActions(forkTimeline, undo, redo) {

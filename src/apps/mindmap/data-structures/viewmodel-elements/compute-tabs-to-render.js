@@ -1,6 +1,6 @@
 import { Tabs } from '~mindmap/data-structures'
 
-export default function computeTabsToRender({tabs, actions }) {
+export default function computeTabsToRender({ tabs, actions }) {
   const bindIdToTabActions = prepareTabIdBindings(actions)
 
   return Tabs.getArrayIdName(tabs).map(([id, name]) => ({
