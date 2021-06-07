@@ -74,6 +74,9 @@ const partialNodeUpdates = {
   foldNode: (state, { id }) => ({
     nodes: Nodes.toggleFold(state.nodes, id),
   }),
+  shiftFocusTo: (state, direction) => ({
+    nodes: Nodes.shiftFocusTo(state.nodes, direction)
+  })
 }
 
 const partialTabUpdates = {

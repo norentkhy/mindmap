@@ -4,6 +4,8 @@ import {
   doubleClickElement,
   typeWithKeyboard,
   pressKey,
+  pressKeyDown,
+  pressKeyUp,
 } from '../dependencies'
 import { mapObject } from '~/utils/FunctionalProgramming'
 
@@ -24,6 +26,8 @@ const [definedClicks, definedDoubleClicks] = [
 export const action = {
   typeWithKeyboard,
   pressKey,
+  pressKeyDown,
+  pressKeyUp,
   clickOn: { ...definedClicks },
   doubleClickOn: { ...definedDoubleClicks },
 }

@@ -30,6 +30,8 @@ export {
   typeWithKeyboard,
   typeAndPressEnter,
   pressKey,
+  pressKeyDown,
+  pressKeyUp,
   getFocus,
   getInputSelection,
   generateUUID,
@@ -42,6 +44,16 @@ function typeWithKeyboard(keys) {
   return userEvent.type(Target, keys)
 }
 
+function pressKeyDown(key) {
+  const Target = getFocus()
+  return fireEvent.keyDown(Target, fireEventKeyDict[key])
+}
+
+function pressKeyUp(key) {
+  const Target = getFocus()
+  return fireEvent.keyUp(Target, fireEventKeyDict[key])
+}
+
 function pressKey(key) {
   const Target = getFocus()
   const testingLibraryKey = mapToTestingLibraryKey(key)
@@ -49,12 +61,23 @@ function pressKey(key) {
 }
 
 function mapToTestingLibraryKey(key) {
-  switch (key) {
-    case 'enter':
-      return '{enter}'
-    default:
-      return key
-  }
+  if (key in keyDict) return keyDict[key]
+  return key
+}
+
+const fireEventKeyDict = {
+  left: { key: 'ArrowLeft', code: 'ArrowLeft'},
+  right: { key: 'ArrowRight', code: 'ArrowRight'},
+  up: { key: 'ArrowUp', code: 'ArrowUp'},
+  down: { key: 'ArrowDown', code: 'ArrowDown'},
+}
+
+const keyDict = {
+  enter: '{enter}',
+  left: '{arrowleft}',
+  right: '{arrowright}',
+  up: '{arrowup}',
+  down: '{arrowdown}',
 }
 
 function typeAndPressEnter(text) {

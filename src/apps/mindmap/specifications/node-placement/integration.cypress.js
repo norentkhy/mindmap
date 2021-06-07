@@ -7,7 +7,7 @@ import {
   typeOnKeyboard,
   visitMindmapApp,
 } from '~mindmap/test-utilities/cypress'
-import { getAllCombinations } from '~/utils/FunctionalProgramming'
+import { span, getAllCombinations } from '~/utils/FunctionalProgramming'
 
 export default function testNodePlacement(describe, beforeEach, it, cy) {
   beforeEach(() => {
@@ -44,9 +44,4 @@ function createRatioGrid({
   const leftRatios = span(leftRatio, horizontal, 1)
   const topRatios = span(topRatio, vertical, 1)
   return getAllCombinations(leftRatios, topRatios)
-}
-
-function span(start, step, end) {
-  if (start >= end) return []
-  return [start, ...span(start + step, step, end)]
 }

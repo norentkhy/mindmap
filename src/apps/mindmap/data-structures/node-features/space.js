@@ -5,6 +5,7 @@ export default {
   get: Collection.get,
   registerRoot: registerRootSpace,
   registerChild: registerChildSpace,
+  getClosest,
 }
 
 const stepSize = {
@@ -15,6 +16,40 @@ const stepSize = {
 const firstCenterOffset = {
   left: 100,
   top: 50,
+}
+
+function getClosest(space, targetId, direction) {
+  const targetCenterOffset = getCenterOffset(space, targetId)
+  const nonTargetNodes = Collection.filter(space, ([id]) => id !== targetId)
+  const distances = nonTargetNodes.map(([id, { centerOffset }]) => {
+    return { id, ...calculateDistance(targetCenterOffset, centerOffset) }
+  })
+  const validDistances = distances.filter(isOnSide[direction])
+  if (!validDistances.length) return targetId
+
+  const closestDistance = validDistances.reduce(pickClosest())
+  return closestDistance.id
+}
+
+const isOnSide = {
+  left: ({ dx }) => dx < 0,
+  right: ({ dx }) => dx > 0,
+  up: ({ dy }) => dy < 0,
+  down: ({ dy }) => dy > 0,
+}
+
+function pickClosest(direction) {
+  return (first, second) => {
+    if (first.euclidian < second.euclidian) return first
+    return second
+  }
+}
+
+function calculateDistance(targetOffset, offset) {
+  const dx = offset.left - targetOffset.left
+  const dy = offset.top - targetOffset.top
+  const euclidian = Math.sqrt(dx ** 2 + dy ** 2)
+  return { dx, dy, euclidian }
 }
 
 function getCenterOffset(space, id) {

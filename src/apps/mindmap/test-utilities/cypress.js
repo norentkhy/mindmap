@@ -183,6 +183,10 @@ export function expectToFindNodeInput(cy, positive = true) {
 
 export function pressOnKeyboard(cy, button) {
   if (button == 'enter') return typeOnKeyboard(cy, '{enter}')
+  if (button == 'left') return typeOnKeyboard(cy, '{leftarrow}')
+  if (button == 'right') return typeOnKeyboard(cy, '{rightarrow}')
+  if (button == 'up') return typeOnKeyboard(cy, '{uparrow}')
+  if (button == 'down') return typeOnKeyboard(cy, '{downarrow}')
   return typeOnKeyboard(cy, button)
 }
 

@@ -1,9 +1,9 @@
 export function update(obj, update) {
-  return {...obj, ...update}
+  return { ...obj, ...update }
 }
 
 export function modify(obj, applyModification) {
-  const newObj = {...obj}
+  const newObj = { ...obj }
   return applyModification(newObj)
 }
 
@@ -12,7 +12,7 @@ export function append(arr, item) {
 }
 
 export function remove(arr, item) {
-  return arr.filter(element => element != item)
+  return arr.filter((element) => element != item)
 }
 
 export function reduceObject(obj, init, reduce) {
@@ -27,6 +27,7 @@ export function mapObject(obj, map) {
     {}
   )
 }
+
 export function mapMultipleArrays(arrayOfArrays, map) {
   const minimumLength = arrayOfArrays.reduce(
     reduceToMinimumLength,
@@ -49,6 +50,21 @@ export function reduceToMinimumLength(minimumLength, arr) {
 
 export function repeat(n, fn) {
   for (let i = 0; i < n; i++) fn(i)
+}
+
+export function span(start, step, end) {
+  if (start >= end) return []
+  return [start, ...span(start + step, step, end)]
+}
+
+export function zip(arr1, arr2, applyZip = (x, y) => [x, y]) {
+  let i = 0
+  let zipped = []
+  while (i in arr1 && i in arr2) {
+    zipped[i] = applyZip(arr1[i], arr2[i])
+    i++
+  }
+  return zipped
 }
 
 export function getAllCombinations(...thingsToCombine) {

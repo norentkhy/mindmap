@@ -5,6 +5,7 @@ export default function computeGeneralActions(actions) {
     createTab: actions.addNewTab,
     createNode: actions.createRootNode,
     createNodeOnMouse: computeCreateNodeOnMouse(actions.createRootNode),
+    navigate: actions.shiftFocusTo
   }
 }
 

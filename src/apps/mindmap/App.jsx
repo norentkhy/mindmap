@@ -26,10 +26,10 @@ function StatefulMainView() {
   const model = useModel()
   const {
     nodes,
-    do: { createNodeOnMouse },
+    do: { createNodeOnMouse, navigate },
   } = model
 
-  return <MainView nodes={nodes} createNode={createNodeOnMouse} />
+  return <MainView nodes={nodes} createNode={createNodeOnMouse} navigate={navigate} />
 }
 
 function StatefulTabs() {

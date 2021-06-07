@@ -15,6 +15,7 @@ export default {
   editContents,
   select,
   toggleFold,
+  shiftFocusTo,
 }
 
 function init() {
@@ -104,4 +105,10 @@ function createUnassignedNode(nodes) {
   }
 
   return [unassignedNodeUpdate, id]
+}
+
+function shiftFocusTo(nodes, direction) {
+  return update(nodes, {
+    focusedId: Space.getClosest(nodes.space, nodes.focusedId, direction),
+  })
 }
