@@ -30,6 +30,7 @@ export default function MindNode({ node }) {
         aria-label="node"
         ref={nodeRef}
         position={containerStyle}
+        onClick={() => node.do.select?.()}
         onDoubleClick={(e) => {
           e.stopPropagation()
           node.do.startToEdit()

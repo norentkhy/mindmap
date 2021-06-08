@@ -48,7 +48,7 @@ export function reduceToMinimumLength(minimumLength, arr) {
 }
 
 export function repeat(n, fn) {
-  for (let i = 0; i < n; i++) fn()
+  for (let i = 0; i < n; i++) fn(i)
 }
 
 export function getAllCombinations(...thingsToCombine) {

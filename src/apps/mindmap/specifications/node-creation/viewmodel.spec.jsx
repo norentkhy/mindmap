@@ -22,12 +22,11 @@ describe('nodes', () => {
         text: '',
         editing: true,
         focused: true,
-        do: {
+        do: expect.objectContaining({
           startToEdit: expect.any(Function),
           changeNodeText: expect.any(Function),
-          toggleFold: expect.any(Function),
           createChild: expect.any(Function),
-        },
+        }),
       }),
     ])
   })
@@ -56,12 +55,11 @@ describe('nodes', () => {
         text: '',
         editing: true,
         focused: true,
-        do: {
+        do: expect.objectContaining({
           startToEdit: expect.any(Function),
           changeNodeText: expect.any(Function),
-          toggleFold: expect.any(Function),
           createChild: expect.any(Function),
-        },
+        }),
       }),
     ])
   })

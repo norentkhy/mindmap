@@ -18,12 +18,14 @@ function prepareNodeIdBindings({
   finalizeEditNode,
   foldNode,
   createChildNode,
+  selectNode,
 }) {
   return (id) => ({
     startToEdit: () => initiateEditNode(id),
     changeNodeText: (text) => finalizeEditNode({ id, text }),
     toggleFold: () => foldNode({ id }),
     createChild: () => createChildNode(id),
+    select: () => selectNode(id),
   })
 }
 

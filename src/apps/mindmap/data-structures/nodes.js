@@ -13,6 +13,7 @@ export default {
   createRoot,
   createChild,
   editContents,
+  select,
   toggleFold,
 }
 
@@ -80,6 +81,10 @@ function editContents(nodes, id, newContent) {
     editingIds: Ids.flip(nodes.editingIds, id),
     focusedId: id,
   })
+}
+
+function select(nodes, id) {
+  return update(nodes, { focusedId: id })
 }
 
 function toggleFold(nodes, id) {

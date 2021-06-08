@@ -68,6 +68,9 @@ const partialNodeUpdates = {
   finalizeEditNode: (state, { id, text }) => ({
     nodes: Nodes.editContents(state.nodes, id, { text }),
   }),
+  selectNode: (state, id) => ({
+    nodes: Nodes.select(state.nodes, id)
+  }),
   foldNode: (state, { id }) => ({
     nodes: Nodes.toggleFold(state.nodes, id),
   }),

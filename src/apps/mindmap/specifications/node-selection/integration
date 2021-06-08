@@ -1,0 +1,8 @@
+NOTE
+
+This feature is normally handeld by the browser.
+For this reason, the integration test will not make any differences.
+
+However, this feature will give the app more control.
+This is necessary for other features.
+Therefore the integration of this feature is tested in those other features.
