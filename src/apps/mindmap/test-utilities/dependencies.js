@@ -22,6 +22,8 @@ export {
   queryElementByText,
   clickElement,
   doubleClickElement,
+  dragElementStart,
+  dragElementEnd,
   expect,
   waitFor,
   render,
@@ -66,10 +68,10 @@ function mapToTestingLibraryKey(key) {
 }
 
 const fireEventKeyDict = {
-  left: { key: 'ArrowLeft', code: 'ArrowLeft'},
-  right: { key: 'ArrowRight', code: 'ArrowRight'},
-  up: { key: 'ArrowUp', code: 'ArrowUp'},
-  down: { key: 'ArrowDown', code: 'ArrowDown'},
+  left: { key: 'ArrowLeft', code: 'ArrowLeft' },
+  right: { key: 'ArrowRight', code: 'ArrowRight' },
+  up: { key: 'ArrowUp', code: 'ArrowUp' },
+  down: { key: 'ArrowDown', code: 'ArrowDown' },
 }
 
 const keyDict = {
@@ -82,6 +84,22 @@ const keyDict = {
 
 function typeAndPressEnter(text) {
   return typeWithKeyboard(`${text}{enter}`)
+}
+
+function dragElementStart(Element) {
+  const dragStartEvent = createDragEvent('dragstart')
+  return fireEvent(Element, dragStartEvent)
+}
+
+function dragElementEnd(Element) {
+  const dragEndEvent = createDragEvent('dragend')
+  return fireEvent(Element, dragEndEvent)
+}
+
+function createDragEvent(type) {
+  const dragEvent = new MouseEvent(type, { bubbles: true, cancelable: true })
+  dragEvent.dataTransfer = { effectAllowed: null }
+  return dragEvent
 }
 
 function getFocus() {

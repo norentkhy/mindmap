@@ -27,6 +27,12 @@ export default function MindNode({ node }) {
   if (!editing)
     return (
       <NodeContainer
+        draggable
+        onDragStart={(e) => {
+          e.dataTransfer.effectAllowed = 'move'
+          node.do.handleDragStart(e)
+        }}
+        onDragEnd={(e) => node.do.handleDragEnd(e) }
         aria-label="node"
         ref={nodeRef}
         position={containerStyle}
@@ -57,7 +63,7 @@ function useContainerStyle(ref, node) {
         height: size.height,
       }) || {}
     setContainerStyle(newContainerStyle)
-  }, [size.width, size.height])
+  }, [size.width, size.height, node?.compute?.containerStyle])
 
   node?.use?.sizeObserver(ref, (e) => {
     const { width, height } = e.target.getBoundingClientRect()

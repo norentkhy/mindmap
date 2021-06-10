@@ -5,6 +5,8 @@ export default {
   get: Collection.get,
   registerRoot: registerRootSpace,
   registerChild: registerChildSpace,
+  registerMoveStart,
+  registerMoveEnd,
   getClosest,
 }
 
@@ -105,4 +107,38 @@ function computeNextCenterOffset(
   if (downward) draft.top += downward * stepSize.vertical
 
   return draft
+}
+
+function registerMoveStart(space, id, startOffsetMove) {
+  return Collection.modify(space, id, (subject) => ({
+    ...subject,
+    startOffsetMove,
+  }))
+}
+
+function registerMoveEnd(space, id, endOffsetMove) {
+  return Collection.modify(space, id, (subject) => {
+    const { centerOffset, startOffsetMove } = subject
+    const offsetDistance = subtractOffset(endOffsetMove, startOffsetMove)
+    return {
+      ...subject,
+      centerOffset: sumOffset(centerOffset, offsetDistance),
+      startOffsetMove: null,
+    }
+  })
+}
+
+function subtractOffset(offsetA, offsetB) {
+  return applyToLeftAndTop(offsetA, offsetB, (a, b) => a - b)
+}
+
+function sumOffset(offsetA, offsetB) {
+  return applyToLeftAndTop(offsetA, offsetB, (a, b) => a + b)
+}
+
+function applyToLeftAndTop(a, b, calculate) {
+  return {
+    left: calculate(a.left, b.left),
+    top: calculate(a.top, b.top),
+  }
 }

@@ -16,6 +16,8 @@ export default {
   select,
   toggleFold,
   shiftFocusTo,
+  initiateMove,
+  finalizeMove
 }
 
 function init() {
@@ -110,5 +112,17 @@ function createUnassignedNode(nodes) {
 function shiftFocusTo(nodes, direction) {
   return update(nodes, {
     focusedId: Space.getClosest(nodes.space, nodes.focusedId, direction),
+  })
+}
+
+function initiateMove(nodes, id, offset) {
+  return update(nodes, {
+    space: Space.registerMoveStart(nodes.space, id, offset)
+  })
+}
+
+function finalizeMove(nodes, id, offset) {
+  return update(nodes, {
+    space: Space.registerMoveEnd(nodes.space, id, offset)
   })
 }

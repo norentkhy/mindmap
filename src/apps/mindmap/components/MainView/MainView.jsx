@@ -7,6 +7,7 @@ export function MainView({ nodes, createNode, navigate }) {
     <MindSpace
       aria-label="main view"
       onDoubleClick={createNode}
+      onDragOver={preventDragEndAnimation}
       onKeyDown={({ key }) => {
         key === 'ArrowLeft' && navigate('left')
         key === 'ArrowRight' && navigate('right')
@@ -19,4 +20,8 @@ export function MainView({ nodes, createNode, navigate }) {
       ))}
     </MindSpace>
   )
+}
+
+function preventDragEndAnimation(e) {
+  e.preventDefault() 
 }

@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid'
 
-const label = {
+export const label = {
   tabsContainer: 'tabs',
   addTabButton: 'add new tab',
   renamingTab: 'renaming this tab',
@@ -12,8 +12,16 @@ const label = {
   redoButton: 'redo action',
 }
 
+export function find(cy, targetLabel) {
+  return cy.findByLabelText(label[targetLabel])
+}
+
+export function findElementWithText(cy, text) {
+  return cy.findByText(text)
+}
+
 export function clickOnElementWithText(cy, text) {
-  cy.findByText(text).click()
+  return findElementWithText(cy, text).click()
 }
 
 export function clickButtonToCreateNode(cy) {
@@ -54,12 +62,13 @@ export function doubleClickToRenameTabFromLeft(cy, index) {
   _findTabFromLeft(cy, index).dblclick()
 }
 
-function calculateOffset(Element, horizontalRatio, verticalRatio) {
+export function calculateOffset(Element, horizontalRatio, verticalRatio) {
   const { offsetWidth, offsetHeight } = Element
   const left = offsetWidth * horizontalRatio
   const top = offsetHeight * verticalRatio
+  const normalised = { left: horizontalRatio, top: verticalRatio, }
 
-  return { left, top }
+  return { left, top, normalised }
 }
 
 export function createChildNodeWithName(cy, name) {
@@ -74,8 +83,19 @@ export function createRootNodeWithName(cy, name) {
   pressOnKeyboard(cy, 'enter')
 }
 
+export function getMindSpaceNormalised(cy, x, y) {
+  return cy
+    .findByLabelText(label.mindSpace)
+    .as('MindSpace')
+    .then(([MindSpace]) => ({
+      MindSpace,
+      offset: calculateOffset(MindSpace, x, y),
+    }))
+}
+
 function doubleClickMindSpace({ cy, provideClickOffset, offsetName }) {
-  cy.findByLabelText(label.mindSpace)
+  return cy
+    .findByLabelText(label.mindSpace)
     .as('MindSpace')
     .then(([MindSpace]) => ({
       MindSpace,
@@ -157,6 +177,21 @@ export function expectToFocusedAt(cy, offsetLabel) {
     })
 }
 
+export function expectFocusedAtNormalised(cy, x, y) {
+  cy.all(cy.focused(), cy.get('@MindSpace'))
+    .then(([[Focused], [MindSpace]]) => ({
+      Focused,
+      MindSpace,
+    }))
+    .then(({ Focused, MindSpace }) => ({
+      offsetNode: calculateOffsetFromMindSpace({ Element: Focused, MindSpace }),
+      mouseOffset: calculateOffset(MindSpace, x, y),
+    }))
+    .should(({ offsetNode, mouseOffset }) => {
+      expectTargetToSurroundPoint({ target: offsetNode, point: mouseOffset })
+    })
+}
+
 export function expectToFindNode(cy, positive = true) {
   const Element = cy.findByLabelText(label.node)
   if (positive) Element.should('exist')
@@ -205,6 +240,25 @@ function expectTargetToSurroundPoint({ target, point }) {
   expect(target.top + target.height).to.be.above(point.top)
 }
 
+export function expectToBeSurrounded(point, rect) {
+  expect(rect.left).to.be.below(point.left)
+  expect(rect.left + rect.width).to.be.above(point.left)
+  expect(rect.top).to.be.below(point.top)
+  expect(rect.top + rect.height).to.be.above(point.top)
+}
+
+export function calculateOffsetDifference(ElementA, ElementB) {
+  const RectA = ElementA.getBoundingClientRect()
+  const RectB = ElementB.getBoundingClientRect()
+
+  return {
+    left: RectA.left - RectB.left,
+    top: RectA.top - RectB.top,
+    width: RectA.width,
+    height: RectA.width,
+  }
+}
+
 function calculateOffsetFromMindSpace({ Element, MindSpace }) {
   const MindSpaceRect = MindSpace.getBoundingClientRect()
   const ElementRect = Element.getBoundingClientRect()
@@ -219,4 +273,49 @@ function calculateOffsetFromMindSpace({ Element, MindSpace }) {
 
 export function generateUniqueString() {
   return uuidv4()
+}
+
+/**
+ * new style:
+ * - more functional, no surprises
+ * - makes use of .then-chains
+ *   - this is how cypress guarantees order
+ */
+
+export function dragAndDropElement(cy, nodeText, startOffset, endOffset) {
+  return cy
+    .findByText(nodeText)
+    .trigger('dragstart', {
+      dataTransfer: new DataTransfer(),
+      clientX: startOffset.left,
+      clientY: startOffset.top,
+    })
+    .trigger('drop', {
+      clientX: endOffset.left,
+      clientY: endOffset.top,
+    })
+    .trigger('dragend', {
+      clientX: endOffset.left,
+      clientY: endOffset.top,
+    })
+}
+
+export function expectFocusedAtElementNormalised(cy, Element, x, y) {
+  return cy
+    .focused()
+    .then(([Focused]) => ({
+      focusedOffset: calculateOffsetDifference(Focused, Element),
+      expectedOffset: calculateOffset(Element, x, y),
+    }))
+    .should(({ focusedOffset, expectedOffset }) => {
+      expectToBeSurrounded(expectedOffset, focusedOffset)
+    })
+}
+
+export function doubleClickElement(cy, Element, offset) {
+  return cy.wrap(Element).dblclick(offset.left, offset.top)
+}
+
+export function typeAndPressEnter(cy, text) {
+  return cy.focused().type(text).type('{enter}')
 }

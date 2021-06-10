@@ -1,3 +1,5 @@
+import { computeCenterOffset } from './mouse-computations'
+
 export default function computeGeneralActions(actions) {
   return {
     undo: actions.undo,
@@ -15,13 +17,5 @@ function computeCreateNodeOnMouse(createRootNode) {
   function createNodeOnMouse(event) {
     const centerOffset = computeCenterOffset(event)
     createRootNode(centerOffset)
-  }
-}
-
-function computeCenterOffset({ clientX, clientY, target }) {
-  const { left, top } = target.getBoundingClientRect()
-  return {
-    left: clientX - left,
-    top: clientY - top,
   }
 }

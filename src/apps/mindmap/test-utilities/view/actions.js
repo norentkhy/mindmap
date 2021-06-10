@@ -6,6 +6,8 @@ import {
   pressKey,
   pressKeyDown,
   pressKeyUp,
+  dragElementStart,
+  dragElementEnd,
 } from '../dependencies'
 import { mapObject } from '~/utils/FunctionalProgramming'
 
@@ -18,16 +20,18 @@ function actionOnDefinedElementQueries(doAction) {
   })
 }
 
-const [definedClicks, definedDoubleClicks] = [
-  clickElement,
-  doubleClickElement,
-].map((doAction) => actionOnDefinedElementQueries(doAction))
+const defined = mapObject(
+  { clickElement, doubleClickElement, dragElementStart, dragElementEnd },
+  (doAction) => actionOnDefinedElementQueries(doAction)
+)
 
 export const action = {
   typeWithKeyboard,
   pressKey,
   pressKeyDown,
   pressKeyUp,
-  clickOn: { ...definedClicks },
-  doubleClickOn: { ...definedDoubleClicks },
+  clickOn: { ...defined.clickElement },
+  doubleClickOn: { ...defined.doubleClickElement },
+  dragStart: { ...defined.dragElementStart },
+  dragEnd: { ...defined.dragElementEnd },
 }

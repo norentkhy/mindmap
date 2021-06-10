@@ -1,4 +1,5 @@
 import { Nodes } from '~mindmap/data-structures'
+import { computeCenterOffset } from './mouse-computations'
 
 export default function computeNodesToRender({
   nodes,
@@ -19,6 +20,8 @@ function prepareNodeIdBindings({
   foldNode,
   createChildNode,
   selectNode,
+  initiateMoveNode,
+  finalizeMoveNode,
 }) {
   return (id) => ({
     startToEdit: () => initiateEditNode(id),
@@ -26,6 +29,8 @@ function prepareNodeIdBindings({
     toggleFold: () => foldNode({ id }),
     createChild: () => createChildNode(id),
     select: () => selectNode(id),
+    handleDragStart: (e) => initiateMoveNode(id, computeCenterOffset(e)),
+    handleDragEnd: (e) => finalizeMoveNode(id, computeCenterOffset(e)),
   })
 }
 

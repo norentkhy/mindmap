@@ -76,6 +76,12 @@ const partialNodeUpdates = {
   }),
   shiftFocusTo: (state, direction) => ({
     nodes: Nodes.shiftFocusTo(state.nodes, direction)
+  }),
+  initiateMoveNode: (state, id, offset) => ({
+    nodes: Nodes.initiateMove(state.nodes, id, offset)
+  }),
+  finalizeMoveNode: (state, id, offset) => ({
+    nodes: Nodes.finalizeMove(state.nodes, id, offset)
   })
 }
 

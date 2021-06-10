@@ -63,7 +63,7 @@ function getIdMap(objects) {
 function isChangedObj(oldObj, newObj, keys) {
   return keys.reduce((isModified, key) => {
     if (isModified) return true
-    return oldObj[key] === newObj[key]
+    return oldObj[key] !== newObj[key]
   }, false)
 }
 
