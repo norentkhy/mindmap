@@ -10,6 +10,7 @@ const queryElementByText = screen.queryByText
 const clickElement = userEvent.click
 const doubleClickElement = fireEvent.doubleClick
 const queryAllElementsByRole = screen.queryAllByRole
+const queryAllElementsByLabelText = screen.queryAllByLabelText
 const debugView = screen.debug
 const renderView = render
 const createMockFn = jest.fn
@@ -20,25 +21,26 @@ export {
   createMockFn,
   queryElementByLabelText,
   queryElementByText,
-  clickElement,
-  doubleClickElement,
-  dragElementStart,
-  dragElementEnd,
+  queryAllElementsByRole,
+  queryAllElementsByLabelText,
+  getFocus,
+  getInputSelection,
   expect,
   waitFor,
   render,
   renderView,
   debugView,
+  clickElement,
+  doubleClickElement,
+  dragElementStart,
+  dragElementEnd,
   typeWithKeyboard,
   typeAndPressEnter,
   pressKey,
   pressKeyDown,
   pressKeyUp,
-  getFocus,
-  getInputSelection,
   generateUUID,
   addIdTo,
-  queryAllElementsByRole,
 }
 
 function typeWithKeyboard(keys) {

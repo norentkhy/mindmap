@@ -11,12 +11,13 @@ export function useTime(initialPresent = null) {
 
   const actions = useMemo(() => bindActions(setTimeline), [setTimeline])
 
-  return [timeline, actions.registerNew, actions.undo, actions.redo]
+  return [timeline, actions.registerNew, actions.mutatePresent, actions.undo, actions.redo]
 }
 
 function bindActions(setTimeline) {
   return {
     registerNew: bindAddToTimeline(setTimeline),
+    mutatePresent: bindMutatePresent(setTimeline),
     undo: bindUndo(setTimeline),
     redo: bindRedo(setTimeline),
   }
@@ -25,6 +26,11 @@ function bindActions(setTimeline) {
 function bindAddToTimeline(setTimeline) {
   return (newPresent) =>
     setTimeline((timeline) => Timeline.fork(timeline, newPresent))
+}
+
+function bindMutatePresent(setTimeline) {
+  return newPresent =>
+  setTimeline(timeline => Timeline.mutate(timeline, newPresent))
 }
 
 function bindUndo(setTimeline) {

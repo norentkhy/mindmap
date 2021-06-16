@@ -11,7 +11,3 @@ function computeCss(style) {
     (css, [key, value]) => css + `${key}: ${value};\n`
   )
 }
-
-function returnComputeContainerStyle(centerOffset) {
-  //later first fix viewmodel problem
-}

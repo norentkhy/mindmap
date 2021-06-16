@@ -137,11 +137,11 @@ function renderUseTime(initialPresent) {
 }
 
 function goForward({ result, distance }) {
-  act(() => result.current[3](distance))
+  act(() => result.current[4](distance))
 }
 
 function goBack({ result, distance }) {
-  act(() => result.current[2](distance))
+  act(() => result.current[3](distance))
 }
 
 function goBackToTheStart(result) {

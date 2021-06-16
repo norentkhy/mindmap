@@ -10,6 +10,8 @@ export const label = {
   createRootNodeButton: 'create root node',
   undoButton: 'undo action',
   redoButton: 'redo action',
+  childLine: 'child of parent',
+  linkAnchor: 'anchor of link',
 }
 
 export function find(cy, targetLabel) {
@@ -22,6 +24,18 @@ export function findElementWithText(cy, text) {
 
 export function clickOnElementWithText(cy, text) {
   return findElementWithText(cy, text).click()
+}
+
+export function findAllLinkAnchors(cy) {
+  return cy.findAllByLabelText(label.linkAnchor)
+}
+
+export function findAllChildLinks(cy) {
+  return cy.findAllByLabelText(label.childLine)
+}
+
+export function expectToFindLine(cy) {
+  cy.findByLabelText(label.childLine)
 }
 
 export function clickButtonToCreateNode(cy) {
@@ -66,7 +80,7 @@ export function calculateOffset(Element, horizontalRatio, verticalRatio) {
   const { offsetWidth, offsetHeight } = Element
   const left = offsetWidth * horizontalRatio
   const top = offsetHeight * verticalRatio
-  const normalised = { left: horizontalRatio, top: verticalRatio, }
+  const normalised = { left: horizontalRatio, top: verticalRatio }
 
   return { left, top, normalised }
 }
@@ -316,6 +330,25 @@ export function doubleClickElement(cy, Element, offset) {
   return cy.wrap(Element).dblclick(offset.left, offset.top)
 }
 
+export function doubleClickElementNormalised(cy, Element, x, y) {
+  return cy.wrap(Element).dblclick(x, y)
+}
+
 export function typeAndPressEnter(cy, text) {
   return cy.focused().type(text).type('{enter}')
+}
+
+export function expectOffsetBetween(offsetBetween, [offsetA, offsetB]) {
+  if (offsetA.left < offsetBetween.left)
+    return expectOffsetBetweenSorted(offsetBetween, [offsetA, offsetB])
+  if (offsetB.left < offsetBetween.left)
+    return expectOffsetBetweenSorted(offsetBetween, [offsetB, offsetA])
+  throw new Error('offsetBetween definitely not between A and B')
+}
+
+export function expectOffsetBetweenSorted(offsetBetween, [offsetL, offsetR]) {
+  expect(offsetBetween.left).to.be.gte(offsetL.left)
+  expect(offsetBetween.top).to.be.gte(offsetL.top)
+  expect(offsetBetween.left).to.be.lte(offsetR.left)
+  expect(offsetBetween.top).to.be.lte(offsetR.top)
 }

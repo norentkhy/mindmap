@@ -14,8 +14,9 @@ const hooks = {
 }
 
 export default function useViewmodel() {
-  const [timeline, forkTimeline, undo, redo] = useTime(initialState)
-  const actions = useActions(forkTimeline, undo, redo)
+  const [timeline, forkTimeline, mutateTimeline, undo, redo] =
+    useTime(initialState)
+  const actions = useActions(forkTimeline, mutateTimeline, undo, redo)
   // return Viewmodel.compute(timeline.present, actions, hooks)
   return useViewmodelUpdate(timeline.present, actions, hooks) //
 }
@@ -29,22 +30,25 @@ function useViewmodelUpdate(state, actions, hooks) {
   return newViewmodel
 }
 
-function useActions(forkTimeline, undo, redo) {
+function useActions(forkTimeline, mutateTimeline, undo, redo) {
   return useMemo(
-    () => ({ ...bindStateChanges(forkTimeline), undo, redo }),
+    () => ({ ...bindStateChanges(forkTimeline, mutateTimeline), undo, redo }),
     [forkTimeline, undo, redo]
   )
 }
 
-function bindStateChanges(setState) {
+function bindStateChanges(forkTimeline, mutateTimeline) {
   return {
-    ...bindUpdates(partialNodeUpdates, setState),
-    ...bindUpdates(partialTabUpdates, setState),
+    ...bindUpdates(partialNodeMutations, mutateTimeline),
+    ...bindUpdates(partialNodeUpdates, forkTimeline),
+    ...bindUpdates(partialTabUpdates, forkTimeline),
   }
 }
 
 function bindUpdates(updates, setState) {
-  return mapObject(updates, (update) => bindUpdate(update, setState))
+  return mapObject(updates, (update) => {
+    return bindUpdate(update, setState)
+  })
 }
 
 function bindUpdate(update, setState) {
@@ -69,20 +73,29 @@ const partialNodeUpdates = {
     nodes: Nodes.editContents(state.nodes, id, { text }),
   }),
   selectNode: (state, id) => ({
-    nodes: Nodes.select(state.nodes, id)
+    nodes: Nodes.select(state.nodes, id),
   }),
   foldNode: (state, { id }) => ({
     nodes: Nodes.toggleFold(state.nodes, id),
   }),
   shiftFocusTo: (state, direction) => ({
-    nodes: Nodes.shiftFocusTo(state.nodes, direction)
+    nodes: Nodes.shiftFocusTo(state.nodes, direction),
   }),
   initiateMoveNode: (state, id, offset) => ({
-    nodes: Nodes.initiateMove(state.nodes, id, offset)
+    nodes: Nodes.initiateMove(state.nodes, id, offset),
   }),
   finalizeMoveNode: (state, id, offset) => ({
-    nodes: Nodes.finalizeMove(state.nodes, id, offset)
-  })
+    nodes: Nodes.finalizeMove(state.nodes, id, offset),
+  }),
+  makeParent: (state, parentId, childId) => ({
+    nodes: Nodes.makeParent(state.nodes, parentId, childId),
+  }),
+}
+
+const partialNodeMutations = {
+  registerNodeSize: (state, id, size) => ({
+    nodes: Nodes.registerSize(state.nodes, id, size),
+  }),
 }
 
 const partialTabUpdates = {

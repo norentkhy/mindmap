@@ -1,8 +1,9 @@
-import MindNode from './MindNode'
+import MindNodes from './MindNodes'
+import MindLinks from './MindLinks'
 import { MindSpace } from '../Styled'
 import React from 'react'
 
-export function MainView({ nodes, createNode, navigate }) {
+export function MainView({ nodes, links = [], createNode, navigate }) {
   return (
     <MindSpace
       aria-label="main view"
@@ -15,13 +16,12 @@ export function MainView({ nodes, createNode, navigate }) {
         key === 'ArrowDown' && navigate('down')
       }}
     >
-      {nodes?.map((node) => (
-        <MindNode key={node.id} node={node} />
-      ))}
+      <MindLinks links={links} />
+      <MindNodes nodes={nodes} />
     </MindSpace>
   )
 }
 
 function preventDragEndAnimation(e) {
-  e.preventDefault() 
+  e.preventDefault()
 }

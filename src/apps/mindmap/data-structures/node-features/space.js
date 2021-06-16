@@ -8,6 +8,8 @@ export default {
   registerMoveStart,
   registerMoveEnd,
   getClosest,
+  getSize,
+  registerSize,
 }
 
 const stepSize = {
@@ -141,4 +143,13 @@ function applyToLeftAndTop(a, b, calculate) {
     left: calculate(a.left, b.left),
     top: calculate(a.top, b.top),
   }
+}
+
+function registerSize(space, id, size) {
+  return Collection.modify(space, id, (subject) => ({ ...subject, size }))
+}
+
+function getSize(space, id) {
+  const { size } = Collection.get(space, id)
+  return size
 }

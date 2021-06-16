@@ -10,45 +10,22 @@ import {
 describe('with explicit coordinates', () => {
   const [eventMouse, offsetMouse] = computeMouseEventAndOffset()
 
-  const sizeNode = {
-    width: 100,
-    height: 20,
-  }
-
   test('create root node', () => {
     const vm = renderViewmodel()
     act(() => vm.do.createNodeOnMouse(eventMouse))
-
-    expect(vm.nodes[0].compute.containerStyle(sizeNode)).toEqual({
-      position: 'absolute',
-      left: `${offsetMouse.left - sizeNode.width / 2}px`,
-      top: `${offsetMouse.top - sizeNode.height / 2}px`,
-    })
+    expect(vm.nodes[0].centerOffset).toEqual(offsetMouse)
   })
 })
 
 describe('without explicit coordinates', () => {
-  const sizeNode = {
-    width: 100,
-    height: 20,
-  }
-
   test('automatic placement without mouse event', () => {
     const vm = renderViewmodel()
 
     act(() => vm.do.createNode())
-    expect(vm.nodes[0].compute.containerStyle(sizeNode)).toEqual({
-      position: 'absolute',
-      left: `${100 - sizeNode.width / 2}px`,
-      top: `${50 - sizeNode.height / 2}px`,
-    })
+    expect(vm.nodes[0].centerOffset).toEqual({ left: 100, top: 50 })
 
     act(() => vm.do.createNode())
-    expect(vm.nodes[1].compute.containerStyle(sizeNode)).toEqual({
-      position: 'absolute',
-      left: `${100 - sizeNode.width / 2}px`,
-      top: `${100 - sizeNode.height / 2}px`,
-    })
+    expect(vm.nodes[1].centerOffset).toEqual({ left: 100, top: 100 })
   })
 
   test('child placement without mouse event', () => {
@@ -56,18 +33,10 @@ describe('without explicit coordinates', () => {
     act(() => vm.do.createNode())
 
     act(() => vm.nodes[0].do.createChild())
-    expect(vm.nodes[1].compute.containerStyle(sizeNode)).toEqual({
-      position: 'absolute',
-      left: `${200 - sizeNode.width / 2}px`,
-      top: `${50 - sizeNode.height / 2}px`,
-    })
+    expect(vm.nodes[1].centerOffset).toEqual({ left: 200, top: 50 })
 
     act(() => vm.nodes[0].do.createChild())
-    expect(vm.nodes[2].compute.containerStyle(sizeNode)).toEqual({
-      position: 'absolute',
-      left: `${200 - sizeNode.width / 2}px`,
-      top: `${100 - sizeNode.height / 2}px`,
-    })
+    expect(vm.nodes[2].centerOffset).toEqual({ left: 200, top: 100 })
   })
 })
 

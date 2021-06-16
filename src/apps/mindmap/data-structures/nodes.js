@@ -5,6 +5,7 @@ import { update } from '~/utils/FunctionalProgramming'
 export default {
   init,
   getArrayVisibleIds,
+  getArrayChildLinksOf,
   getCenterOffset,
   getText,
   isEditing,
@@ -17,7 +18,10 @@ export default {
   toggleFold,
   shiftFocusTo,
   initiateMove,
-  finalizeMove
+  finalizeMove,
+  getSize,
+  registerSize,
+  makeParent,
 }
 
 function init() {
@@ -57,6 +61,11 @@ function getArrayVisibleIds(nodes) {
     IdsOf.getRecursive(nodes.childIdsOf, foldedId)
   )
   return Ids.filter(nodes.ids, (id) => !hiddenIds.includes(id))
+}
+
+function getArrayChildLinksOf(nodes, parentId) {
+  const childIds = IdsOf.get(nodes.childIdsOf, parentId)
+  return Ids.toArray.map(childIds, (childId) => ({ parentId, childId }))
 }
 
 function createRoot(nodes, centerOffset) {
@@ -117,12 +126,28 @@ function shiftFocusTo(nodes, direction) {
 
 function initiateMove(nodes, id, offset) {
   return update(nodes, {
-    space: Space.registerMoveStart(nodes.space, id, offset)
+    space: Space.registerMoveStart(nodes.space, id, offset),
   })
 }
 
 function finalizeMove(nodes, id, offset) {
   return update(nodes, {
-    space: Space.registerMoveEnd(nodes.space, id, offset)
+    space: Space.registerMoveEnd(nodes.space, id, offset),
+  })
+}
+
+function getSize(nodes, id) {
+  return Space.getSize(nodes.space, id)
+}
+
+function registerSize(nodes, id, size) {
+  return update(nodes, {
+    space: Space.registerSize(nodes.space, id, size),
+  })
+}
+
+function makeParent(nodes, parentId, childId) {
+  return update(nodes, {
+    childIdsOf: IdsOf.add(nodes.childIdsOf, parentId, childId),
   })
 }

@@ -1,4 +1,5 @@
 import {
+  computeMindSpaceToRender,
   computeNodesToRender,
   computeTabsToRender,
   computeGeneralActions,
@@ -10,16 +11,19 @@ export default {
 }
 
 function compute(state, actions, hooks) {
+  const { nodes, links } = computeMindSpaceToRender({
+    nodes: state.nodes,
+    actions,
+    useSizeObserver: hooks.useSizeObserver,
+  })
+
   return {
     tabs: computeTabsToRender({
       tabs: state.tabs,
       actions,
     }),
-    nodes: computeNodesToRender({
-      nodes: state.nodes,
-      actions,
-      useSizeObserver: hooks.useSizeObserver,
-    }),
+    nodes,
+    links,
     do: computeGeneralActions(actions),
   }
 }
@@ -35,6 +39,7 @@ function mixModel(oldModel, newModel) {
   return {
     tabs: mixObjs(oldModel.tabs, newModel.tabs, tabViewPropertyKeys),
     nodes: mixObjs(oldModel.nodes, newModel.nodes, nodeViewPropertyKeys),
+    links: newModel.links,
     do: newModel.do,
   }
 }

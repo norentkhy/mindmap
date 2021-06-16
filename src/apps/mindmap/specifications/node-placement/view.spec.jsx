@@ -29,31 +29,20 @@ describe('mindboard placement', () => {
 
   test('placement via style', () => {
     let firstSize = true
+    const useSizeObserver = (_ref, callback) => {
+      if (!firstSize) return
+      firstSize = false
+      const getBoundingClientRect = () => ({ width: 100, height: 20 })
+      callback({ target: { getBoundingClientRect } })
+    }
+
     const stylishNode = addIdTo({
       text: 'a very stylish node',
-      compute: {
-        containerStyle: createMockFn((_boundingClientRect) => {
-          return { position: 'absolute', left: '20px', top: '50px' }
-        }),
-      },
-      use: {
-        sizeObserver: createMockFn((_ref, callback) => {
-          if (firstSize) {
-            firstSize = false
-            callback({
-              target: {
-                getBoundingClientRect: () => ({ width: 100, height: 20 }),
-              },
-            })
-          }
-        }),
-      },
+      centerOffset: { left: 70, top: 60 },
+      use: { sizeObserver: createMockFn(useSizeObserver) },
     })
     view.render(<MindNode node={stylishNode} />)
-    expect(stylishNode.compute.containerStyle).toBeCalledWith({
-      width: expect.any(Number),
-      height: expect.any(Number),
-    })
+
     view.expect
       .node(stylishNode)
       .toHaveStyle({ position: 'absolute', left: '20px', top: '50px' })

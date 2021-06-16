@@ -2,14 +2,14 @@ import { Nodes } from '~mindmap/data-structures'
 import { computeCenterOffset } from './mouse-computations'
 
 export default function computeNodesToRender({
+  ids,
   nodes,
   actions,
   useSizeObserver,
 }) {
   const bindIdToNodeActions = prepareNodeIdBindings(actions)
-  const visibleIds = Nodes.getArrayVisibleIds(nodes)
 
-  return visibleIds.map((id) =>
+  return ids.map((id) =>
     packageNode({ id, nodes, useSizeObserver, bindIdToNodeActions })
   )
 }
@@ -22,6 +22,8 @@ function prepareNodeIdBindings({
   selectNode,
   initiateMoveNode,
   finalizeMoveNode,
+  registerNodeSize,
+  makeParent,
 }) {
   return (id) => ({
     startToEdit: () => initiateEditNode(id),
@@ -31,16 +33,16 @@ function prepareNodeIdBindings({
     select: () => selectNode(id),
     handleDragStart: (e) => initiateMoveNode(id, computeCenterOffset(e)),
     handleDragEnd: (e) => finalizeMoveNode(id, computeCenterOffset(e)),
+    registerSize: (size) => registerNodeSize(id, size),
+    makeParent: (targetId) => makeParent(id, targetId),
   })
 }
 
 function packageNode({ id, nodes, useSizeObserver, bindIdToNodeActions }) {
   const nodeProperties = getNodeProperties(nodes, id)
-  const nodeComputations = bindNodeComputations(nodes, id)
 
   return {
     ...nodeProperties,
-    compute: nodeComputations,
     use: { sizeObserver: useSizeObserver },
     do: bindIdToNodeActions(id),
   }
@@ -53,17 +55,6 @@ function getNodeProperties(nodes, id) {
     editing: Nodes.isEditing(nodes, id),
     folded: Nodes.isFolded(nodes, id),
     focused: Nodes.isFocused(nodes, id),
-  }
-}
-
-function bindNodeComputations(nodes, id) {
-  const centerOffset = Nodes.getCenterOffset(nodes, id)
-
-  return {
-    containerStyle: ({ width, height }) => ({
-      position: 'absolute',
-      left: `${centerOffset.left - width / 2}px`,
-      top: `${centerOffset.top - height / 2}px`,
-    }),
+    centerOffset: Nodes.getCenterOffset(nodes, id),
   }
 }

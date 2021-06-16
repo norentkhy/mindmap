@@ -5,6 +5,7 @@ import testUndoRedo from '~mindmap/specifications/undo-redo/integration.cypress'
 import testNodePlacement from '~mindmap/specifications/node-placement/integration.cypress'
 import testNodeKeyboardNavigation from '~mindmap/specifications/node-keyboard-navigation/integration.cypress'
 import testNodeDragAndDrop from '~mindmap/specifications/node-drag-and-drop/integration.cypress'
+import testLinks from '~mindmap/specifications/node-links/integration.cypress'
 
 testNodeKeyboardNavigation(describe, beforeEach, it, cy)
 
@@ -16,6 +17,7 @@ const testSpecifications = [
   ['node placement', testNodePlacement],
   ['node keyboard navigation', testNodeKeyboardNavigation],
   ['node drag and drop', testNodeDragAndDrop],
+  ['node links', testLinks],
 ]
 
 testSpecifications.forEach(([description, executeTests]) => {

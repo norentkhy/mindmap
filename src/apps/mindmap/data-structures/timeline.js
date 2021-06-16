@@ -1,6 +1,7 @@
 export default {
   init,
   fork,
+  mutate,
   shiftToPast,
   shiftToFuture,
   shiftToStart,
@@ -16,6 +17,13 @@ function fork(timeline, computeNewPresent) {
     pasts: [...timeline.pasts, timeline.present],
     present: computeNewPresent(timeline.present),
     futures: [],
+  }
+}
+
+function mutate(timeline, computeMutation) {
+  return {
+    ...timeline,
+    present: computeMutation(timeline.present)
   }
 }
 

@@ -16,11 +16,7 @@ test('handleDragStart', () => {
   const offsetEnd = computeMouseEvent({ left: 910, top: 705 })
   act(() => vm.nodes[0].do.handleDragStart(offsetStart))
   act(() => vm.nodes[0].do.handleDragEnd(offsetEnd))
-  expect(vm.nodes[0].compute.containerStyle(sizeNode)).toEqual({
-    position: 'absolute',
-    left: `${900 - sizeNode.width / 2}px`,
-    top: `${700 - sizeNode.height / 2}px`,
-  })
+  expect(vm.nodes[0].centerOffset).toEqual({ left: 900, top: 700, })
 })
 
 function computeMouseEvent(offsetMouse) {

@@ -3,13 +3,18 @@ import {
   queryElementByText,
   getFocus,
   queryAllElementsByRole,
+  queryAllElementsByLabelText,
 } from '../dependencies'
 
 const label = {
   mindSpace: 'main view',
+  linkSpace: 'link space',
+  nodeSpace: 'node space',
   rootTree: 'container of rootnode',
   node: 'node',
   nodeInput: 'editing node',
+  childLink: 'child of parent',
+  linkAnchor: 'anchor point of link',
   tabs: { tabInput: 'renaming this tab' },
   button: {
     createRootNode: 'create root node',
@@ -32,8 +37,12 @@ export const definedElementQueries = {
   untitledTab: queryUntitledTab,
   nodeInput: queryNodeInput,
   node: queryNode,
+  childLink: queryChildLink,
+  linkAnchor: queryLinkAnchor,
   rootTree: queryRootTree,
   mindSpace: () => queryElementByLabelText(label.mindSpace),
+  linkSpace: () => queryElementByLabelText(label.linkSpace),
+  nodeSpace: () => queryElementByLabelText(label.nodeSpace),
   createRootNodeButton: () =>
     queryElementByLabelText(label.button.createRootNode),
   createTabButton: () => queryElementByLabelText(label.button.createTab),
@@ -143,4 +152,15 @@ function queryTab({ index, id, name, numberOfFirstMatchesToSkip = 0 }) {
   const MatchedTabs = queryAllTabs({ id, name })
   if (!MatchedTabs.length) return null
   return MatchedTabs[numberOfFirstMatchesToSkip]
+}
+
+function queryChildLink() {
+  const childLinks = queryAllElementsByLabelText(label.childLink)
+  if (!childLinks.length) return null
+  if (childLinks.length === 1) return childLinks[0]
+}
+
+function queryLinkAnchor(anchorId) {
+  const linkAnchors = queryAllElementsByLabelText(label.linkAnchor)
+  return linkAnchors.find(anchor => anchor.getAttribute('data-id') === anchorId)
 }
