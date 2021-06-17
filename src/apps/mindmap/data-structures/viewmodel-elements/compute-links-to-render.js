@@ -1,9 +1,6 @@
 import { Nodes, Geometry } from '~mindmap/data-structures'
 
-export default function computeLinksToRender({
-  nodeIds,
-  nodes,
-}) {
+export default function computeLinksToRender({ nodeIds, nodes }) {
   const childParentPairs = nodeIds.flatMap((nodeId) =>
     Nodes.getArrayChildLinksOf(nodes, nodeId)
   )
@@ -37,56 +34,27 @@ function computeAnchors(nodes, link) {
 }
 
 function computeAnchorOffsets(nodes, link) {
-  const parent = {
-    centerOffset: Nodes.getCenterOffset(nodes, link.parentId),
-    size: Nodes.getSize(nodes, link.parentId),
-  }
-
-  const child = {
-    centerOffset: Nodes.getCenterOffset(nodes, link.childId),
-    size: Nodes.getSize(nodes, link.childId),
-  }
-
-  const direction = determineDirection(parent.centerOffset, child.centerOffset)
+  const [parent, child] = [link.parentId, link.childId].map((id) => ({
+    centerOffset: Nodes.getCenterOffset(nodes, id),
+    size: Nodes.getSize(nodes, id),
+  }))
+  const angle = calculateAngle(parent.centerOffset, child.centerOffset)
 
   return {
-    parent: computeAnchorOffsetOnEdge(parent, direction),
-    child: computeAnchorOffsetOnEdge(child, opposite[direction]),
+    parent: computeAnchorOffsetOnEdge(parent, angle),
+    child: computeAnchorOffsetOnEdge(child, Geometry.invertAngle(angle)),
   }
 }
 
-function computeAnchorOffsetOnEdge(nodeDimensions, direction) {
+function computeAnchorOffsetOnEdge(nodeDimensions, angle) {
   const { centerOffset, size } = nodeDimensions
   if (!size) return centerOffset
 
-  return {
-    left:
-      centerOffset.left +
-      -((direction === 'left') * (1 / 2) * size.width) +
-      +((direction === 'right') * (1 / 2) * size.width),
-    top:
-      centerOffset.top +
-      -((direction === 'down') * (1 / 2) * size.height) +
-      +((direction === 'up') * (1 / 2) * size.height),
-  }
+  return Geometry.computePointOnEdge(angle, size, centerOffset)
 }
 
-const opposite = {
-  left: 'right',
-  right: 'left',
-  up: 'down',
-  down: 'up',
-}
-
-function determineDirection(startOffset, endOffset) {
+function calculateAngle(startOffset, endOffset) {
   const dx = endOffset.left - startOffset.left
   const dy = endOffset.top - startOffset.top
-  const angle = Math.atan2(dy, dx)
-
-  if (Geometry.isInBottomQuadrant(angle)) return 'down'
-  if (Geometry.isInTopQuadrant(angle)) return 'up'
-  if (Geometry.isInLeftQuadrant(angle)) return 'left'
-  if (Geometry.isInRightQuadrant(angle)) return 'right'
-
-  throw new Error(`unexpected angle: ${angle}`)
+  return Math.atan2(dy, dx)
 }

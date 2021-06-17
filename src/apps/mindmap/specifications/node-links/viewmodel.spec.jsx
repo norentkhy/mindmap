@@ -59,7 +59,7 @@ describe('anchor positioning: automatic child spawn', () => {
 
     const [link] = vm.links
     const parentOffset = vm.nodes[0].centerOffset
-    expect(link.start.centerOffset).toEqual({
+    expectOffsetsToBeClose(link.start.centerOffset, {
       left: parentOffset.left + nodeSize.width / 2,
       top: parentOffset.top,
     })
@@ -75,7 +75,7 @@ describe('anchor positioning: automatic child spawn', () => {
 
     const [link] = vm.links
     const childOffset = vm.nodes[1].centerOffset
-    expect(link.end.centerOffset).toEqual({
+    expectOffsetsToBeClose(link.end.centerOffset, {
       left: childOffset.left - nodeSize.width / 2,
       top: childOffset.top,
     })
@@ -137,4 +137,8 @@ function computeMouseEvent(offsetMouse) {
     ...clientOffset,
     target: { getBoundingClientRect: () => boundingClientRect },
   }
+}
+
+function expectOffsetsToBeClose(a, b) {
+  return ['left', 'top'].forEach((key) => expect(a[key]).toBeCloseTo(b[key]))
 }

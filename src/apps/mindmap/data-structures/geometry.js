@@ -1,14 +1,93 @@
 import { getAllCombinations } from '~/utils/FunctionalProgramming'
 
 export default {
+  computePointOnEdge,
   getRectEdges,
   isRectOnEdge,
   areTouching,
   getCenterOffset,
-  isInLeftQuadrant,
-  isInTopQuadrant,
-  isInRightQuadrant,
-  isInBottomQuadrant,
+  sanitizeAngle,
+  invertAngle,
+}
+
+function computePointOnEdge(angle, boxSize, centerOffset) {
+  const pointVector = computePointVector(angle, boxSize)
+
+  return {
+    left: centerOffset.left + pointVector.dx,
+    top: centerOffset.top + pointVector.dy,
+  }
+}
+
+function computePointVector(angle, boxSize) {
+  const sanitizedAngle = sanitizeAngle(angle)
+  const half = { width: boxSize.width / 2, height: boxSize.height / 2 }
+  if (sanitizedAngle === Math.PI / 2) return { dx: 0, dy: half.height }
+  if (sanitizedAngle === -Math.PI / 2) return { dx: 0, dy: -half.height }
+  if (sanitizedAngle === 0) return { dx: half.width, dy: 0 }
+  if (sanitizedAngle === Math.PI) return { dx: -half.width, dy: 0 }
+
+  const boxAngle = Math.atan2(half.height, half.width)
+
+  if (isInTopOrBottomPart(sanitizedAngle, boxAngle))
+    return vectorFrom({ angle: sanitizedAngle, dyAbs: half.height })
+
+  if (isInLeftOrRightPart(sanitizedAngle, boxAngle))
+    return vectorFrom({ angle: sanitizedAngle, dxAbs: half.width })
+}
+
+function isInTopOrBottomPart(angle, boxAngle) {
+  return [isInTopPart, isInBottomPart].some((predicate) =>
+    predicate(angle, boxAngle)
+  )
+}
+
+function isInLeftOrRightPart(angle, boxAngle) {
+  return [isInLeftPart, isInRightPart].some((predicate) =>
+    predicate(angle, boxAngle)
+  )
+}
+
+function sanitizeAngle(angle) {
+  if (angle <= Math.PI && angle > -Math.PI) return angle
+  if (angle > Math.PI) return sanitizeAngle(angle - 2 * Math.PI)
+  if (angle <= -Math.PI) return sanitizeAngle(angle + 2 * Math.PI)
+}
+
+function vectorFrom({ dxAbs, dyAbs, angle }) {
+  const tangent = Math.tan(angle)
+
+  const xSign = Math.sign(Math.cos(angle))
+  const ySign = Math.sign(Math.sin(angle))
+
+  if (!dxAbs)
+    return { dx: xSign * Math.abs(dyAbs / tangent), dy: ySign * dyAbs }
+  if (!dyAbs)
+    return { dx: xSign * dxAbs, dy: ySign * Math.abs(dxAbs * tangent) }
+}
+
+function isInLeftPart(angle, separationAngleInTopRightQuadrant) {
+  const startAngle = Math.PI - separationAngleInTopRightQuadrant
+  const endAngle = -startAngle
+  return angle >= startAngle || angle < -endAngle
+}
+
+function isInTopPart(angle, separationAngleInTopRightPart) {
+  const startAngle = separationAngleInTopRightPart
+  const endAngle = Math.PI - startAngle
+  return angle >= startAngle && angle < endAngle
+}
+
+function isInRightPart(angle, separationAngleInTopRightPart) {
+  const startAngle = -separationAngleInTopRightPart
+  const endAngle = -startAngle
+  return angle >= startAngle && angle < endAngle
+}
+
+function isInBottomPart(angle, separationAngleInTopRightPart) {
+  const endAngle = -separationAngleInTopRightPart
+  const startAngle = -endAngle - Math.PI
+  return angle >= startAngle && angle < endAngle
 }
 
 function isRectOnEdge(rect, edge) {
@@ -96,18 +175,6 @@ function getCenterOffset(Element) {
   }
 }
 
-function isInLeftQuadrant(angle) {
-  return angle >= (3 / 4) * Math.PI || angle < -(3 / 4) * Math.PI
-}
-
-function isInTopQuadrant(angle) {
-  return angle >= (1 / 4) * Math.PI && angle < (3 / 4) * Math.PI
-}
-
-function isInRightQuadrant(angle) {
-  return angle >= (-1 / 4) * Math.PI && angle < (1 / 4) * Math.PI
-}
-
-function isInBottomQuadrant(angle) {
-  return angle >= (-3 / 4) * Math.PI && angle < (-1 / 4) * Math.PI
+function invertAngle(angle) {
+  return angle + Math.PI
 }
