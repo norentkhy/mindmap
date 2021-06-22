@@ -2,7 +2,7 @@ import useViewmodel from '~mindmap/components/Model/useViewmodel'
 import { renderHook } from '@testing-library/react-hooks'
 
 export { act } from '@testing-library/react-hooks'
-export { describe, test, expect } from './dependencies'
+export { describe, test, expect, createMockFn } from './dependencies'
 
 export function expectAnId() {
   return expect.any(String)

@@ -12,6 +12,7 @@ export default {
     map: mapToArray,
     filter: filterToArray,
   },
+  isEmpty,
 }
 
 function createIds(...args) {
@@ -50,4 +51,8 @@ function mapToArray(ids, applyMapping) {
 
 function filterToArray(ids, predicate) {
   return Array.from(ids).filter(predicate)
+}
+
+function isEmpty(ids) {
+  return !ids.size
 }

@@ -8,8 +8,9 @@ export const label = {
   node: 'node',
   editingNode: 'editing node',
   createRootNodeButton: 'create root node',
-  undoButton: 'undo action',
-  redoButton: 'redo action',
+  createChildNodeButton: 'create child node',
+  undoButton: 'undo',
+  redoButton: 'redo',
   childLine: 'child of parent',
   linkAnchor: 'anchor of link',
 }

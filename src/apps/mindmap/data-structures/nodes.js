@@ -4,10 +4,14 @@ import { update } from '~/utils/FunctionalProgramming'
 
 export default {
   init,
+  getAmount,
   getArrayVisibleIds,
   getArrayChildLinksOf,
   getCenterOffset,
   getText,
+  getEditingIds,
+  getFocusedId,
+  isEditingAny,
   isEditing,
   isFolded,
   isFocused,
@@ -34,6 +38,22 @@ function init() {
     foldedIds: Ids.init(),
     focusedId: null,
   }
+}
+
+function getAmount(nodes) {
+  return nodes.ids.size
+}
+
+function getFocusedId(nodes) {
+  return nodes.focusedId
+}
+
+function getEditingIds(nodes) {
+  return Ids.toArray.map(nodes.editingIds, (x) => x)
+}
+
+function isEditingAny(nodes) {
+  return !Ids.isEmpty(nodes.editingIds)
 }
 
 function isEditing(nodes, id) {

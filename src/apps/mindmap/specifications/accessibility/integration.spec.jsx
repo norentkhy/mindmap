@@ -9,7 +9,7 @@ describe('view elements', () => {
   })
   test('actions', () => {
     view.render(<MindMapApp />)
-    view.expect.label('actions').toBeVisible()
+    view.expect.label('interactive actions console').toBeVisible()
   })
 
   test('main view', () => {

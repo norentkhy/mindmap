@@ -1,6 +1,6 @@
 import {
+  computeInteractiveActions,
   computeMindSpaceToRender,
-  computeNodesToRender,
   computeTabsToRender,
   computeGeneralActions,
 } from './viewmodel-elements'
@@ -10,12 +10,14 @@ export default {
   update,
 }
 
-function compute(state, actions, hooks) {
+function compute(state, actions, hooks, timeline) {
   const { nodes, links } = computeMindSpaceToRender({
     nodes: state.nodes,
     actions,
-    useSizeObserver: hooks.useSizeObserver,
+    hooks,
   })
+
+  const generalActions = computeGeneralActions(actions)
 
   return {
     tabs: computeTabsToRender({
@@ -24,12 +26,17 @@ function compute(state, actions, hooks) {
     }),
     nodes,
     links,
-    do: computeGeneralActions(actions),
+    actionPanel: computeInteractiveActions({
+      timeline: timeline,
+      nodes: state.nodes,
+      actions,
+    }),
+    do: generalActions,
   }
 }
 
-function update(prior, state, actions, hooks) {
-  const newViewmodel = compute(state, actions, hooks)
+function update(prior, state, actions, hooks, timeline) {
+  const newViewmodel = compute(state, actions, hooks, timeline)
   if (!prior.viewmodel) return newViewmodel
 
   return mixModel(prior.viewmodel, newViewmodel)
@@ -37,10 +44,9 @@ function update(prior, state, actions, hooks) {
 
 function mixModel(oldModel, newModel) {
   return {
+    ...newModel,
     tabs: mixObjs(oldModel.tabs, newModel.tabs, tabViewPropertyKeys),
     nodes: mixObjs(oldModel.nodes, newModel.nodes, nodeViewPropertyKeys),
-    links: newModel.links,
-    do: newModel.do,
   }
 }
 

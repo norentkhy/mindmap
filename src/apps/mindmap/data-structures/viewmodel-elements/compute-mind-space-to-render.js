@@ -1,15 +1,10 @@
 import { Nodes } from '~mindmap/data-structures'
-import {
-  computeNodesToRender,
-  computeLinksToRender,
-  computeTabsToRender,
-  computeGeneralActions,
-} from './index'
+import { computeNodesToRender, computeLinksToRender } from './index'
 
 export default function computeMindSpaceToRender({
   nodes,
   actions,
-  useSizeObserver,
+  hooks: { useSizeObserver },
 }) {
   const visibleNodeIds = Nodes.getArrayVisibleIds(nodes)
 
@@ -24,7 +19,7 @@ export default function computeMindSpaceToRender({
       nodeIds: visibleNodeIds,
       nodes,
       actions,
-      useSizeObserver
+      useSizeObserver,
     }),
   }
 }

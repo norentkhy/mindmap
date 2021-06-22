@@ -6,6 +6,7 @@ import testNodePlacement from '~mindmap/specifications/node-placement/integratio
 import testNodeKeyboardNavigation from '~mindmap/specifications/node-keyboard-navigation/integration.cypress'
 import testNodeDragAndDrop from '~mindmap/specifications/node-drag-and-drop/integration.cypress'
 import testLinks from '~mindmap/specifications/node-links/integration.cypress'
+import testInteractiveActions from '~mindmap/specifications/interactive-actions/integration.cypress'
 
 testNodeKeyboardNavigation(describe, beforeEach, it, cy)
 
@@ -18,6 +19,7 @@ const testSpecifications = [
   ['node keyboard navigation', testNodeKeyboardNavigation],
   ['node drag and drop', testNodeDragAndDrop],
   ['node links', testLinks],
+  ['interactive actions', testInteractiveActions],
 ]
 
 testSpecifications.forEach(([description, executeTests]) => {

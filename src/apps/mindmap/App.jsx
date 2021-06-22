@@ -1,25 +1,25 @@
 import React from 'react'
-import { Actions, MainView, ModelProvider, Tabs } from './components'
+import { MainView, ModelProvider, Tabs, InteractiveActions } from './components'
 import useModel from '~mindmap/hooks/useModel'
 import styled from 'styled-components'
 
 export default function MindMap() {
   return (
     <Providers>
-      <FlexRowFullHeight>
+      <FlexColumnFullHeight>
         <StatefulTabs />
-        <StatefulActions />
-        <StatefulMainView />
-      </FlexRowFullHeight>
+        <FlexRowFullHeight>
+          <StatefulMainView />
+          <StatefulInteractiveActions />
+        </FlexRowFullHeight>
+      </FlexColumnFullHeight>
     </Providers>
   )
 }
 
-function StatefulActions() {
+function StatefulInteractiveActions() {
   const model = useModel()
-  const { createNode, undo, redo } = model.do
-
-  return <Actions actions={{ createNode, undo, redo }} />
+  return <InteractiveActions viewmodel={model.actionPanel} />
 }
 
 function StatefulMainView() {
@@ -54,8 +54,14 @@ function Providers({ children }) {
   return <ModelProvider>{children}</ModelProvider>
 }
 
-const FlexRowFullHeight = styled.div`
+const FlexColumnFullHeight = styled.div`
   display: flex;
   flex-direction: column;
+  height: 100%;
+`
+
+const FlexRowFullHeight = styled.div`
+  display: flex;
+  flex-direction: row;
   height: 100%;
 `

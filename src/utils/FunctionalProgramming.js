@@ -83,3 +83,23 @@ export function combineArrayWithCombinations(combinations, array) {
     })
   })
 }
+
+export function splitArray(array, predicateOrDetermineIndex) {
+  return array.reduce((result, element) => {
+    const key = determineKey(element)
+    return pushOntoKey(result, key, element)
+  }, [])
+
+  function determineKey(element) {
+    const key = predicateOrDetermineIndex(element)
+    if (typeof key === 'boolean') return Number(!key)
+    return key
+  }
+
+  function pushOntoKey(result, key, element) {
+    if (!Array.isArray(array[key])) result[key] = [element]
+    result[key].push(element)
+    return result
+  }
+}
+
