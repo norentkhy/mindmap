@@ -1,6 +1,5 @@
 export { Collection, Ids } from './primitives'
 export { Space, IdsOf, NodeContents } from './node-features'
-export { default as Style } from './style'
 export { default as Nodes } from './nodes'
 export { default as Viewmodel } from './viewmodel'
 export { default as Tabs } from './tabs'

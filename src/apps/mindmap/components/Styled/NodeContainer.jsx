@@ -1,8 +1,15 @@
-import { Style } from '~mindmap/data-structures'
 import styled from 'styled-components'
 
 const NodeContainer = styled.button`
-  ${({ position }) => Style.computeCss(position)}
+  position: var(--position);
+  left: var(--left);
+  top: var(--top);
+
+  &[data-transparent=true] {
+    color: transparent;
+    background-color: transparent;
+    border-color: transparent;
+  }
 `
 
 export default NodeContainer

@@ -27,27 +27,6 @@ describe('mindboard placement', () => {
     )
   })
 
-  test('placement via style', () => {
-    let firstSize = true
-    const useSizeObserver = (_ref, callback) => {
-      if (!firstSize) return
-      firstSize = false
-      const getBoundingClientRect = () => ({ width: 100, height: 20 })
-      callback({ target: { getBoundingClientRect } })
-    }
-
-    const stylishNode = addIdTo({
-      text: 'a very stylish node',
-      centerOffset: { left: 70, top: 60 },
-      use: { sizeObserver: createMockFn(useSizeObserver) },
-    })
-    view.render(<MindNode node={stylishNode} />)
-
-    view.expect
-      .node(stylishNode)
-      .toHaveStyle({ position: 'absolute', left: '20px', top: '50px' })
-  })
-
   test('mindspace has relative position', () => {
     view.render(<MainView />)
     view.expect.mindSpace().toHaveStyle({ position: 'relative' })

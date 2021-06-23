@@ -2,7 +2,7 @@ import {
   visitMindmapApp,
   createChildNodeWithName,
   createRootNodeWithName,
-  findElementWithText,
+  findNode,
   findAllLinkAnchors,
   findAllChildLinks,
   expectToFindLine,
@@ -12,24 +12,24 @@ import { Geometry } from '~mindmap/data-structures'
 import { mapObject } from '~/utils/FunctionalProgramming'
 import { DOM } from '../../data-structures/index'
 
-export default function testNodeLines(describe, beforeEach, it, cy) {
+export default function testNodeLines(describe, beforeEach, test, cy) {
   beforeEach(() => {
     visitMindmapApp(cy)
   })
 
-  it('link made when relation exists between node', () => {
+  test('link made when relation exists between node', () => {
     createRootNodeWithName(cy, 'parent')
     createChildNodeWithName(cy, 'child')
     expectToFindLine(cy)
   })
 
-  it('link exists between the two nodes', () => {
+  test('link exists between the two nodes', () => {
     createRootNodeWithName(cy, 'parent')
     createChildNodeWithName(cy, 'child')
 
     cy.all(
-      findElementWithText(cy, 'parent'),
-      findElementWithText(cy, 'child'),
+      findNode(cy, { text: 'parent' }),
+      findNode(cy, { text: 'child' }),
       findAllChildLinks(cy)
     )
       .then(([[Parent], [Child], [Link]]) => {
@@ -41,13 +41,13 @@ export default function testNodeLines(describe, beforeEach, it, cy) {
       })
   })
 
-  it('link anchors on edge of each node', () => {
+  test('link anchors on edge of each node', () => {
     createRootNodeWithName(cy, 'parent')
     createChildNodeWithName(cy, 'child')
 
     cy.all(
-      findElementWithText(cy, 'parent'),
-      findElementWithText(cy, 'child'),
+      findNode(cy, { text: 'parent' }),
+      findNode(cy, { text: 'child' }),
       findAllLinkAnchors(cy)
     )
       .then(([[Parent], [Child], [AnchorA, AnchorB]]) => {
@@ -56,9 +56,9 @@ export default function testNodeLines(describe, beforeEach, it, cy) {
         return DOM.pairTouchingRects(anchorRects, nodeRects)
       })
       .then((rectPairs) => {
-        rectPairs.forEach(([anchorOffset, nodeOffset]) =>
+        rectPairs.forEach(([anchorOffset, nodeOffset]) => {
           expectAnchorOnNodeEdge(anchorOffset, nodeOffset)
-        )
+        })
       })
   })
 }

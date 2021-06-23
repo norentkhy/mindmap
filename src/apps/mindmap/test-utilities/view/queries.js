@@ -59,7 +59,8 @@ export const query = {
 }
 
 function queryNode({ text }) {
-  return queryElementByText(text)
+  const nodes = queryAllElementsByLabelText(label.node)
+  return nodes.find(node => node.textContent === text)
 }
 
 function queryAllNodes() {

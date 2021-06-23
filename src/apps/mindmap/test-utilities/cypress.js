@@ -15,6 +15,14 @@ export const label = {
   linkAnchor: 'anchor of link',
 }
 
+export function findNode(cy, { text }) {
+  return cy.findAllByLabelText(label.node).then(findMatchingNode)
+
+  function findMatchingNode(nodes) {
+    return Array.from(nodes).find((node) => node.textContent === text)
+  }
+}
+
 export function find(cy, targetLabel) {
   return cy.findByLabelText(label[targetLabel])
 }
