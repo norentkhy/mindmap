@@ -37,6 +37,7 @@ function init() {
     editingIds: Ids.init(),
     foldedIds: Ids.init(),
     focusedId: null,
+    moveTargetId: null,
   }
 }
 
@@ -147,12 +148,15 @@ function shiftFocusTo(nodes, direction) {
 function initiateMove(nodes, id, offset) {
   return update(nodes, {
     space: Space.registerMoveStart(nodes.space, id, offset),
+    moveTargetId: id,
   })
 }
 
-function finalizeMove(nodes, id, offset) {
+function finalizeMove(nodes, offset) {
+  const id = nodes.moveTargetId
   return update(nodes, {
     space: Space.registerMoveEnd(nodes.space, id, offset),
+    moveTargetId: null,
   })
 }
 

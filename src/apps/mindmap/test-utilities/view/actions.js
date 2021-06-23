@@ -8,6 +8,7 @@ import {
   pressKeyUp,
   dragElementStart,
   dragElementEnd,
+  dropElement,
 } from '../dependencies'
 import { mapObject } from '~/utils/FunctionalProgramming'
 
@@ -21,7 +22,7 @@ function actionOnDefinedElementQueries(doAction) {
 }
 
 const defined = mapObject(
-  { clickElement, doubleClickElement, dragElementStart, dragElementEnd },
+  { clickElement, doubleClickElement, dragElementStart, dragElementEnd, dropElement },
   (doAction) => actionOnDefinedElementQueries(doAction)
 )
 
@@ -34,4 +35,5 @@ export const action = {
   doubleClickOn: { ...defined.doubleClickElement },
   dragStart: { ...defined.dragElementStart },
   dragEnd: { ...defined.dragElementEnd },
+  drop: { ...defined.dropElement },
 }

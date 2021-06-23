@@ -27,7 +27,7 @@ function StatefulMainView() {
   const {
     nodes,
     links,
-    do: { createNodeOnMouse, navigate },
+    do: { createNodeOnMouse, navigate, handleNodeDrop },
   } = model
 
   return (
@@ -36,6 +36,7 @@ function StatefulMainView() {
       links={links}
       createNode={createNodeOnMouse}
       navigate={navigate}
+      handleNodeDrop={handleNodeDrop}
     />
   )
 }

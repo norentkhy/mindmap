@@ -1,12 +1,19 @@
 import MindNode from './MindNode'
-import React from 'react'
+import React, { useRef } from 'react'
 import styled from 'styled-components'
 
-export default function MindNodes({ nodes }) {
+export default function MindNodes({ nodes, handleNodeDrop }) {
+  const ref = useRef()
+
   return (
-    <NodeSpace aria-label="node space">
+    <NodeSpace
+      aria-label="node space"
+      ref={ref}
+      onDragOver={(e) => e.preventDefault()}
+      onDrop={handleNodeDrop}
+    >
       {nodes?.map((node) => (
-        <MindNode key={node.id} node={node} />
+        <MindNode key={node.id} node={node} parentRef={ref} />
       ))}
     </NodeSpace>
   )

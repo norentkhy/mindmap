@@ -21,7 +21,6 @@ function prepareNodeIdBindings({
   createChildNode,
   selectNode,
   initiateMoveNode,
-  finalizeMoveNode,
   registerNodeSize,
   makeParent,
 }) {
@@ -31,8 +30,8 @@ function prepareNodeIdBindings({
     toggleFold: () => foldNode({ id }),
     createChild: () => createChildNode(id),
     select: () => selectNode(id),
-    handleDragStart: (e) => initiateMoveNode(id, computeCenterOffset(e)),
-    handleDragEnd: (e) => finalizeMoveNode(id, computeCenterOffset(e)),
+    handleDragStart: (e, NodeSpace) =>
+      initiateMoveNode(id, computeCenterOffset(e, NodeSpace)),
     registerSize: (size) => registerNodeSize(id, size),
     makeParent: (targetId) => makeParent(id, targetId),
   })

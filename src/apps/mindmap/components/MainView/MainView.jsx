@@ -3,7 +3,7 @@ import MindLinks from './MindLinks'
 import { MindSpace } from '../Styled'
 import React from 'react'
 
-export function MainView({ nodes, links = [], createNode, navigate }) {
+export function MainView({ nodes, links = [], createNode, navigate, handleNodeDrop }) {
   return (
     <MindSpace
       aria-label="main view"
@@ -17,7 +17,7 @@ export function MainView({ nodes, links = [], createNode, navigate }) {
       }}
     >
       <MindLinks links={links} />
-      <MindNodes nodes={nodes} />
+      <MindNodes nodes={nodes} handleNodeDrop={handleNodeDrop} />
     </MindSpace>
   )
 }

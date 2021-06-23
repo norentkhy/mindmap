@@ -34,6 +34,7 @@ export {
   doubleClickElement,
   dragElementStart,
   dragElementEnd,
+  dropElement,
   typeWithKeyboard,
   typeAndPressEnter,
   pressKey,
@@ -91,6 +92,11 @@ function typeAndPressEnter(text) {
 function dragElementStart(Element) {
   const dragStartEvent = createDragEvent('dragstart')
   return fireEvent(Element, dragStartEvent)
+}
+
+function dropElement(Element) {
+  const dropEvent = createDragEvent('drop')
+  return fireEvent(Element, dropEvent)
 }
 
 function dragElementEnd(Element) {

@@ -11,13 +11,13 @@ export default {
 }
 
 function compute(state, actions, hooks, timeline) {
-  const { nodes, links } = computeMindSpaceToRender({
+  const { handleNodeDrop, nodes, links } = computeMindSpaceToRender({
     nodes: state.nodes,
     actions,
     hooks,
   })
 
-  const generalActions = computeGeneralActions(actions)
+  const generalActions = computeGeneralActions(actions, handleNodeDrop)
 
   return {
     tabs: computeTabsToRender({

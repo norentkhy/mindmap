@@ -2,7 +2,7 @@ import NodeInput from './NodeInput'
 import { NodeContainer, EmptyHeightSpan } from '../Styled'
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
 
-export default function MindNode({ node }) {
+export default function MindNode({ node, parentRef }) {
   const nodeRef = useRef()
   const { editing, focused, text } = node
 
@@ -18,7 +18,7 @@ export default function MindNode({ node }) {
       ref={nodeRef}
       style={positionStyle}
       data-transparent={editing}
-      {...getInteractionProps(node)}
+      {...getInteractionProps(node, parentRef)}
     >
       {!editing && <EmptyHeightSpan>{text}</EmptyHeightSpan>}
       {editing && <NodeInput node={node} size={size} />}
@@ -26,16 +26,15 @@ export default function MindNode({ node }) {
   )
 }
 
-function getInteractionProps(node) {
+function getInteractionProps(node, parentRef) {
   if (node.editing) return {}
 
   return {
     draggable: true,
     onDragStart: (e) => {
       e.dataTransfer.effectAllowed = 'move'
-      node.do.handleDragStart(e)
+      node.do.handleDragStart(e, parentRef.current)
     },
-    onDragEnd: (e) => node.do.handleDragEnd(e),
     onClick: () => node.do.select?.(),
     onDoubleClick: (e) => {
       e.stopPropagation()
