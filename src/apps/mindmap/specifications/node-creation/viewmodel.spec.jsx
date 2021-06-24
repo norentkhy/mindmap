@@ -72,6 +72,7 @@ describe('nodes', () => {
     expect(vm.nodes).toEqual([
       expect.objectContaining({
         editing: true,
+        text: 'this will change'
       }),
     ])
   })

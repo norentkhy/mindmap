@@ -109,8 +109,11 @@ function createChild(nodes, parentId) {
 }
 
 function editContents(nodes, id, newContent) {
+  const newContents = newContent
+    ? NodeContents.set(nodes.contents, id, newContent)
+    : nodes.contents
   return update(nodes, {
-    contents: NodeContents.set(nodes.contents, id, newContent),
+    contents: newContents,
     editingIds: Ids.flip(nodes.editingIds, id),
     focusedId: id,
   })

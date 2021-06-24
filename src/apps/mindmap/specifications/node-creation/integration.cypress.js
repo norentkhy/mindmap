@@ -47,6 +47,7 @@ export default function testNodeCreation(describe, beforeEach, it, cy) {
       pressOnKeyboard(cy, 'enter')
 
       expectToFindNodeInput(cy)
+      cy.focused().should('have.value', nodeName)
     })
   })
 
