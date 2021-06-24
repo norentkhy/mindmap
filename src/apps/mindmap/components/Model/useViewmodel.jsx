@@ -17,7 +17,7 @@ export default function useViewmodel() {
   const [timeline, forkTimeline, mutateTimeline, undo, redo] =
     useTime(initialState)
   const actions = useActions(forkTimeline, mutateTimeline, undo, redo)
-  return useViewmodelUpdate(timeline.present, actions, hooks, timeline) //
+  return useViewmodelUpdate(timeline.present, actions, hooks, timeline)
 }
 
 function useViewmodelUpdate(state, actions, hooks, timeline) {
@@ -58,7 +58,7 @@ function bindUpdate(update, setState) {
     }))
 }
 
-const partialNodeUpdates = {
+const partialNodeUpdates = bindNodesMappingsToTabs({
   createRootNode: (state, centerOffset) => ({
     nodes: Nodes.createRoot(state.nodes, centerOffset),
   }),
@@ -89,20 +89,22 @@ const partialNodeUpdates = {
   makeParent: (state, parentId, childId) => ({
     nodes: Nodes.makeParent(state.nodes, parentId, childId),
   }),
-}
+})
 
-const partialNodeMutations = {
+const partialNodeMutations = bindNodesMappingsToTabs({
   registerNodeSize: (state, id, size) => ({
     nodes: Nodes.registerSize(state.nodes, id, size),
   }),
-}
+})
 
 const partialTabUpdates = {
   addNewTab: (state) => ({
     tabs: Tabs.createUntitled(state.tabs),
+    nodes: Nodes.init(),
   }),
   selectTab: (state, id) => ({
     tabs: Tabs.select(state.tabs, id),
+    nodes: Tabs.getNodesOf(state.tabs, id),
   }),
   initiateRenameTab: (state, id) => ({
     tabs: Tabs.rename(state.tabs, id),
@@ -110,4 +112,18 @@ const partialTabUpdates = {
   finishRenameTab: (state, id, newName) => ({
     tabs: Tabs.rename(state.tabs, id, newName),
   }),
+}
+
+function bindNodesMappingsToTabs(partialNodeUpdatesOrMutations) {
+  return mapObject(partialNodeUpdatesOrMutations, bindNodesMappingToTabs)
+}
+
+function bindNodesMappingToTabs(mapNodes) {
+  return (state, ...args) => {
+    const newState = mapNodes(state, ...args)
+    return {
+      ...newState,
+      tabs: Tabs.setNodesOfCurrent(state.tabs, newState.nodes),
+    }
+  }
 }

@@ -42,6 +42,7 @@ export {
   pressKeyUp,
   generateUUID,
   addIdTo,
+  expectEqualExcludingFunctions,
 }
 
 function typeWithKeyboard(keys) {
@@ -120,4 +121,20 @@ function generateUUID() {
 
 function addIdTo(object) {
   return { id: generateUUID(), ...object }
+}
+
+function expectEqualExcludingFunctions(a, b) {
+  const [excludedA, excludedB] = [a, b].map(excludeDeepFunctions)
+  return expect(excludedA).toEqual(excludedB)
+}
+
+function excludeDeepFunctions(obj) {
+  const newObj = { ...obj }
+  const entries = Object.entries(newObj)
+  entries.forEach(([key, value]) => {
+    if (typeof value === 'function') delete newObj[key]
+    if (typeof value === 'object' && value !== null)
+      newObj[key] = excludeDeepFunctions(value)
+  })
+  return newObj
 }

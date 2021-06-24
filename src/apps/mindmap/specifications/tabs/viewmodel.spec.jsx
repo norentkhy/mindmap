@@ -5,9 +5,10 @@ import {
   expectAnId,
   renderViewmodel,
   act,
+  expectEqualExcludingFunctions,
 } from '~mindmap/test-utilities/viewmodel'
 
-describe('tabs: viewmodel', () => {
+describe('tab buttons', () => {
   test('initial', () => {
     const vm = renderViewmodel()
     expect(vm.tabs).toEqual([
@@ -67,5 +68,41 @@ describe('tabs: viewmodel', () => {
     expect(vm.tabs).toEqual([
       expect.objectContaining({ renaming: false, name: 'renamed tab' }),
     ])
+  })
+})
+
+describe('nodes context control', () => {
+  test('new nodes when tab is created', () => {
+    const vm = renderViewmodel()
+    const initialNodes = vm.nodes
+    act(() => vm.do.createNode())
+    act(() => vm.nodes[0].do.changeNodeText('changed node text'))
+
+    act(() => vm.do.createTab())
+
+    expect(vm.nodes).toEqual(initialNodes)
+  })
+
+  test('nodes reconstructed when tab switched back', () => {
+    const vm = renderViewmodel()
+    act(() => vm.do.createNode())
+    act(() => vm.nodes[0].do.changeNodeText('changed node text'))
+    const nodesFirstTab = vm.nodes
+    act(() => vm.do.createTab())
+
+    act(() => vm.tabs[0].do.select())
+
+    expectEqualExcludingFunctions(vm.nodes, nodesFirstTab)
+  })
+
+  test('not sure why this crashes', () => {
+
+    const vm = renderViewmodel()
+    act(() => vm.do.createNode())
+    act(() => vm.nodes[0].do.changeNodeText('changed node text'))
+    act(() => vm.do.createTab())
+
+    act(() => vm.tabs[0].do.select())
+    act(() => vm.tabs[1].do.select())
   })
 })

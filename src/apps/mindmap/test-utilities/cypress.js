@@ -85,6 +85,10 @@ export function doubleClickToRenameTabFromLeft(cy, index) {
   _findTabFromLeft(cy, index).dblclick()
 }
 
+export function clickTabFromLeft(cy, index) {
+  _findTabFromLeft(cy, index).click()
+}
+
 export function calculateOffset(Element, horizontalRatio, verticalRatio) {
   const { offsetWidth, offsetHeight } = Element
   const left = offsetWidth * horizontalRatio

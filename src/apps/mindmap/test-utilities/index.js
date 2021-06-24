@@ -7,6 +7,7 @@ import {
   describe,
   test,
   expect,
+  expectEqualExcludingFunctions,
 } from './dependencies'
 
 export {
@@ -18,4 +19,5 @@ export {
   describe,
   test,
   expect,
+  expectEqualExcludingFunctions,
 }

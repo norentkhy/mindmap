@@ -6,6 +6,7 @@ const Collection = {
   add: addToCollection,
   replace: replaceInCollection,
   get: getFromCollection,
+  set: replaceInCollection,
   remove: removeFromCollection,
   last: getLastFromCollection,
   map: mapCollection,
