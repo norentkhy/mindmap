@@ -23,8 +23,6 @@ function getNavigationButtons(deps) {
 }
 
 function getContextButtons(deps) {
-  if (!Nodes.getAmount(deps.nodes)) return getButtons(deps, ['CREATE_NODE'])
-
   return getButtons(deps, ['CREATE_NODE', 'CREATE_CHILD', 'SUBMIT_TEXT'])
 }
 

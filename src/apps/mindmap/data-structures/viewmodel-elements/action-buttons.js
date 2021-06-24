@@ -10,7 +10,7 @@ const CREATE_NODE = {
 const CREATE_CHILD = {
   staticProps: { text: 'create child node', label: 'create child node' },
   bindProps: (deps) => ({
-    disabled: Nodes.isEditingAny(deps.nodes),
+    disabled: Nodes.isEditingAny(deps.nodes) || !deps.nodes.focusedId,
     callback: () => {
       const focusedId = Nodes.getFocusedId(deps.nodes)
       return deps.actions.createChildNode(focusedId)

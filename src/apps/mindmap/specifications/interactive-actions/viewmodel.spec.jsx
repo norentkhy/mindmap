@@ -32,7 +32,11 @@ describe('interactive actions state', () => {
     expect(vm.actionPanel).toEqual({
       buttons: {
         navigation: expectNavigationButtons({ disabled: true }),
-        context: [expectButton.createNode()],
+        context: [
+          expectButton.createNode(),
+          expectButton.createChild({ disabled: true }),
+          expectButton.submitText({ disabled: true }),
+        ],
         time: [
           expectButton.undo({ disabled: true }),
           expectButton.redo({ disabled: true }),
