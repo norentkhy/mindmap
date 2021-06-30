@@ -60,10 +60,21 @@ function pressKeyUp(key) {
   return fireEvent.keyUp(Target, fireEventKeyDict[key])
 }
 
-function pressKey(key) {
+function pressKey(key, modifier) {
   const Target = getFocus()
   const testingLibraryKey = mapToTestingLibraryKey(key)
-  return userEvent.type(Target, testingLibraryKey)
+  const keySpecification = modifier?.shift
+    ? `${modifierKey.shift[0]}${testingLibraryKey}${modifierKey.shift[1]}`
+    : testingLibraryKey
+
+  return userEvent.type(Target, keySpecification)
+}
+
+const modifierKey = {
+  shift: ['{shift}', '{/shift}'],
+  ctrl: ['{ctrl}', '{/ctrl}'],
+  alt: ['{alt}', '{/alt}'],
+  meta: ['{meta}', '{/meta}'],
 }
 
 function mapToTestingLibraryKey(key) {

@@ -11,7 +11,7 @@ import {
   visitMindmapApp,
 } from '~mindmap/test-utilities/cypress'
 
-export default function testNodeCreation(describe, beforeEach, it, cy) {
+export default function testNodeCreation(describe, beforeEach, test, cy) {
   beforeEach(() => {
     visitMindmapApp(cy)
   })
@@ -19,7 +19,7 @@ export default function testNodeCreation(describe, beforeEach, it, cy) {
   describe('methods of root node creation', () => {
     ;[doubleClickToCreateNode, clickButtonToCreateNode].forEach(
       (createRootNode) => {
-        it(`${createRootNode.name}`, () => {
+        test(`${createRootNode.name}`, () => {
           createRootNode(cy)
 
           expectToFindNode(cy)
@@ -32,7 +32,7 @@ export default function testNodeCreation(describe, beforeEach, it, cy) {
   describe('editing a node', () => {
     const nodeName = 'this is a name'
 
-    it('complete node naming after root node creation', () => {
+    test('complete node naming after root node creation', () => {
       clickButtonToCreateNode(cy)
 
       typeOnKeyboard(cy, nodeName)
@@ -42,30 +42,44 @@ export default function testNodeCreation(describe, beforeEach, it, cy) {
       expectToFindNodeInput(cy, false)
     })
 
-    it('edit a node that already has a name', () => {
+    test('edit a node that already has a name', () => {
       createRootNodeWithName(cy, nodeName)
       pressOnKeyboard(cy, 'enter')
 
       expectToFindNodeInput(cy)
       cy.focused().should('have.value', nodeName)
     })
+
+    test('nodes can contain multiple lines', () => {
+      const lines = ['this is the first line', 'this is the last line']
+      clickButtonToCreateNode(cy)
+
+      typeOnKeyboard(cy, lines[0])
+      pressOnKeyboard(cy, 'enter', { shift: true })
+      
+      typeOnKeyboard(cy, lines[1])
+      pressOnKeyboard(cy, 'enter')
+
+      lines.forEach(line => expectFocusedToContainText(cy, line))
+      expectToFindNodeInput(cy, false)
+    })
   })
 
   describe('creating a child node', () => {
     const nodeName = 'this is a parent'
-    it('create root node and give it a name', () => {
+    test('create root node and give it a name', () => {
       createRootNodeWithName(cy, nodeName)
       expectToFindNodeInput(cy, false)
     })
 
-    it('create a child node', () => {
+    test('create a child node', () => {
       createRootNodeWithName(cy, 'parent')
       pressOnKeyboard(cy, 'c')
       expectToFindNodeInput(cy)
       expectToFindMultipleNodes(cy, 2)
     })
 
-    it('give child node a name', () => {
+    test('give child node a name', () => {
       createRootNodeWithName(cy, 'parent')
       pressOnKeyboard(cy, 'c')
 

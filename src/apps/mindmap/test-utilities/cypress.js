@@ -243,13 +243,21 @@ export function expectToFindNodeInput(cy, positive = true) {
   if (!positive) NodeInput.should('not.exist')
 }
 
-export function pressOnKeyboard(cy, button) {
-  if (button == 'enter') return typeOnKeyboard(cy, '{enter}')
-  if (button == 'left') return typeOnKeyboard(cy, '{leftarrow}')
-  if (button == 'right') return typeOnKeyboard(cy, '{rightarrow}')
-  if (button == 'up') return typeOnKeyboard(cy, '{uparrow}')
-  if (button == 'down') return typeOnKeyboard(cy, '{downarrow}')
-  return typeOnKeyboard(cy, button)
+export function pressOnKeyboard(cy, button, modifier) {
+  const cyButton = buttonDict[button] || button
+  const cyButtonWithModifiers = modifier?.shift
+    ? `{shift+${button}}`
+    : cyButton
+
+  return typeOnKeyboard(cy, cyButtonWithModifiers)
+}
+
+const buttonDict = {
+  enter: '{enter}',
+  left: '{leftarrow}',
+  right: '{rightarrow}',
+  up: '{uparrow}',
+  down: '{downarrow}',
 }
 
 export function typeOnKeyboard(cy, typingContent) {

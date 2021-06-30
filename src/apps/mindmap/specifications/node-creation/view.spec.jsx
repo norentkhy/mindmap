@@ -66,4 +66,21 @@ describe('new state structure', () => {
     view.pressKey('enter')
     expect(nodeInEdit.do.changeNodeText).nthCalledWith(1, 'new text')
   })
+
+  test('press shift+enter to write on a new line', () => {
+    const nodeInEdit = addIdTo({
+      text: '',
+      editing: true,
+      focused: true,
+      do: { changeNodeText: createMockFn() },
+    })
+    view.render(<MainView nodes={[nodeInEdit]} />)
+    view.typeWithKeyboard('line 1')
+    view.pressKey('enter', { shift: true })
+    expect(nodeInEdit.do.changeNodeText).toBeCalledTimes(0)
+    
+    view.typeWithKeyboard('line 2')
+    view.pressKey('enter')
+    expect(nodeInEdit.do.changeNodeText).nthCalledWith(1, 'line 1\nline 2')
+  })
 })

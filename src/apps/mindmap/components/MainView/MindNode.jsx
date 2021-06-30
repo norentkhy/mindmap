@@ -1,5 +1,5 @@
 import NodeInput from './NodeInput'
-import { NodeContainer, EmptyHeightSpan } from '../Styled'
+import { NodeContainer, EmptyHeightDiv } from '../Styled'
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
 
 export default function MindNode({ node, parentRef }) {
@@ -20,7 +20,7 @@ export default function MindNode({ node, parentRef }) {
       data-transparent={editing}
       {...getInteractionProps(node, parentRef)}
     >
-      {!editing && <EmptyHeightSpan>{text}</EmptyHeightSpan>}
+      {!editing && <EmptyHeightDiv>{text}</EmptyHeightDiv>}
       {editing && <NodeInput node={node} size={size} />}
     </NodeContainer>
   )

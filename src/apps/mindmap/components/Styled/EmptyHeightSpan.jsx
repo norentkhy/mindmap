@@ -1,9 +1,11 @@
 import styled from 'styled-components'
 
-const EmptyHeightSpan = styled.span`
+const EmptyHeightDiv = styled.div`
+  white-space: pre-line;
+
   &::before {
     content: '\\200b';
   }
 `
 
-export default EmptyHeightSpan
+export default EmptyHeightDiv
