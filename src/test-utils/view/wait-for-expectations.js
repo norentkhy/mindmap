@@ -1,6 +1,6 @@
 import { definedElementExpects } from './expectations'
-import { waitFor } from '@testing-library/react'
-import { mapObject } from 'utils/FunctionalProgramming'
+import { waitFor } from '../dependencies'
+import { mapObject } from 'src/utils/FunctionalProgramming'
 
 const waitForDefinedElement = mapObject(
   definedElementExpects,
@@ -13,7 +13,7 @@ export const waitForExpectation = {
 
 export function getWaitForOptions({
   getExpectOptions,
-  structureSample = definedElementExpects.focus(),
+  structureSample = definedElementExpects.nodeInput(),
 }) {
   return (...args) =>
     proxyWaitFor({

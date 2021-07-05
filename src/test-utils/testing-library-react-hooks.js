@@ -1,4 +1,4 @@
-import { mapObject } from 'utils/FunctionalProgramming'
+import { mapObject } from 'src/utils/FunctionalProgramming'
 import { act } from '@testing-library/react-hooks'
 
 export function getActions(result) {

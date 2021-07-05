@@ -1,6 +1,6 @@
+import { getArgsOfLastCall } from 'src/test-utils/jest'
+import { createMockResizeObserverHook } from 'src/test-utils/react-mocks'
 import { renderHook } from '@testing-library/react-hooks'
-import { getArgsOfLastCall } from 'test-utils/jest'
-import { createMockResizeObserverHook } from 'test-utils/react-mocks'
 
 describe('mock useResizeObserver', () => {
   const sample = {
@@ -66,10 +66,8 @@ describe('mock useResizeObserver', () => {
   })
 
   function renderMockResizeSituation(initialTargetProperties) {
-    const {
-      fireResizeEvent,
-      useMockResizeObserver,
-    } = createMockResizeObserverHook(initialTargetProperties)
+    const { fireResizeEvent, useMockResizeObserver } =
+      createMockResizeObserverHook(initialTargetProperties)
 
     const testRef = {
       current: { note: 'this is supposed to be an HTML object or a fiber' },

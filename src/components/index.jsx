@@ -1,8 +1,4 @@
-import {
-  ViewmodelContext,
-  ViewmodelProvider,
-  withViewmodel,
-  useViewmodel,
-} from './Viewmodel'
-
-export { ViewmodelContext, ViewmodelProvider, withViewmodel, useViewmodel }
+export { ModelContext, ModelProvider } from './Model'
+export { Actions, InteractiveActions } from './Actions'
+export { MainView, MindNode } from './MainView'
+export { Tabs } from './Tabs'

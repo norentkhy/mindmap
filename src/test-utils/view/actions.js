@@ -1,26 +1,39 @@
-import userEvent from '@testing-library/user-event'
-import { mapObject } from '~/utils/FunctionalProgramming'
-import { definedElementQueries, getFocus } from './queries'
+import { definedElementQueries } from './queries'
+import {
+  clickElement,
+  doubleClickElement,
+  typeWithKeyboard,
+  pressKey,
+  pressKeyDown,
+  pressKeyUp,
+  dragElementStart,
+  dragElementEnd,
+  dropElement,
+} from '../dependencies'
+import { mapObject } from 'src/utils/FunctionalProgramming'
 
-const definedElementClicks = mapObject(definedElementQueries, clickElement)
+function actionOnDefinedElementQueries(doAction) {
+  return mapObject(definedElementQueries, (queryElement) => {
+    return (...args) => {
+      const Element = queryElement(...args)
+      return doAction(Element)
+    }
+  })
+}
+
+const defined = mapObject(
+  { clickElement, doubleClickElement, dragElementStart, dragElementEnd, dropElement },
+  (doAction) => actionOnDefinedElementQueries(doAction)
+)
 
 export const action = {
-  typeAndPressEnter,
-  click: definedElementClicks,
-}
-
-function clickElement(queryElement) {
-  return (elementInfo) => {
-    const Element = queryElement(elementInfo)
-    return userEvent.click(Element)
-  }
-}
-
-function typeWithKeyboard(keys) {
-  const Target = getFocus()
-  return userEvent.type(Target, keys)
-}
-
-function typeAndPressEnter(text) {
-  return typeWithKeyboard(`${text}{enter}`)
+  typeWithKeyboard,
+  pressKey,
+  pressKeyDown,
+  pressKeyUp,
+  clickOn: { ...defined.clickElement },
+  doubleClickOn: { ...defined.doubleClickElement },
+  dragStart: { ...defined.dragElementStart },
+  dragEnd: { ...defined.dragElementEnd },
+  drop: { ...defined.dropElement },
 }

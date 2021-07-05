@@ -1,3 +1,3 @@
-import testNodeDragAndDrop from '~mindmap/specifications/node-drag-and-drop/integration.cypress'
+import testNodeDragAndDrop from 'src/specifications/node-drag-and-drop/integration.cypress'
 
 testNodeDragAndDrop(describe, beforeEach, it, cy)

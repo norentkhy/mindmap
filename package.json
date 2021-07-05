@@ -14,9 +14,8 @@
     "prod:debug": "yarn debug --env.mode production",
     "dev:debug": "yarn debug --env.mode development",
     "dev:build": "yarn webpack --env.mode development",
-    "storybook": "yarn generate && start-storybook -p 9090",
+    "storybook": "start-storybook -p 9090",
     "jest": "jest",
-    "generate": "node build-utils/generateHeroImage.js",
     "jest:watch": "jest --watch",
     "cypress:open": "cypress open"
   },
@@ -73,10 +72,5 @@
   },
   "resolutions": {
     "styled-components": "^5"
-  },
-  "jest": {
-    "testPathIgnorePatterns": [
-      "./src/components/BookCase/"
-    ]
   }
 }

@@ -18,7 +18,7 @@ module.exports = ({ mode, presets } = { mode: 'production', presets: [] }) => {
   const config = merge(
     {
       mode,
-      entry: path.resolve(__dirname, 'src/apps/website/index.js'),
+      entry: path.resolve(__dirname, 'src/main.js'),
       module: {
         rules: [
           {
@@ -50,7 +50,7 @@ module.exports = ({ mode, presets } = { mode: 'production', presets: [] }) => {
       },
       plugins: [
         new HtmlWebpackPlugin({
-          template: path.resolve(__dirname, 'src/apps/website/index.html'),
+          template: path.resolve(__dirname, 'src/index.html'),
         }),
         new webpack.ProgressPlugin(),
       ],

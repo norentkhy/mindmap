@@ -1,5 +1,5 @@
 import { useLocation } from '@reach/router'
-import parseUrlQuery from 'utils/parseUrlQuery'
+import parseUrlQuery from 'src/utils/parseUrlQuery'
 
 function useUrlParameters() {
   const { search } = useLocation()

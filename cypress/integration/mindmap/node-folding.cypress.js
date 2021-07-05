@@ -1,3 +1,3 @@
-import testNodeFolding from '~mindmap/specifications/node-folding/integration.cypress'
+import testNodeFolding from 'src/specifications/node-folding/integration.cypress'
 
 testNodeFolding(describe, it, cy)

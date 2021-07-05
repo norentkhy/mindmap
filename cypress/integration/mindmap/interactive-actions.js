@@ -1,3 +1,3 @@
-import testInteractiveActions from '~mindmap/specifications/interactive-actions/integration.cypress'
+import testInteractiveActions from 'src/specifications/interactive-actions/integration.cypress'
 
 testInteractiveActions(describe, beforeEach, it, cy)

@@ -1,4 +1,11 @@
-import { view } from './view'
-import { viewmodel } from './viewmodel'
-
-export { view, viewmodel }
+export { view } from './view'
+export { viewmodel } from './viewmodel'
+export {
+  addIdTo,
+  render,
+  createMockFn,
+  describe,
+  test,
+  expect,
+  expectEqualExcludingFunctions,
+} from './dependencies'

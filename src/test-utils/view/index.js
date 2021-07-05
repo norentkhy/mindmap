@@ -1,14 +1,16 @@
 import { query } from './queries'
 import { expectations } from './expectations'
-import { waitForExpectation } from './wait-for-expectations'
+import { waitForExpectation, getWaitForOptions } from './wait-for-expectations'
 import { action } from './actions'
-import { renderView, debugView } from './render'
+import { renderView, debugView, describe, test, expect } from '../dependencies'
 
-export const view = {
+const view = {
   debug: debugView,
   render: renderView,
   query,
   action,
   expect: expectations,
   waitFor: waitForExpectation,
+  ...action
 }
+export { getWaitForOptions, view, describe, test, expect }

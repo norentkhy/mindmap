@@ -1,12 +1,12 @@
-import testNodeCreation from '~mindmap/specifications/node-creation/integration.cypress'
-import testNodeFolding from '~mindmap/specifications/node-folding/integration.cypress'
-import testTabs from '~mindmap/specifications/tabs/integration.cypress'
-import testUndoRedo from '~mindmap/specifications/undo-redo/integration.cypress'
-import testNodePlacement from '~mindmap/specifications/node-placement/integration.cypress'
-import testNodeKeyboardNavigation from '~mindmap/specifications/node-keyboard-navigation/integration.cypress'
-import testNodeDragAndDrop from '~mindmap/specifications/node-drag-and-drop/integration.cypress'
-import testLinks from '~mindmap/specifications/node-links/integration.cypress'
-import testInteractiveActions from '~mindmap/specifications/interactive-actions/integration.cypress'
+import testNodeCreation from 'src/specifications/node-creation/integration.cypress'
+import testNodeFolding from 'src/specifications/node-folding/integration.cypress'
+import testTabs from 'src/specifications/tabs/integration.cypress'
+import testUndoRedo from 'src/specifications/undo-redo/integration.cypress'
+import testNodePlacement from 'src/specifications/node-placement/integration.cypress'
+import testNodeKeyboardNavigation from 'src/specifications/node-keyboard-navigation/integration.cypress'
+import testNodeDragAndDrop from 'src/specifications/node-drag-and-drop/integration.cypress'
+import testLinks from 'src/specifications/node-links/integration.cypress'
+import testInteractiveActions from 'src/specifications/interactive-actions/integration.cypress'
 
 testNodeKeyboardNavigation(describe, beforeEach, it, cy)
 

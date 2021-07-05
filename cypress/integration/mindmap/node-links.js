@@ -1,3 +1,3 @@
-import testNodeLinks from '~mindmap/specifications/node-links/integration.cypress'
+import testNodeLinks from 'src/specifications/node-links/integration.cypress'
 
 testNodeLinks(describe, beforeEach, it, cy)

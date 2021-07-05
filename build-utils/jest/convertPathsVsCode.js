@@ -7,7 +7,7 @@ function convertPathsVsCode(configVsCode) {
     (jestModuleMapper, aliasAndPathExtension) => {
       const [aliasVsCode, [pathExtensionVsCode]] = aliasAndPathExtension
       const alias = aliasVsCode.slice(0, -2)
-      const pathExtension = pathExtensionVsCode.slice(2, -2)
+      const pathExtension = pathExtensionVsCode.slice(0, -2)
 
       if (alias.includes('images')) return jestModuleMapper
       return {
