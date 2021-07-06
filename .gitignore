@@ -4,3 +4,4 @@ mock-files
 *.generated.*
 cypress/videos
 cypress/screenshots
+.parcel-cache
