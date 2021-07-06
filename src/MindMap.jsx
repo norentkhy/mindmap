@@ -1,21 +1,21 @@
-import React from 'react'
-import { MainView, ModelProvider, Tabs, InteractiveActions } from './components'
+import {
+  MainView,
+  ModelProvider,
+  Tabs,
+  InteractiveActions,
+  AppLayout,
+} from './components'
 import useModel from 'src/hooks/useModel'
-import styled from 'styled-components'
+import React from 'react'
 
 export default function MindMap() {
   return (
-    <AppContainer>
-      <Providers>
-        <FlexColumnFullHeight>
-          <StatefulTabs />
-          <FlexRowFullHeight>
-            <StatefulMainView />
-            <StatefulInteractiveActions />
-          </FlexRowFullHeight>
-        </FlexColumnFullHeight>
-      </Providers>
-    </AppContainer>
+    <AppLayout
+      Provider={<ModelProvider />}
+      Tabs={<StatefulTabs />}
+      MainView={<StatefulMainView />}
+      Actions={<StatefulInteractiveActions />}
+    />
   )
 }
 
@@ -52,30 +52,3 @@ function StatefulTabs() {
 
   return <Tabs tabs={tabs} createTab={createTab} />
 }
-
-function Providers({ children }) {
-  return <ModelProvider>{children}</ModelProvider>
-}
-
-const FlexColumnFullHeight = styled.div`
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-`
-
-const FlexRowFullHeight = styled.div`
-  display: flex;
-  flex-direction: row;
-  height: 100%;
-`
-
-const AppContainer = styled.div`
-  height: 100%;
-  width: 100%;
-  font-size: 16px;
-  font-family: Arial;
-
-  & * {
-    box-sizing: border-box;
-  }
-`

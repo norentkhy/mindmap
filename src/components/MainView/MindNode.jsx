@@ -1,78 +1,93 @@
-import NodeInput from './NodeInput'
-import { NodeContainer, EmptyHeightDiv } from '../Styled'
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { MindNodeLayout } from '../Layout'
+import React, { useEffect, useRef, useState } from 'react'
 
 export default function MindNode({ node, parentRef }) {
-  const nodeRef = useRef()
   const { editing, focused, text } = node
 
-  const { positionStyle, size } = useSizeForPosition(nodeRef, node)
+  const [currentText, setCurrentText] = useState(text)
+  const { containerRef, inputRef } = useNodeRefs()
+  useElementFocus(focused, editing, containerRef, inputRef)
 
-  useEffect(() => {
-    if (focused && !editing) nodeRef.current?.focus()
-  }, [focused, editing, nodeRef.current])
+  const handleResize = node.do?.registerSize
+  const useSizeObserver = node.use?.sizeObserver
+  const changeNodeText = node.do?.changeNodeText
 
   return (
-    <NodeContainer
-      aria-label="node"
-      ref={nodeRef}
-      style={positionStyle}
-      data-transparent={editing}
-      {...getInteractionProps(node, parentRef)}
-    >
-      {!editing && <EmptyHeightDiv>{text}</EmptyHeightDiv>}
-      {editing && <NodeInput node={node} size={size} />}
-    </NodeContainer>
+    <MindNodeLayout
+      Content={currentText}
+      editing={editing}
+      centerOffset={node.centerOffset}
+      handleResize={handleResize}
+      containerProps={{
+        ref: containerRef,
+        ...(!editing && {
+          draggable: true,
+          onDragStart: (e) => {
+            e.dataTransfer.effectAllowed = 'move'
+            node.do.handleDragStart(e, parentRef.current)
+          },
+          onClick: () => node.do.select?.(),
+          onDoubleClick: (e) => {
+            e.stopPropagation()
+            node.do.startToEdit()
+          },
+          onKeyUp: ({ key }) => {
+            key === 'Enter' && node.do.startToEdit()
+            key === 'c' && node.do.createChild()
+            key === 'f' && node.do.toggleFold()
+          },
+        }),
+      }}
+      inputProps={{
+        ref: inputRef,
+        value: currentText,
+        onChange: ({ target }) => setCurrentText(target.value),
+        onFocus: ({ target }) => target.select(),
+        onKeyDown: preventDefaultEnter,
+        onKeyUp: mapInputKeyUpHandlers(
+          () => setCurrentText(addEmptySpace),
+          () => changeNodeText(sanitizeText(currentText))
+        ),
+      }}
+      useSizeObserver={useSizeObserver}
+    />
   )
 }
 
-function getInteractionProps(node, parentRef) {
-  if (node.editing) return {}
+function addEmptySpace(string) {
+  return string + '\u200b'
+}
 
-  return {
-    draggable: true,
-    onDragStart: (e) => {
-      e.dataTransfer.effectAllowed = 'move'
-      node.do.handleDragStart(e, parentRef.current)
-    },
-    onClick: () => node.do.select?.(),
-    onDoubleClick: (e) => {
-      e.stopPropagation()
-      node.do.startToEdit()
-    },
-    onKeyUp: ({ key }) => {
-      key === 'Enter' && node.do.startToEdit()
-      key === 'c' && node.do.createChild()
-      key === 'f' && node.do.toggleFold()
-    },
+function preventDefaultEnter(event) {
+  event.stopPropagation()
+  if (!event.shiftKey && event.key === 'Enter') return event.preventDefault()
+}
+
+function mapInputKeyUpHandlers(workAroundNewLine, submitCurrentText) {
+  return handleKeyUp
+
+  function handleKeyUp(event) {
+    event.stopPropagation()
+    if (event.key === 'Enter') {
+      if (event.shiftKey) return workAroundNewLine()
+      return submitCurrentText()
+    }
   }
 }
 
-const assumedEmptyNodeSize = { width: 16, height: 15 }
-
-function useSizeForPosition(ref, node) {
-  const [size, setSize] = useState(assumedEmptyNodeSize)
-  const [positionStyle, setPositionStyle] = useState({})
-
-  useLayoutEffect(() => {
-    const newPositionStyle = computePositionStyle(node.centerOffset, size)
-    setPositionStyle(newPositionStyle)
-  }, [size.width, size.height, node.centerOffset])
-
-  node?.use?.sizeObserver(ref, (e) => {
-    const { width, height } = e.target.getBoundingClientRect()
-    setSize({ width, height })
-    node?.do?.registerSize({ width, height })
-  })
-
-  return { positionStyle, size }
+function sanitizeText(text) {
+  return text.trimRight(2).split('\u200b').join('')
 }
 
-function computePositionStyle(centerOffset, size) {
-  if (!centerOffset || !size.width || !size.height) return {}
-  return {
-    '--position': 'absolute',
-    '--left': `${centerOffset.left - size.width / 2}px`,
-    '--top': `${centerOffset.top - size.height / 2}px`,
-  }
+function useNodeRefs() {
+  const containerRef = useRef()
+  const inputRef = useRef()
+  return { containerRef, inputRef }
+}
+
+function useElementFocus(focused, editing, containerRef, inputRef) {
+  return useEffect(() => {
+    if (focused && !editing) containerRef.current?.focus()
+    if (focused && editing) inputRef.current?.focus()
+  }, [focused, editing, containerRef.current, inputRef.current])
 }
