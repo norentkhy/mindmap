@@ -4,10 +4,8 @@ import {
   describe,
   test,
   expect,
-  addIdTo,
 } from 'src/test-utils'
 import React from 'react'
-import MindNode from '../../components/MainView/MindNode'
 import { MainView } from '../../components/index'
 
 describe('mindboard placement', () => {
@@ -25,10 +23,5 @@ describe('mindboard placement', () => {
         }),
       })
     )
-  })
-
-  test('mindspace has relative position', () => {
-    view.render(<MainView />)
-    view.expect.mindSpace().toHaveStyle({ position: 'relative' })
   })
 })
