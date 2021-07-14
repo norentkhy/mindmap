@@ -9,10 +9,39 @@ const presetConfig = require('./build-utils/webpack/loadPresets')
 const parseJsonFile = require('./build-utils/parseJsonFile')
 const convertPathsVsCode = require('./build-utils/webpack/convertPathsVsCode')
 
-const configVsCode = parseJsonFile('./jsconfig.json')
+const configVsCode = parseJsonFile('./tsconfig.json')
 const pathsVsCode = convertPathsVsCode(configVsCode, (pathWebpack) =>
   path.resolve(__dirname, pathWebpack)
 )
+
+const babelModuleRule = {
+  test: /\.(t|j)sx?$/,
+  exclude: /(node_modules|bower_components)/,
+  loader: 'babel-loader',
+}
+
+const typescriptModuleRule = {
+  test: /\.(t|j)sx?$/,
+  exclude: /(node_modules|bower_components)/,
+  loader: 'ts-loader',
+}
+
+const sourcemapModuleRule = {
+  enforce: 'pre',
+  test: /\.js$/,
+  exclude: /node_modules/,
+  loader: 'source-map-loader',
+}
+
+const imagesModuleRule = {
+  test: /\.(png|svg|jpg|gif)$/,
+  use: ['file-loader'],
+}
+
+const cssModuleRule = {
+  test: /\.css$/,
+  use: ['style-loader', 'css-loader'],
+}
 
 module.exports = ({ mode, presets } = { mode: 'production', presets: [] }) => {
   const config = merge(
@@ -21,29 +50,17 @@ module.exports = ({ mode, presets } = { mode: 'production', presets: [] }) => {
       entry: path.resolve(__dirname, 'src/main.js'),
       module: {
         rules: [
-          {
-            test: /\.(js|jsx)$/,
-            exclude: /(node_modules|bower_components)/,
-            loader: 'babel-loader',
-            options: {
-              presets: [['@babel/preset-env', { modules: false }]],
-            },
-          },
-          {
-            test: /\.(png|svg|jpg|gif)$/,
-            use: ['file-loader'],
-          },
-          {
-            test: /\.css$/,
-            use: ['style-loader', 'css-loader'],
-          },
+          babelModuleRule,
+          typescriptModuleRule,
+          sourcemapModuleRule,
+          imagesModuleRule,
+          cssModuleRule,
         ],
       },
+      devtool: 'source-map',
       resolve: {
-        extensions: ['*', '.js', '.jsx'],
-        alias: {
-          ...pathsVsCode,
-        },
+        extensions: ['*', '.js', '.jsx', '.ts', '.tsx'],
+        alias: { ...pathsVsCode },
       },
       output: {
         filename: 'bundle.js',

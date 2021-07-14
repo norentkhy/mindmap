@@ -2,7 +2,7 @@ const path = require('path')
 const parseJsonFile = require('../build-utils/parseJsonFile')
 const convertPathsVsCode = require('../build-utils/storybook/convertPathsVsCode')
 
-const configVsCode = parseJsonFile('./jsconfig.json')
+const configVsCode = parseJsonFile('./tsconfig.json')
 const pathsVsCode = convertPathsVsCode(configVsCode, (pathWebpack) =>
   path.resolve(__dirname, pathWebpack)
 )
