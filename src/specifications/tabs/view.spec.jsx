@@ -43,10 +43,11 @@ describe('tabs: view', () => {
     const tab = addIdTo({
       name: 'editing this',
       renaming: false,
-      do: { editName: createMockFn() },
+      do: { editName: createMockFn(), select: createMockFn() },
     })
     view.render(<Tabs tabs={[tab]} />)
     view.doubleClickOn.tab(tab)
+    expect(tab.do.select).toBeCalledTimes(2)
     expect(tab.do.editName).toBeCalledTimes(1)
   })
 

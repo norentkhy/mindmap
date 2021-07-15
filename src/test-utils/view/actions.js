@@ -1,14 +1,5 @@
 import { definedElementQueries } from './queries'
-import {
-  clickElement,
-  doubleClickElement,
-  withKeyboard,
-  typeWithKeyboard,
-  pressKey,
-  pressKeyDown,
-  pressKeyUp,
-  dragElement,
-} from '../dependency-wrappers'
+import { withKeyboard, withMouse } from '../dependency-wrappers'
 import { mapObject } from 'src/utils/FunctionalProgramming'
 
 function actionOnDefinedElementQueries(doAction) {
@@ -22,21 +13,18 @@ function actionOnDefinedElementQueries(doAction) {
 
 const defined = mapObject(
   {
-    clickElement,
-    doubleClickElement,
-    dragElementStart: (Element) => dragElement('dragstart', Element),
-    dragElementEnd: (Element) => dragElement('dragend', Element),
-    dropElement: (Element) => dragElement('drop', Element),
+    clickElement: (Element) => withMouse('click', Element),
+    doubleClickElement: (Element) => withMouse('doubleClick', Element),
+    dragElementStart: (Element) => withMouse('dragStart', Element),
+    dragElementEnd: (Element) => withMouse('dragEnd', Element),
+    dropElement: (Element) => withMouse('drop', Element),
   },
   (doAction) => actionOnDefinedElementQueries(doAction)
 )
 
 export const action = {
   withKeyboard,
-  typeWithKeyboard,
-  pressKey,
-  pressKeyDown,
-  pressKeyUp,
+  withMouse,
   clickOn: { ...defined.clickElement },
   doubleClickOn: { ...defined.doubleClickElement },
   dragStart: { ...defined.dragElementStart },

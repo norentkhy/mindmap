@@ -15,7 +15,8 @@ const debugView = screen.debug
 const renderView = render
 const createMockFn = jest.fn
 
-export {default as withKeyboard} from './keyboard'
+export { default as withKeyboard } from './keyboard'
+export { default as withMouse } from './mouse'
 
 export {
   describe,
@@ -39,7 +40,6 @@ export {
   addIdTo,
   expectEqualExcludingFunctions,
 }
-
 
 function dragElement(type: dragEventType, Element: HTMLElement) {
   const dragEvent = createDragEvent(type)
