@@ -57,8 +57,8 @@ describe('tabs: view', () => {
       do: { rename: createMockFn() },
     })
     view.render(<Tabs tabs={[tab]} />)
-    view.typeWithKeyboard('new name')
-    view.pressKey('enter')
+    view.withKeyboard('type', 'new name')
+    view.withKeyboard('press', 'enter')
     expect(tab.do.rename).nthCalledWith(1, 'new name')
   })
 })

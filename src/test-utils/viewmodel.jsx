@@ -8,7 +8,7 @@ export {
   expect,
   createMockFn,
   expectEqualExcludingFunctions,
-} from './dependencies'
+} from './dependency-wrappers'
 
 export function expectAnId() {
   return expect.any(String)

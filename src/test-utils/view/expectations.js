@@ -1,5 +1,5 @@
 import { query, definedElementQueries } from './queries'
-import { expect, getInputSelection } from '../dependencies'
+import { expect, getInputSelection } from '../dependency-wrappers'
 import { mapObject } from 'src/utils/FunctionalProgramming'
 import 'jest-styled-components'
 const queryAllUntitledTabs = query.allUntitledTabs

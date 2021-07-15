@@ -2,7 +2,7 @@ import { query } from './queries'
 import { expectations } from './expectations'
 import { waitForExpectation, getWaitForOptions } from './wait-for-expectations'
 import { action } from './actions'
-import { renderView, debugView, describe, test, expect } from '../dependencies'
+import { renderView, debugView, describe, test, expect } from '../dependency-wrappers'
 
 const view = {
   debug: debugView,

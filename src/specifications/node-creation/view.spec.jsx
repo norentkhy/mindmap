@@ -62,8 +62,8 @@ describe('new state structure', () => {
       do: { changeNodeText: createMockFn() },
     })
     view.render(<MainView nodes={[nodeInEdit]} />)
-    view.typeWithKeyboard('new text')
-    view.pressKey('enter')
+    view.withKeyboard('type', 'new text')
+    view.withKeyboard('press', 'enter')
     expect(nodeInEdit.do.changeNodeText).nthCalledWith(1, 'new text')
   })
 
@@ -75,12 +75,12 @@ describe('new state structure', () => {
       do: { changeNodeText: createMockFn() },
     })
     view.render(<MainView nodes={[nodeInEdit]} />)
-    view.typeWithKeyboard('line 1')
-    view.pressKey('enter', { shift: true })
+    view.withKeyboard('type', 'line 1')
+    view.withKeyboard('press', ['shift', 'enter'])
     expect(nodeInEdit.do.changeNodeText).toBeCalledTimes(0)
-    
-    view.typeWithKeyboard('line 2')
-    view.pressKey('enter')
+
+    view.withKeyboard('type', 'line 2')
+    view.withKeyboard('press', 'enter')
     expect(nodeInEdit.do.changeNodeText).nthCalledWith(1, 'line 1\nline 2')
   })
 })

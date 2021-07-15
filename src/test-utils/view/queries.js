@@ -4,7 +4,7 @@ import {
   getFocus,
   queryAllElementsByRole,
   queryAllElementsByLabelText,
-} from '../dependencies'
+} from '../dependency-wrappers'
 
 const label = {
   mindSpace: 'main view',

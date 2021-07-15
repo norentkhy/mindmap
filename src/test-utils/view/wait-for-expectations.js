@@ -1,5 +1,5 @@
 import { definedElementExpects } from './expectations'
-import { waitFor } from '../dependencies'
+import { waitFor } from '../dependency-wrappers'
 import { mapObject } from 'src/utils/FunctionalProgramming'
 
 const waitForDefinedElement = mapObject(

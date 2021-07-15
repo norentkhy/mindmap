@@ -24,7 +24,7 @@ describe('node folding: view', () => {
     })
     view.render(<MainView nodes={[foldTarget]} />)
     view.clickOn.node(foldTarget)
-    view.pressKey('f')
+    view.withKeyboard('press', 'f')
 
     expect(foldTarget.do.toggleFold).toBeCalledTimes(1)
   })

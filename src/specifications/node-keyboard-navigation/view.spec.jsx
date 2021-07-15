@@ -19,7 +19,7 @@ describe('mindboard placement', () => {
       view.render(<MainView nodes={[node]} navigate={navigate} />)
       view.expect.node(node).toHaveFocus()
 
-      view.pressKeyDown(direction)
+      view.withKeyboard('keyDown', direction)
       expect(navigate).nthCalledWith(1, direction)
     }
   )
@@ -30,8 +30,8 @@ describe('mindboard placement', () => {
     view.render(<MainView nodes={[node]} navigate={navigate} />)
     view.expect.node(node).toHaveFocus()
 
-    repeat(5, () => view.pressKeyDown('left'))
-    view.pressKeyUp('left')
+    repeat(5, () => view.withKeyboard('keyDown', 'left'))
+    view.withKeyboard('keyUp', 'left')
     expect(navigate).nthCalledWith(5, 'left')
   })
 })
