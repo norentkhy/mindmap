@@ -1,4 +1,3 @@
-import { getInputSelection } from '../dom'
 import { describe, test, expect, jest } from '@jest/globals'
 import '@testing-library/jest-dom'
 import { render, screen, waitFor } from '@testing-library/react'
@@ -14,6 +13,7 @@ const createMockFn = jest.fn
 export { default as withKeyboard } from './keyboard'
 export { default as withMouse } from './mouse'
 export { addIdTo } from './id'
+export { getInputSelection, getFocused } from '../dom'
 
 export {
   describe,
@@ -23,18 +23,12 @@ export {
   queryElementByText,
   queryAllElementsByRole,
   queryAllElementsByLabelText,
-  getFocus,
-  getInputSelection,
   expect,
   waitFor,
   render,
   renderView,
   debugView,
   expectEqualExcludingFunctions,
-}
-
-function getFocus() {
-  return document.activeElement || document.body
 }
 
 function expectEqualExcludingFunctions(a: object, b: object) {

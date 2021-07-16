@@ -1,7 +1,7 @@
 import {
   queryElementByLabelText,
   queryElementByText,
-  getFocus,
+  getFocused,
   queryAllElementsByRole,
   queryAllElementsByLabelText,
 } from '../dependency-wrappers'
@@ -31,7 +31,7 @@ const text = {
 export const definedElementQueries = {
   label: queryElementByLabelText,
   text: queryElementByText,
-  focus: getFocus,
+  focus: getFocused,
   tab: queryTab,
   tabInput: queryTabInput,
   untitledTab: queryUntitledTab,

@@ -1,3 +1,4 @@
+import { getFocused } from '../dom'
 import { fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
@@ -88,8 +89,4 @@ const keyboardDict = {
   right: '{arrowright}',
   up: '{arrowup}',
   down: '{arrowdown}',
-}
-
-function getFocused() {
-  return document.activeElement || document.body
 }
