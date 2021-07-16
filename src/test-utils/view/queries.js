@@ -1,10 +1,4 @@
-import {
-  queryElementByLabelText,
-  queryElementByText,
-  getFocused,
-  queryAllElementsByRole,
-  queryAllElementsByLabelText,
-} from '../dependency-wrappers'
+import { queryElement, queryElements } from '../dependency-wrappers'
 
 const label = {
   mindSpace: 'main view',
@@ -29,25 +23,25 @@ const text = {
 }
 
 export const definedElementQueries = {
-  label: queryElementByLabelText,
-  text: queryElementByText,
-  focus: getFocused,
+  label: (...args) => queryElement('label', ...args),
+  text: (...args) => queryElement('text', ...args),
+  focus: () => queryElement('focused'),
   tab: queryTab,
-  tabInput: queryTabInput,
+  tabInput: () => queryElement('label', label.tabs.tabInput),
   untitledTab: queryUntitledTab,
-  nodeInput: queryNodeInput,
+  nodeInput: () => queryElement('label', label.nodeInput),
   node: queryNode,
   childLink: queryChildLink,
   linkAnchor: queryLinkAnchor,
   rootTree: queryRootTree,
-  mindSpace: () => queryElementByLabelText(label.mindSpace),
-  linkSpace: () => queryElementByLabelText(label.linkSpace),
-  nodeSpace: () => queryElementByLabelText(label.nodeSpace),
+  mindSpace: () => queryElement('label', label.mindSpace),
+  linkSpace: () => queryElement('label', label.linkSpace),
+  nodeSpace: () => queryElement('label', label.nodeSpace),
   createRootNodeButton: () =>
-    queryElementByLabelText(label.button.createRootNode),
-  createTabButton: () => queryElementByLabelText(label.button.createTab),
-  undoButton: () => queryElementByLabelText(label.button.undo),
-  redoButton: () => queryElementByLabelText(label.button.redo),
+    queryElement('label', label.button.createRootNode),
+  createTabButton: () => queryElement('label', label.button.createTab),
+  undoButton: () => queryElement('label', label.button.undo),
+  redoButton: () => queryElement('label', label.button.redo),
 }
 
 export const query = {
@@ -59,16 +53,12 @@ export const query = {
 }
 
 function queryNode({ text }) {
-  const nodes = queryAllElementsByLabelText(label.node)
-  return nodes.find(node => node.textContent === text)
+  const nodes = queryElements('label', label.node)
+  return nodes.find((node) => node.textContent === text)
 }
 
 function queryAllNodes() {
-  return queryAllElementsByRole('button')
-}
-
-function queryNodeInput() {
-  return queryElementByLabelText(label.nodeInput)
+  return queryElements('role', 'button')
 }
 
 function queryRelevantResizeElements() {
@@ -95,7 +85,7 @@ function queryAllElements() {
 }
 
 function queryMindSpace() {
-  return queryElementByLabelText(label.mindSpace)
+  return queryElement('label', label.mindSpace)
 }
 
 function isMindSpace(Element) {
@@ -136,18 +126,18 @@ function queryAllUntitledTabs() {
 }
 
 function queryAllTabs({ id, name }) {
-  const Tabs = Array.from(queryElementByLabelText('tabs').children)
+  const Tabs = Array.from(queryElement('label', 'tabs').children)
   if (id) return Tabs.filter((Tab) => Tab.getAttribute('data-id') === id)
   return Tabs.filter((Tab) => Tab.textContent === name)
 }
 
 function queryTabInput() {
-  return queryElementByLabelText(label.tabs.tabInput)
+  return queryElement('label', label.tabs.tabInput)
 }
 
 function queryTab({ index, id, name, numberOfFirstMatchesToSkip = 0 }) {
   if (index || index === 0) {
-    const TabsContainer = queryElementByLabelText('tabs')
+    const TabsContainer = queryElement('label', 'tabs')
     return TabsContainer.children[index]
   }
   const MatchedTabs = queryAllTabs({ id, name })
@@ -156,12 +146,14 @@ function queryTab({ index, id, name, numberOfFirstMatchesToSkip = 0 }) {
 }
 
 function queryChildLink() {
-  const childLinks = queryAllElementsByLabelText(label.childLink)
+  const childLinks = queryElements('label', label.childLink)
   if (!childLinks.length) return null
   if (childLinks.length === 1) return childLinks[0]
 }
 
 function queryLinkAnchor(anchorId) {
-  const linkAnchors = queryAllElementsByLabelText(label.linkAnchor)
-  return linkAnchors.find(anchor => anchor.getAttribute('data-id') === anchorId)
+  const linkAnchors = queryElements('label', label.linkAnchor)
+  return linkAnchors.find(
+    (anchor) => anchor.getAttribute('data-id') === anchorId
+  )
 }
