@@ -1,22 +1,5 @@
+import label from 'src/specifications/element-labels'
 import { queryElement, queryElements } from '../dependency-wrappers'
-
-const label = {
-  mindSpace: 'main view',
-  linkSpace: 'link space',
-  nodeSpace: 'node space',
-  rootTree: 'container of rootnode',
-  node: 'node',
-  nodeInput: 'editing node',
-  childLink: 'child of parent',
-  linkAnchor: 'anchor point of link',
-  tabs: { tabInput: 'renaming this tab' },
-  button: {
-    createRootNode: 'create root node',
-    createTab: 'add new tab',
-    undo: 'undo action',
-    redo: 'redo action',
-  },
-}
 
 const text = {
   tabs: { untitled: 'untitled' },
