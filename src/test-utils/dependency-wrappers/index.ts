@@ -1,14 +1,10 @@
 import { getInputSelection } from '../dom'
-import { v4 as uuidv4 } from 'uuid'
 import { describe, test, expect, jest } from '@jest/globals'
 import '@testing-library/jest-dom'
-import { render, fireEvent, screen, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import { render, screen, waitFor } from '@testing-library/react'
 
 const queryElementByLabelText = screen.queryByLabelText
 const queryElementByText = screen.queryByText
-const clickElement = userEvent.click
-const doubleClickElement = fireEvent.doubleClick
 const queryAllElementsByRole = screen.queryAllByRole
 const queryAllElementsByLabelText = screen.queryAllByLabelText
 const debugView = screen.debug
@@ -17,6 +13,7 @@ const createMockFn = jest.fn
 
 export { default as withKeyboard } from './keyboard'
 export { default as withMouse } from './mouse'
+export { addIdTo } from './id'
 
 export {
   describe,
@@ -33,36 +30,11 @@ export {
   render,
   renderView,
   debugView,
-  clickElement,
-  doubleClickElement,
-  dragElement,
-  generateUUID,
-  addIdTo,
   expectEqualExcludingFunctions,
-}
-
-function dragElement(type: dragEventType, Element: HTMLElement) {
-  const dragEvent = createDragEvent(type)
-  return fireEvent(Element, dragEvent)
-}
-
-function createDragEvent(type: dragEventType) {
-  const dragEvent = new MouseEvent(type, { bubbles: true, cancelable: true })
-  // @ts-expect-error: workaround due to non-existence of DragEvent in js-dom
-  dragEvent.dataTransfer = { effectAllowed: null }
-  return dragEvent
 }
 
 function getFocus() {
   return document.activeElement || document.body
-}
-
-function generateUUID() {
-  return uuidv4()
-}
-
-function addIdTo(object: object) {
-  return { id: generateUUID(), ...object }
 }
 
 function expectEqualExcludingFunctions(a: object, b: object) {
@@ -80,5 +52,3 @@ function excludeDeepFunctions(obj: object) {
   })
   return newObj
 }
-
-type dragEventType = 'dragstart' | 'dragend' | 'drop'
